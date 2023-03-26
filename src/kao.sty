@@ -1073,20 +1073,21 @@
 %	ENCODING AND FONTS
 %----------------------------------------------------------------------------------------
 
+% TODO: Determine whether the fonts are OK and whether their combination is appropriate <26-03-23> 
 \newcommand{\kao@fontmethodModern}{%
 	\RequirePackage{amssymb} % Must be loaded before unicode-math
 	\RequirePackage[force]{filehook} % Fixes an error
 	\RequirePackage{unicode-math} % Math fonts in xetexorluatex
-	\setromanfont[ % Libertinus Serif font
+	\setromanfont[ % Computer Modern Serif
 		Scale=1.04
-	]{Libertinus Serif}
+	]{CMU Serif}
 	\setsansfont[ % Libertinus Sans font
 		Scale=1
-	]{Libertinus Sans}
+	]{CMU Sans Serif}
 	\setmonofont[ % Libertinus Mono font
 		Scale=.89
-	]{Liberation Mono}
-	\setmathfont{Libertinus Math} % Libertinus Math font
+	]{Fira Code}
+	\setmathfont{CMU Serif Roman} % Libertinus Math font
 	\ifluatex
 	\else
 		\RequirePackage{morewrites} % Fix some errors related to floats (not necessary with LuaLaTeX
