@@ -1079,7 +1079,8 @@
 	\RequirePackage[force]{filehook} % Fixes an error
 	\RequirePackage{unicode-math} % Math fonts in xetexorluatex
 	\setromanfont[% Libertinus Serif font
-	]{CMU Serif}
+		Path = fonts/,
+	]{CMUSerif}
 
 	% TODO: Ask on stack overflow, what is the problem. It is not in the Sans font being larger. There must be some
 	% spacing added or some mysterious newline?! <07-11-23, kunzaatko> 
@@ -1087,11 +1088,15 @@
 	% - Consider if it is necessary to have a sans font
 	% - if sans font is necessary, compare some fonts that are different that CMU
 	\setsansfont[ % Libertinus Sans font
-	]{CMU Serif}
+		Path = fonts/,
+	]{CMUSerif}
 	\setmonofont[ % Libertinus Mono font
+		Path = fonts/,
 		Scale=.89
-	]{Fira Code}
-	\setmathfont{CMU Serif Roman} % Libertinus Math font
+	]{FiraCode}
+	\setmathfont[
+		Path = fonts/,
+	]{CMUSerif} % Libertinus Math font
 	\ifluatex
 	\else
 		\RequirePackage{morewrites} % Fix some errors related to floats (not necessary with LuaLaTeX
