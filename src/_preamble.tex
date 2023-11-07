@@ -1,9 +1,11 @@
 % Load the kaobook class
 \documentclass[
-	fontsize=10pt, % Base font size
-	twoside=false, % Use different layouts for even and odd pages (in particular, if twoside=true, the margin column will be always on the outside)
-	%open=any, % If twoside=true, uncomment this to force new chapters to start on any page, not only on right (odd) pages
+	fontsize=10pt,
+	twoside=true,
+	open=any, % uncomment this to force new chapters to start on any page, not only on right (odd) pages
+    chapterentrydots=true, % dots in the TOC
 	secnumdepth=1, % How deep to number headings. Defaults to 1 (sections)
+    fontmethod=modern,
 ]{kaobook}
 
 % Choose the language
@@ -15,10 +17,9 @@
 %\usepackage{showlabels} % Uncomment to output the content of \label commands to the document where they are used
 
 % Load the bibliography package
-\usepackage{kaobiblio}
+\usepackage[addspace=true, linkeverything=true]{kaobiblio}
 
-% TODO: Add bibliography <26-03-23> 
-% \addbibresource{minimal.bib} % Bibliography file
+\addbibresource{bibliography.bib}
 
 % Load mathematical packages for theorems and related environments
 \usepackage{kaotheorems}
@@ -29,5 +30,23 @@
 \graphicspath{{figs/}{./}} % Paths where images are looked for
 
 \makeindex[columns=3, title=Alphabetical Index, intoc] % Make LaTeX produce the files required to compile the index
+
+\usepackage{acro}
+
+% TODO: Should this be formatted in some specific way? (emphasised etc.) <13-04-23> 
+\DeclareAcronym{SIM}{
+    short=SI-M,
+    long=structured illumination microscopy
+}
+\DeclareAcronym{TIRFM}{
+    short=TIR-FM,
+    long=total internal reflection fluorescence microscopy,
+}
+\DeclareAcronym{TIR}{
+    short=TIR,
+    long=total internal reflection,
+}
+
+\setcounter{chapter}{-1}
 
 \begin{document}

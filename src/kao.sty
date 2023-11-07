@@ -1078,12 +1078,16 @@
 	\RequirePackage{amssymb} % Must be loaded before unicode-math
 	\RequirePackage[force]{filehook} % Fixes an error
 	\RequirePackage{unicode-math} % Math fonts in xetexorluatex
-	\setromanfont[ % Computer Modern Serif
-		Scale=1.04
+	\setromanfont[% Libertinus Serif font
 	]{CMU Serif}
+
+	% TODO: Ask on stack overflow, what is the problem. It is not in the Sans font being larger. There must be some
+	% spacing added or some mysterious newline?! <07-11-23, kunzaatko> 
+	% FIX: This is not a Sans font... If changed to sans, this makes \emph text too  high <07-11-23> 
+	% - Consider if it is necessary to have a sans font
+	% - if sans font is necessary, compare some fonts that are different that CMU
 	\setsansfont[ % Libertinus Sans font
-		Scale=1
-	]{CMU Sans Serif}
+	]{CMU Serif}
 	\setmonofont[ % Libertinus Mono font
 		Scale=.89
 	]{Fira Code}

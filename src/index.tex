@@ -2,45 +2,15 @@
 %	BOOK INFORMATION
 %----------------------------------------------------------------------------------------
 
-\titlehead{Document Template}
-\title[Template for the {\normalfont\texttt{kaobook}} Class]{Template for the {\normalfont\texttt{kaobook}} Class}
-\author[JBG]{Johnny B. Goode}
+\title[Super-Resolution Imaging]{Analysis of Cell Images \\ Acquired by Super-Resolution
+Microscopy}
+\author[MK]{Martin Kunz}
+% \subtitle{Customise this page according to your needs} % TODO: Decide after the thesis is written <07-11-23> 
 \date{\today}
-\publishers{An Awesome Publisher}
 
 %----------------------------------------------------------------------------------------
 
 \frontmatter % Denotes the start of the pre-document content, uses roman numerals
-
-%----------------------------------------------------------------------------------------
-%	COPYRIGHT PAGE
-%----------------------------------------------------------------------------------------
-
-\makeatletter
-\uppertitleback{\@titlehead} % Header
-
-\lowertitleback{
-	\textbf{Disclaimer} \\
-	You can edit this page to suit your needs. For instance, here we have a no copyright statement, a colophon and some other information. This page is based on the corresponding page of Ken Arroyo Ohori's thesis, with minimal changes.
-	
-	\medskip
-	
-	\textbf{No copyright} \\
-	\cczero\ This book is released into the public domain using the CC0 code. To the extent possible under law, I waive all copyright and related or neighbouring rights to this work.
-	
-	To view a copy of the CC0 code, visit: \\\url{http://creativecommons.org/publicdomain/zero/1.0/}
-	
-	\medskip
-	
-	\textbf{Colophon} \\
-	This document was typeset with the help of \href{https://sourceforge.net/projects/koma-script/}{\KOMAScript} and \href{https://www.latex-project.org/}{\LaTeX} using the \href{https://github.com/fmarotta/kaobook/}{kaobook} class.
-	
-	\medskip
-	
-	\textbf{Publisher} \\
-	First printed in May 2019 by \@publishers
-}
-\makeatother
 
 %----------------------------------------------------------------------------------------
 %	DEDICATION
@@ -49,7 +19,7 @@
 % \dedication{
 % 	The harmony of the world is made manifest in Form and Number, and the heart and soul and all the poetry of Natural Philosophy are embodied in the concept of mathematical beauty.\\
 % 	\flushright -- D'Arcy Wentworth Thompson
-% }
+% } % TODO: ? <05-05-23> 
 
 %----------------------------------------------------------------------------------------
 %	OUTPUT TITLE PAGE AND PREVIOUS
@@ -62,8 +32,9 @@
 %	PREFACE
 %----------------------------------------------------------------------------------------
 
-\chapter*{Preface}
+% \chapter*{Preface} % TODO: Decide when the thesis is written <05-05-23> 
 
+% TODO: Make abstract after the thesis is written <05-05-23> 
 
 %----------------------------------------------------------------------------------------
 %	TABLE OF CONTENTS & LIST OF FIGURES/TABLES
@@ -82,13 +53,13 @@
 
 \tableofcontents % Output the table of contents
 
-\listoffigures % Output the list of figures
+% \listoffigures % Output the list of figures % TODO: Decide when the thesis is written <07-11-23> 
 
 % Comment both of the following lines to have the LOF and the LOT on different pages
-\let\cleardoublepage\bigskip
-\let\clearpage\bigskip
+% \let\cleardoublepage\bigskip
+% \let\clearpage\bigskip
 
-\listoftables % Output the list of tables
+% \listoftables % Output the list of tables % TODO: Decide when the thesis is written <07-11-23> 
 
 \endgroup
 
@@ -99,25 +70,10 @@
 \mainmatter % Denotes the start of the main document content, resets page numbering and uses arabic numbers
 \setchapterstyle{kao} % Choose the default chapter heading style
 
-\chapter{Introduction}
-Advancement in precise and accurate observation techniques was always at the forefront of scientific endeavours.
-Their glamour springs from the potential of breakthroughs that they bring to natural sciences and there general
-    revelational capability.
-We can effortlessly follow the complementary bond between discoveries of new phenomena in natural sciences and the
-    development of novel observation approaches throughout the history of science.
-% TODO: margin note of the past most known discoveries after observational novelties <26-03-23> 
-The prominence and crucial position of sensing development within scientific disciplines has not withered over time.
-% TODO: margin note on Nobel prizes in the past decade for sensing techniques <26-03-23, kunzaatko> 
-Game changing breakthroughs, however appealing, are not a matter of daily occurrence in science and with this in mind
-    scientists are expending serious effort in the improvement of techniques that are the current state of art in the
-    field.
+\input{chapters/01_introduction.tex}
 
-% TODO: Figure with a timeline of significant technology of sensing discoveries. <26-03-23, kunzaatko> 
-
-Although gradual development is not as electrifying and showcase-worthy as are leaps of novelty, we can trace a large
-    amount elevation in knowledge that capitalises on this slow pace of progress.
-% TODO: margin note about the advancement in sensing gravitational waves <26-03-23, kunzaatko> 
-
+% \addpart{Theory} % TODO: Decide if parts are applicable <07-11-23> 
+\input{chapters/02_EM_waves.tex}
 
 \pagelayout{wide} % No margins
 \addpart{Title of the Part}
