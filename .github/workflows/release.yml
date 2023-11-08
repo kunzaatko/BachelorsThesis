@@ -4,7 +4,7 @@ name: "Create Tagged Release with PDF"
 on:
   push:
     tags:
-      - "*"
+      - '**'
 jobs:
   build:
     runs-on: ubuntu-latest
