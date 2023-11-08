@@ -1,10 +1,10 @@
 ---
-name: 'Build LaTeX Document with Biber'
+name: "Create Tagged Release with PDF"
+
 on:
   push:
-    branches:
-      - trunk
-
+    tags:
+      - "*"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,8 +25,9 @@ jobs:
           biber-version: '2.17'
       - name: Build document
         run: tectonic -X build
-      - name: Upload pdf
-        uses: actions/upload-artifact@v3
+      - uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          name: BT_document_MartinKunz
-          path: build/BT_MartinKunz/BT_MartinKunz.pdf
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          files: |
+            build/BT_MartinKunz/BT_MartinKunz.pdf
