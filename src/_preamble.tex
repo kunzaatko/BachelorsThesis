@@ -31,22 +31,8 @@
 
 \makeindex[columns=3, title=Alphabetical Index, intoc] % Make LaTeX produce the files required to compile the index
 
-\usepackage{acro}
-% TODO: Should this be formatted in some specific way? (emphasised etc.) <13-04-23> 
-\DeclareAcronym{SIM}{
-    short=SI-M,
-    long=structured illumination microscopy
-}
-\DeclareAcronym{TIRFM}{
-    short=TIR-FM,
-    long=total internal reflection fluorescence microscopy,
-}
-\DeclareAcronym{TIR}{
-    short=TIR,
-    long=total internal reflection,
-}
-
-\newcommand{\nameemph}[1]{\emph{#1}}
+\include{_acronyms.tex}
+\include{_commands.tex}
 
 \setcounter{chapter}{-1}
 
