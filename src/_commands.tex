@@ -1,1 +1,12 @@
 \newcommand{\nameemph}[1]{\emph{#1}}
+\newcommand{\png}[1]{\includegraphics{#1_full.png}}
+\newcommand{\marginpng}[1]{\includegraphics{#1_margin.png}}
+
+\newcommand{\pdftex}[1]{
+    \def\svgwidth{\textwidth}
+    \import{figures}{#1_full.pdf_tex}
+}
+\newcommand{\marginpdftex}[1]{
+    \def\svgwidth{\textwidth}
+    \import{figures}{#1_margin.pdf_tex}
+}
