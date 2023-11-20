@@ -1,3 +1,4 @@
+const SKIP_PREPARE_IMAGES = true
 include("init.jl")
 using StatsBase
 FIG_NAME = getbase(@__FILE__)
@@ -31,4 +32,4 @@ ylims!(ax, 0, 3.3)
 hidedecorations!(ax; ticks=false, label=false, ticklabels=false)
 ga[1, 1] = Legend(fig, ax, framevisible=false, tellwidth=false, nbanks=4, patchsize=(10, 10)) # TODO: Set in theme <20-11-23>
 
-savefig(fig, FIG_NAME; hwratio=0.8)
+savefig(fig, FIG_NAME; hwratio=0.8, skip=[:raster, :full, :pdf, :eps], override_theme=OVERRIDE_THEMES[:latex_format_ticklabels])

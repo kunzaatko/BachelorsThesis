@@ -32,4 +32,4 @@ hidespines!(ax)
 hidedecorations!(ax; ticks=false, ticklabels=false)
 ax.yreversed = true
 
-savefig(fig, FIG_NAME; hwratio=1)
+savefig(fig, FIG_NAME; hwratio=1, skip=[:vector])

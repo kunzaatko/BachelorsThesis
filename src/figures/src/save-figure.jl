@@ -1,12 +1,9 @@
-using CairoMakie
-using Unitful
+using CairoMakie, GLMakie
 const FIGURE_DIR = joinpath(abspath(dirname(@__FILE__)), "..")
+vectorgraphic(x) = x ∈ [:svg, :eps, :pdf, :pdf_tex] ? true : false
 
 # TODO: Should include the resolution of the save of the figure with either margin figure size (MARGIN_SIZE), or full
 # resolution size (FULL_SIZE) instead of the preset `dpi` <16-11-23> 
-
-const MARGIN_SIZE = 47.7u"mm" |> u"inch" |> ustrip
-const FULL_SIZE = 107u"mm" |> u"inch" |> ustrip
 
 """
     savefig(fig, name, project_dir)
@@ -22,31 +19,93 @@ Save a figure in SVG, EPS and PDF formats.
 
 This function saves a figure object in both SVG and PDF formats. The SVG file is saved in the parent directory with the given name and the extension ".svg". The PDF file is saved in the same directory with the given name and the extension ".pdf". The Inkscape command is used to convert the SVG file to PDF format with text in LaTeX using PDF_TEX.
 """
-function savefig(fig, name, dir=FIGURE_DIR; margin_size=MARGIN_SIZE, full_size=FULL_SIZE, hwratio=HWRATIO, wait=true, backend=CairoMakie, varargs...)
-    @info "Building figure $name"
-    backend.activate!()
-    # if backend == CairoMakie
-    svg_path_margin = joinpath(dir, name * "_margin" * ".svg")
-    svg_path_full = joinpath(dir, name * "_full" * ".svg")
-    Makie.save(svg_path_margin, fig; pt_per_unit=1, resolution=figsize(margin_size, hwratio), varargs...)
-    Makie.save(svg_path_full, fig; pt_per_unit=1, resolution=figsize(full_size, hwratio), varargs...)
+function savefig(fig, name::AbstractString, dir::AbstractString=FIGURE_DIR;
+    hwratio=HWRATIO,
+    backend=CairoMakie,
+    override_theme=Theme(),
+    base_theme=BASE_THEME,
+    margin_theme=MARGIN_THEME,
+    full_theme=FULL_THEME,
+    vector_theme=VECTOR_THEME,
+    raster_theme=RASTER_THEME,
+    gl_theme=GL_THEME,
+    cairo_theme=CAIRO_THEME,
+    skip=[:pdf, :eps], # :svg, :pdf, :pdf_tex, :eps, :png, :raster, :vector, :margin, :full
+    varargs...)
 
-    eps_path_margin = joinpath(dir, name * "_margin" * ".eps")
-    eps_path_full = joinpath(dir, name * "_full" * ".eps")
-    Makie.save(eps_path_margin, fig; pt_per_unit=1, resolution=figsize(margin_size, hwratio), varargs...)
-    Makie.save(eps_path_full, fig; pt_per_unit=1, resolution=figsize(full_size, hwratio), varargs...)
+    # skip
+    deny = []
+    for s in skip
+        if s == :raster
+            append!(deny, [:png])
+            continue
+        elseif s == :vector
+            append!(deny, [:eps, :pdf, :pdf_tex, :svg])
+        else
+            push!(deny, s)
+        end
+    end
+    sort!(deny)
+    unique!(deny)
 
-    pdf_path_margin = joinpath(dir, name * "_margin" * ".pdf")
-    pdf_path_full = joinpath(dir, name * "_full" * ".pdf")
-    # inkscape_cmd_margin = Cmd(["inkscape", svg_path_margin, "--export-area-page", "--export-dpi", string(dpi), "--export-type=pdf", "--export-latex", "--export-filename", pdf_path_margin])
-    inkscape_cmd_margin = Cmd(["inkscape", svg_path_margin, "--export-type=pdf", "--export-latex", "--export-filename", pdf_path_margin])
-    # inkscape_cmd_full = Cmd(["inkscape", svg_path_full, "--export-area-page", "--export-dpi", string(dpi), "--export-type=pdf", "--export-latex", "--export-filename", pdf_path_full])
-    inkscape_cmd_full = Cmd(["inkscape", "-D", "-z", svg_path_full, "--export-type=pdf", "--export-latex", "--export-filename", pdf_path_full])
-    run(inkscape_cmd_margin; wait)
-    run(inkscape_cmd_full; wait)
+    # matrix 
+    avail_formats = backend == CairoMakie ? [:svg, :pdf, :eps, :pdf_tex, :png] : [:png]
+    avail_modes = [:margin, :full]
 
-    png_path_margin = joinpath(dir, name * "_margin" * ".png")
-    png_path_full = joinpath(dir, name * "_full" * ".png")
-    Makie.save(png_path_margin, fig; pt_per_unit=1, px_per_unit=20, resolution=figsize(margin_size, hwratio), varargs...)
-    Makie.save(png_path_full, fig; pt_per_unit=1, px_per_unit=20, resolution=figsize(full_size, hwratio), varargs...)
+    formats = setdiff(avail_formats, deny)
+    sort!(formats; by=f -> f == :svg ? 1 : 2) # pdf_tex is reliant on svg so it has to go first
+    :pdf_tex in formats && @assert :svg in formats ":pdf_tex can only be used if :svg is also generated"
+    modes = setdiff(avail_modes, deny)
+
+    # theming
+    backend_theme = backend == CairoMakie ? cairo_theme : gl_theme
+    format_theme(x) = vectorgraphic(x) ? vector_theme : raster_theme
+    mode_theme(x) = x == :margin ? margin_theme : full_theme
+
+    for f in formats
+        for m in modes
+            local theme = merge(override_theme, mode_theme(m)(hwratio), format_theme(f), backend_theme, base_theme)
+            with_theme(theme) do
+                savefig(fig, name, f, m, backend, dir; hwratio, varargs)
+            end
+        end
+    end
+end
+
+const EXTENSIONS = Dict(
+    :svg => ".svg",
+    :pdf => ".pdf",
+    :eps => ".eps",
+    :pdf_tex => ".pdf",
+    :png => ".png",
+)
+const MODES_SLUGS = Dict(
+    :margin => "_margin",
+    :full => "_full",
+)
+
+function savefig(fig::Figure, name::AbstractString, format::Symbol, mode::Symbol, backend::Module, dir::AbstractString=FIGURE_DIR;
+    extensions=EXTENSIONS, modes_slugs=MODES_SLUGS, hwratio=HWRATIO, wait=false, varargs...)
+
+    path = joinpath(dir, name * modes_slugs[mode] * extensions[format])
+    if format == :pdf_tex
+        @info "Building figure at $(basename(path))_tex"
+        svgpath = joinpath(dir, name * modes_slugs[mode] * extensions[:svg])
+        inkscape_cmd = Cmd(["inkscape", svgpath, "--export-type=pdf", "--export-latex", "--export-filename", path])
+        run(inkscape_cmd; wait)
+    else
+        @info "Building figure at $(basename(path))"
+        if backend == CairoMakie
+            # if vectorgraphic(format)
+            Makie.save(path, fig; backend, px_per_unit=20, resolution=figsize(mode == :margin ? MARGIN_SIZE : FULL_SIZE, hwratio), update=false, pt_per_unit=1, varargs...)
+            # else
+            #     Makie.save(path, fig; backend, update=false, px_per_unit=20, varargs...)
+            # end
+        end
+        backend == GLMakie && Makie.save(path, fig; backend, update=false, varargs...)
+    end
+end
+
+function getbase(filename)
+    return split(basename(filename)[5:end], ".")[1]
 end

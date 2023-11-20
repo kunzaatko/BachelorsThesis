@@ -1,5 +1,5 @@
-# TODO: Theme MAKIE <16-11-23> 
 using ColorSchemes
+using Unitful
 
 const ALPHA = 1.0
 const COLOR_SCHEME = ColorSchemes.seaborn_deep.colors
@@ -90,11 +90,7 @@ function figsize(width_in_inch, height_width_ratio=HWRATIO)
     return width_in_point, height_in_point
 end
 
-# TODO: Margin figures have too fat spine <20-11-23> 
-theme = Theme(
-    figure_padding=3,
-    # TODO: Should be computed from the size of the figure in the paper (1 point in CairoMakie is equal to 1/72 inch)
-    # resolution=( ), 
+const BASE_THEME = Theme(
     Axis=axis_theme,
     Lines=line_theme,
     Scatter=scatter_theme,
@@ -102,20 +98,53 @@ theme = Theme(
     # NOTE: `rasterize=10` is a hack that enables to save with CairoMakie
     # https://github.com/MakieOrg/Makie.jl/issues/1909 <16-11-23> 
     # FIX: Here `rasterize=10` makes the figures much larger... Maybe the images should be saved using GLMakie <16-11-23> 
-    Image=(; interpolate=false, rasterize=10)
+    Image=(; interpolate=false)
 )
 
-gl_theme = Theme(
-    figure_padding=0,
-    # TODO: Should be computed from the size of the figure in the paper (1 point in CairoMakie is equal to 1/72 inch)
-    # resolution=( ), 
+const RASTER_THEME = merge(BASE_THEME, theme_latexfonts())
+
+# FIX: How come the fonts are not transferred to `pdf_tex`? Does the SVG contain fonts or bitmapped fonts? <kunzaatko> 
+const VECTOR_THEME = merge(BASE_THEME, Theme(
+        # NOTE: `rasterize=10` is a hack that enables to save with CairoMakie
+        # https://github.com/MakieOrg/Makie.jl/issues/1909 (makes the figures significantly larger) <16-11-23> 
+        Image=(; interpolate=false, rasterize=10)
+    ), theme_latexfonts())
+
+
+const MARGIN_SIZE = 47.7u"mm" |> u"inch" |> ustrip
+const FULL_SIZE = 107u"mm" |> u"inch" |> ustrip
+
+FULL_THEME = hwratio -> Theme(
+    resolution=figsize(FULL_SIZE, hwratio),
+)
+
+# TODO: Margin figures have too fat spine <20-11-23> 
+MARGIN_THEME = hwratio -> Theme(
+    figure_padding=3,
+    resolution=figsize(MARGIN_SIZE, hwratio)
+)
+
+
+# NOTE: https://docs.makie.org/stable/how-to/save-figure-with-transparency/#glmakie <20-11-23> 
+const GL_THEME = Theme(
+    figure_padding=3,
     Axis=axis_theme,
     # Lines=line_theme,
     # Scatter=scatter_theme,
     Legend=legend_theme,
-    # NOTE: `rasterize=10` is a hack that enables to save with CairoMakie
-    # https://github.com/MakieOrg/Makie.jl/issues/1909 <16-11-23> 
-    # FIX: Here `rasterize=10` makes the figures much larger... Maybe the images should be saved using GLMakie <16-11-23> 
-    Image=(; interpolate=false, rasterize=10)
+    Image=(; interpolate=false)
 )
-Makie.set_theme!(merge(theme, theme_latexfonts()))
+
+const CAIRO_THEME = Theme(
+    Figure=(; backgroundcolor=:transparent),
+)
+
+# FIX: I have an issue with MAKIE, this theming does not work. <20-11-23> 
+OVERRIDE_THEMES = Dict(
+    :latex_format_xticklabels => Theme(Axis=(; xtickformat=latexstring)),
+    :latex_format_yticklabels => Theme(Axis=(; ytickformat=latexstring)),
+)
+OVERRIDE_THEMES[:latex_format_ticklabels] = merge(OVERRIDE_THEMES[:latex_format_xticklabels], OVERRIDE_THEMES[:latex_format_yticklabels])
+
+const INTERACTIVE_THEME = merge(BASE_THEME, GL_THEME)
+set_theme!(INTERACTIVE_THEME)
