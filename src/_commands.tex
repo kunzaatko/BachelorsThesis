@@ -1,4 +1,10 @@
 \newcommand{\nameemph}[1]{\emph{#1}}
+\newcommand{\distribution}[1]{\ensuremath{\mathcal{#1}}}
+% \declaremathoperator{\E}{\mathbb{E}}
+\newcommand{\E}{\ensuremath{\mathbb{E}}}
+\DeclareMathOperator{\Var}{Var}
+% \newcommand{\D}{\ensuremath{\mathbb{D}}}
+
 \newcommand{\png}[1]{\includegraphics{#1_full.png}}
 \newcommand{\marginpng}[1]{\includegraphics{#1_margin.png}}
 
@@ -10,3 +16,6 @@
     \def\svgwidth{\textwidth}
     \import{figures}{#1_margin.pdf_tex}
 }
+
+\newcommand\mqty[1]{\begin{matrix}#1\end{matrix}}
+\newcommand\pmqty[1]{\begin{pmatrix}#1\end{pmatrix}}

@@ -90,8 +90,9 @@ function figsize(width_in_inch, height_width_ratio=HWRATIO)
     return width_in_point, height_in_point
 end
 
+# TODO: Margin figures have too fat spine <20-11-23> 
 theme = Theme(
-    figure_padding=0,
+    figure_padding=3,
     # TODO: Should be computed from the size of the figure in the paper (1 point in CairoMakie is equal to 1/72 inch)
     # resolution=( ), 
     Axis=axis_theme,
@@ -104,4 +105,17 @@ theme = Theme(
     Image=(; interpolate=false, rasterize=10)
 )
 
+gl_theme = Theme(
+    figure_padding=0,
+    # TODO: Should be computed from the size of the figure in the paper (1 point in CairoMakie is equal to 1/72 inch)
+    # resolution=( ), 
+    Axis=axis_theme,
+    # Lines=line_theme,
+    # Scatter=scatter_theme,
+    Legend=legend_theme,
+    # NOTE: `rasterize=10` is a hack that enables to save with CairoMakie
+    # https://github.com/MakieOrg/Makie.jl/issues/1909 <16-11-23> 
+    # FIX: Here `rasterize=10` makes the figures much larger... Maybe the images should be saved using GLMakie <16-11-23> 
+    Image=(; interpolate=false, rasterize=10)
+)
 Makie.set_theme!(merge(theme, theme_latexfonts()))
