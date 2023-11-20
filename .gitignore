@@ -314,3 +314,6 @@ TSWLatexianTemp*
 # End of https://www.toptal.com/developers/gitignore/api/latex
 build/
 kaobook/
+/physics2
+/outline.norg
+/fixdif
