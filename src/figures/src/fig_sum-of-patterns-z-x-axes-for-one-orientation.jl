@@ -1,7 +1,7 @@
 const SKIP_PREPARE_IMAGES = true
 include("init.jl")
 using StatsBase
-FIG_NAME = getbase(@__FILE__)
+const FIG_NAME = getbase(@__FILE__)
 
 fig = Makie.Figure()
 # TODO: Make some convention to determine pixels typographically ... (siunitx?) <20-11-23> 

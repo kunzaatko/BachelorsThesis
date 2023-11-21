@@ -1,5 +1,5 @@
 include("init.jl")
-FIG_NAME = getbase(@__FILE__)
+const FIG_NAME = getbase(@__FILE__)
 
 # fig = Makie.Figure()
 # axes = [Makie.Axis(
