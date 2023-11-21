@@ -1,7 +1,9 @@
+# TODO: Move the preparation scripts into a separate directory <kunzaatko> 
 include("prepare-data.jl")
 include("makie.jl")
 
 using MosaicViews
+using FillArrays
 using SIMIlluminationPatterns
 
 function orientation_mark(ind)

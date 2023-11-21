@@ -157,12 +157,34 @@ Importantly, it is often the case that we assume or in approximation assume that
     \hat{\mu}_{\eta} = \frac{1}{|A|} \sum_{\vec{x} \in A} (u(\vec{x}) - c) \\
     \hat{\sigma^2}_{\eta} = \frac{1}{|A|} \sum_{\vec{x} \in  A} (u(\vec{x}) - \hat{\mu}_{\eta})^2.
 \end{gather*}
-Furthermore even if we do not want to limit the theorized distribution of noise, we can eyeball or even make an
-    empirical estimate of the distribution using the histogram of the intensities in \(A\).
+Furthermore if we do not want to limit to theorized distribution of noise, we can eyeball or even make a histogram,
+    kernel of another empirical estimate of the distribution of the intensities in \(A\).
 In our case, the premise that allows us to select such a set \(A\) is that besides the beads, there are no other sources
     of signal.
+
+\begin{marginfigure}
+    % FIX: Font sizes on figures should be adjusted and this figures has to have a different layout (GridLayout) <21-11-23> 
+    % \marginpng{beads-leakage-on-otsu-threshold}
+    \png{beads-leakage-on-otsu-threshold}
+    \caption{The Ostu threshold leads to lower intensities of some beads to be passed as background. On the left, side,
+        Otsu threshold (\(\approx 0.13\)) is used and on the right, the it is lowered by \(0.07\) to \(\approx 0.6\). The top
+        image shows the difference of the two on a larger area.}
+    \labfig{beads-leakage-on-otsu-threshold}
+\end{marginfigure}
+
 The problem therefore reduces to the distinction of the beads from the background for which an Otsu
-    threshold\sidecite{otsu1979} can be used.
+    threshold\sidecite{otsu1979} can be used however it is necessary to lower the threshold to reduce the lower
+    intensities\reffig{beads-leakage-on-otsu-threshold} that are due to the beads fluorescence.
+
+\begin{figure}[h]
+    \png{noise-distribution-hist-from-background}
+    \labfig{noise-distribution-hist-from-background}
+    \caption{Histogram of the background noise. It is apparent that the threshold cuts off some of the data. This is due
+    to a low \ac{SNR}.}
+\end{figure}
+
+If we consider the background noise as the true noise distribution, we can estimate the \ac{SNR}\sidenote{A popular
+    metric in optical sensing.} of the image as well.
 
 % TODO: Figure: Add background histogram figure <16-11-23> 
 

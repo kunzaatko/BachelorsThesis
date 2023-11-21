@@ -1,6 +1,8 @@
 using ColorSchemes
 using Unitful
 
+# FIX: Adjust font sizes <21-11-23> 
+
 const ALPHA = 1.0
 const COLOR_SCHEME = ColorSchemes.seaborn_deep.colors
 const COLORS = @. RGBAf(
