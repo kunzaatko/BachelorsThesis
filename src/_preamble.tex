@@ -1,3 +1,4 @@
+% TODO: When finished, search for "??" to identify missing references <22-11-23> 
 % Load the kaobook class
 \documentclass[
 	fontsize=10pt,
@@ -26,14 +27,15 @@
 
 % Load the package for hyperreferences
 \usepackage{kaorefs}
+\usepackage{adjustbox}
 
 \graphicspath{{figures/}{./}} % Paths where images are looked for
 
 \makeindex[columns=3, title=Alphabetical Index, intoc] % Make LaTeX produce the files required to compile the index
 
-\include{_acronyms.tex}
-\include{_commands.tex}
-\include{_packages.tex}
+\input{_packages.tex}
+\input{_acronyms.tex}
+\input{_commands.tex}
 
 \setcounter{chapter}{-1}
 
