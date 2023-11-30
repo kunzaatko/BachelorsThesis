@@ -363,23 +363,20 @@ The acquisition that is used for the \ac{PSF} estimation is done by imaging a su
 \section{\ac{PSF} by Averaging Fluorescent Beads}%
 \labsec{psf_by_averaging_fluorescent_beads}
 
-It is common in literature to select one bead from the centre of the microsphere acquisition image and pronounce it as
+It is common in literature to select one bead from the centre of the acquisition image and pronounce it as
     the \ac{PSF} of the optical system.
 % TODO: References (these references should be those which are used elsewhere 
 % (perhaps in the SIM reconstruction papers)) <28-11-23> 
 There is ample room for improvement in this approach. 
-Noteworthy drawbacks of this estimate are
+Noteworthy drawbacks of this estimate are:
     \begin{itemize}
         \item noise contained in a single bead sample can be substantial,
         \item possibility of incorrect centring,
-        \item disregard of the potential dependence on the \(z\)-offset from the focal plane of the particular bead 
+        \item disregard of the relation on the \(z\)-offset from the focal plane of the particular bead 
             sample used,
-        \item negligence towards the dependence of the sampled bead position.
+        \item negligence towards the potential dependence of the sampled bead position.
     \end{itemize}
 
-A simple solution that addresses the aforementioned drawbacks to a certain extent is averaging multiple samples of
-    a single bead.
-In particular, for low \ac{SNR} acquisitions, the noise can be significantly reduced by averaging \ac{PSF} estimates 
     from multiple beads (\refsubsecshort{noise}).
 
 % TODO: Motivational parts for averaging <28-11-23> 
