@@ -2,9 +2,6 @@ using CairoMakie, GLMakie
 const FIGURE_DIR = joinpath(abspath(dirname(@__FILE__)), "..")
 vectorgraphic(x) = x ∈ [:svg, :eps, :pdf, :pdf_tex] ? true : false
 
-# TODO: Should include the resolution of the save of the figure with either margin figure size (MARGIN_SIZE), or full
-# resolution size (FULL_SIZE) instead of the preset `dpi` <16-11-23> 
-
 """
     savefig(fig, name, project_dir)
 
@@ -72,20 +69,24 @@ function savefig(fig, name::AbstractString, dir::AbstractString=FIGURE_DIR;
     end
 end
 
-const EXTENSIONS = Dict(
-    :svg => ".svg",
-    :pdf => ".pdf",
-    :eps => ".eps",
-    :pdf_tex => ".pdf",
-    :png => ".png",
-)
-const MODES_SLUGS = Dict(
-    :margin => "_margin",
-    :full => "_full",
-)
+if !isdefined(@__MODULE__, :EXTENSIONS)
+    const EXTENSIONS = Dict(
+        :svg => ".svg",
+        :pdf => ".pdf",
+        :eps => ".eps",
+        :pdf_tex => ".pdf",
+        :png => ".png",
+    )
+end
+if !isdefined(@__MODULE__, :MODES_SLUGS)
+    const MODES_SLUGS = Dict(
+        :margin => "_margin",
+        :full => "_full",
+    )
+end
 
 function savefig(fig::Figure, name::AbstractString, format::Symbol, mode::Symbol, backend::Module, dir::AbstractString=FIGURE_DIR;
-    extensions=EXTENSIONS, modes_slugs=MODES_SLUGS, hwratio=HWRATIO, wait=false, varargs...)
+    extensions=EXTENSIONS, modes_slugs=MODES_SLUGS, hwratio=HWRATIO, wait=true, varargs...)
 
     path = joinpath(dir, name * modes_slugs[mode] * extensions[format])
     if format == :pdf_tex
@@ -97,7 +98,7 @@ function savefig(fig::Figure, name::AbstractString, format::Symbol, mode::Symbol
         @info "Building figure at $(basename(path))"
         if backend == CairoMakie
             # if vectorgraphic(format)
-            Makie.save(path, fig; backend, px_per_unit=20, resolution=figsize(mode == :margin ? MARGIN_SIZE : FULL_SIZE, hwratio), update=false, pt_per_unit=1, varargs...)
+            Makie.save(path, fig; backend, px_per_unit=20, size=figsize(mode == :margin ? MARGIN_SIZE : FULL_SIZE, hwratio), update=false, pt_per_unit=1, varargs...)
             # else
             #     Makie.save(path, fig; backend, update=false, px_per_unit=20, varargs...)
             # end

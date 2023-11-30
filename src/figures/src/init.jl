@@ -14,3 +14,5 @@ end
 function getbase(filename)
     return split(basename(filename)[5:end], ".")[1]
 end
+
+include("patch-inds.jl")
