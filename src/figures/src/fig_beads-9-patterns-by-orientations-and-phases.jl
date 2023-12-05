@@ -19,8 +19,8 @@ const FIG_NAME = getbase(@__FILE__)
 # end
 
 npad = 10
-nw, nh = size(LR_beads)[1:2]
-mos = mosaic(collect(eachslice(LR_beads; dims=3))...; ncol=3, rowmajor=true, fillvalue=1, npad)
+nw, nh = size(LR_beads[1])
+mos = mosaic(LR_beads...; ncol=3, rowmajor=true, fillvalue=1, npad)
 
 fig, ax, _ = image(mos)
 ax.aspect = DataAspect()
