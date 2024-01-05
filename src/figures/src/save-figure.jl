@@ -16,7 +16,7 @@ Save a figure in SVG, EPS and PDF formats.
 
 This function saves a figure object in both SVG and PDF formats. The SVG file is saved in the parent directory with the given name and the extension ".svg". The PDF file is saved in the same directory with the given name and the extension ".pdf". The Inkscape command is used to convert the SVG file to PDF format with text in LaTeX using PDF_TEX.
 """
-function savefig(fig, name::AbstractString, dir::AbstractString=FIGURE_DIR;
+function savefig(fig_function::Function, name::AbstractString, dir::AbstractString=FIGURE_DIR;
     hwratio=HWRATIO,
     backend=CairoMakie,
     override_theme=Theme(),
@@ -28,6 +28,8 @@ function savefig(fig, name::AbstractString, dir::AbstractString=FIGURE_DIR;
     gl_theme=GL_THEME,
     cairo_theme=CAIRO_THEME,
     skip=[:pdf, :eps], # :svg, :pdf, :pdf_tex, :eps, :png, :raster, :vector, :margin, :full
+    fig_function_args=(),
+    update=false,
     varargs...)
 
     # skip
@@ -61,9 +63,10 @@ function savefig(fig, name::AbstractString, dir::AbstractString=FIGURE_DIR;
 
     for f in formats
         for m in modes
-            local theme = merge(override_theme, mode_theme(m)(hwratio), format_theme(f), backend_theme, base_theme)
-            with_theme(theme) do
-                savefig(fig, name, f, m, backend, dir; hwratio, varargs)
+            local figure_theme = merge(override_theme, mode_theme(m)(hwratio), format_theme(f), backend_theme, base_theme)
+            with_theme(figure_theme) do
+                fig = fig_function(fig_function_args...)
+                savefig(fig, name, f, m, backend, dir; hwratio, varargs, update)
             end
         end
     end
@@ -86,19 +89,24 @@ if !isdefined(@__MODULE__, :MODES_SLUGS)
 end
 
 function savefig(fig::Figure, name::AbstractString, format::Symbol, mode::Symbol, backend::Module, dir::AbstractString=FIGURE_DIR;
-    extensions=EXTENSIONS, modes_slugs=MODES_SLUGS, hwratio=HWRATIO, wait=true, varargs...)
+    extensions=EXTENSIONS, modes_slugs=MODES_SLUGS, hwratio=HWRATIO, wait=true, update=false, varargs...)
 
     path = joinpath(dir, name * modes_slugs[mode] * extensions[format])
     if format == :pdf_tex
         @info "Building figure at $(basename(path))_tex"
         svgpath = joinpath(dir, name * modes_slugs[mode] * extensions[:svg])
-        inkscape_cmd = Cmd(["inkscape", svgpath, "--export-type=pdf", "--export-latex", "--export-filename", path])
+        cmd_parts = ["inkscape", svgpath, "--export-type=pdf", "--export-latex", "--export-filename", path]
+        # FIX: How to send the output to /dev/null in Julia? <21-11-23> 
+        # if !wait
+        #     append!(cmd_parts, ["&>/dev/null"])
+        # end
+        inkscape_cmd = Cmd(cmd_parts)
         run(inkscape_cmd; wait)
     else
         @info "Building figure at $(basename(path))"
         if backend == CairoMakie
             # if vectorgraphic(format)
-            Makie.save(path, fig; backend, px_per_unit=20, size=figsize(mode == :margin ? MARGIN_SIZE : FULL_SIZE, hwratio), update=false, pt_per_unit=1, varargs...)
+            Makie.save(path, fig; backend, px_per_unit=20, pt_per_unit=1, size=figsize(mode == :margin ? MARGIN_SIZE : FULL_SIZE, hwratio), update, varargs...)
             # else
             #     Makie.save(path, fig; backend, update=false, px_per_unit=20, varargs...)
             # end

@@ -1,6 +1,9 @@
 include("init.jl")
 using PSFDistiller
-using PSFDistiller: Median
+using PSFDistiller: Median, Quantile
+
+# FIX: Select beads for RB again... There is a wrongly selected bead #11 <11-12-23> 
+# FIX: Select and estimate PSF for the missing blocks <11-12-23> 
 
 """
     estimate_PSF_averaging(img, patch; varargs...)
@@ -20,7 +23,7 @@ Returns:
 function estimate_PSF_averaging(img, patch; varargs...)
     img = img[1] isa Colorant ? gray.(img) : img
     positions, _ = get_selected_beads(patch)
-    psf, rois, positions, selected, params, fwd = distille_PSF(img; positions, force_align=true, bg_alg=Median(), varargs...)
+    psf, rois, positions, selected, params, fwd = distille_PSF(img; positions, force_align=true, bg_alg=Quantile{0.15}(), varargs...)
     serialize("data/psf_averaging_$(patch).ser", Dict(
         :psf => psf,
         :rois => rois,

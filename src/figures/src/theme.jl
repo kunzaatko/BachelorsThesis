@@ -1,4 +1,8 @@
+# FIX: The Legend Block defines a Box that is too big and the figure looks non-efficient in space. This is impossible to
+# fix using `rowgap!` <28-12-23> 
+# FIX: Margin theme line widths are too wide <22-12-23> 
 if !(isdefined(@__MODULE__, :LOADED_THEMES) && LOADED_THEMES)
+    @info "Loading Makie themes..."
     const LOADED_THEMES = true
     using ColorSchemes
     using Unitful
@@ -35,54 +39,62 @@ if !(isdefined(@__MODULE__, :LOADED_THEMES) && LOADED_THEMES)
     const CYCLE = Cycle([:color, :marker], covary=true)
     const HWRATIO = 0.68
 
-    axis_theme = (
-        xlabelsize=10,
-        ylabelsize=10,
-        spinewidth=1.1,
-        xticklabelsize=8,
-        yticklabelsize=8,
-        xgridvisible=false,
-        ygridvisible=false,
-        xtickalign=1,
-        ytickalign=1,
-        xticksize=5,
-        yticksize=5,
-        xtickwidth=0.8,
-        ytickwidth=0.8,
-        xminorticksvisible=true,
-        yminorticksvisible=true,
-        xminortickalign=1,
-        yminortickalign=1,
-        xminorticks=IntervalsBetween(5),
-        yminorticks=IntervalsBetween(5),
-        xminorticksize=3,
-        yminorticksize=3,
-        xminortickwidth=0.75,
-        yminortickwidth=0.75,
-        xlabelpadding=-2,
-        ylabelpadding=2,
+    const BASE_THEME = merge(
+        Theme(
+            pt_per_unit=1,
+            figure_padding=2,
+            Axis=(
+                xgridvisible=false,
+                ygridvisible=false,
+                # spinewidth=1.1,
+                # xminorticks=IntervalsBetween(5),
+                # yminorticks=IntervalsBetween(5),
+                # xlabelpadding=-2,
+                # ylabelpadding=2,
+                # xminortickwidth=0.75,
+                # yminortickwidth=0.75,
+
+                ## DEFAULT ##
+                # xminorticksvisible=true,
+                # yminorticksvisible=true,
+                # xminortickalign=1,
+                # yminortickalign=1,
+                # xminorticksize=3,
+                # yminorticksize=3,
+            ),
+            Lines=(;
+                cycle=CYCLE
+            ),
+            Scatter=(
+                cycle=CYCLE,
+                markersize=MARKERSIZE,
+                strokewidth=0,
+            ),
+            Legend=(
+                nbanks=1,
+                framevisible=false,
+                tellwidth=false,
+                tellheight=false,
+            ),
+            Image=(; interpolate=false),
+            Heatmap=(;
+                colormap=:Spectral
+            )
+        ),
+        theme_latexfonts()
     )
 
-    line_theme = (;
-        cycle=CYCLE
+    const RASTER_THEME = Theme()
+
+    # FIX: How come the fonts are not transferred to `pdf_tex`? Does the SVG contain fonts or bitmapped fonts? <kunzaatko> 
+    const VECTOR_THEME = Theme(
+        # NOTE: `rasterize=10` is a hack that enables to save with CairoMakie
+        # https://github.com/MakieOrg/Makie.jl/issues/1909 (makes the figures significantly larger) <16-11-23> 
+        Image=(; rasterize=10)
     )
 
-    scatter_theme = (
-        cycle=CYCLE,
-        markersize=MARKERSIZE,
-        strokewidth=0,
-    )
-
-    legend_theme = (
-        nbanks=1,
-        framecolor=(:grey, 0.5),
-        framevisible=false,
-        labelsize=7.5,
-        padding=(2, 2, 2, 2),
-        margin=(0, 0, 0, 0),
-        rowgap=-10,
-        colgap=4,
-    )
+    const MARGIN_SIZE = 47.7u"mm" |> u"inch" |> ustrip
+    const FULL_SIZE = 107u"mm" |> u"inch" |> ustrip
 
     function figsize(width_in_inch, height_width_ratio=HWRATIO)
         width_in_point = floor(Int, 72width_in_inch)
@@ -90,61 +102,88 @@ if !(isdefined(@__MODULE__, :LOADED_THEMES) && LOADED_THEMES)
         return width_in_point, height_in_point
     end
 
-    const BASE_THEME = Theme(
-        Axis=axis_theme,
-        Lines=line_theme,
-        Legend=legend_theme,
-        # NOTE: `rasterize=10` is a hack that enables to save with CairoMakie
-        # https://github.com/MakieOrg/Makie.jl/issues/1909 <16-11-23> 
-        # FIX: Here `rasterize=10` makes the figures much larger... Maybe the images should be saved using GLMakie <16-11-23> 
-        Image=(; interpolate=false)
-    )
-
-    const RASTER_THEME = merge(BASE_THEME, theme_latexfonts())
-
-    # FIX: How come the fonts are not transferred to `pdf_tex`? Does the SVG contain fonts or bitmapped fonts? <kunzaatko> 
-    const VECTOR_THEME = merge(BASE_THEME, Theme(
-            # NOTE: `rasterize=10` is a hack that enables to save with CairoMakie
-            # https://github.com/MakieOrg/Makie.jl/issues/1909 (makes the figures significantly larger) <16-11-23> 
-            Image=(; interpolate=false, rasterize=10)
-        ), theme_latexfonts())
-
-
-    const MARGIN_SIZE = 47.7u"mm" |> u"inch" |> ustrip
-    const FULL_SIZE = 107u"mm" |> u"inch" |> ustrip
-
     FULL_THEME = hwratio -> Theme(
-        resolution=figsize(FULL_SIZE, hwratio),
+        size=figsize(FULL_SIZE, hwratio),
+        Axis=(
+            xticklabelsize=10, yticklabelsize=10,
+            xtickwidth=0.7, ytickwidth=0.7,
+            xticksize=4, yticksize=4,
+        ),
+        Legend=(
+            labelsize=10,
+        ),
+        Colorbar=(
+            labelsize=10,
+            ticklabelsize=10,
+            leftspinevisible=false, rightspinevisible=false, topspinevisible=false, bottomspinevisible=false,
+            width=5,
+            # labelpadding=1.5,
+            tickwidth=0.7,
+            ticksize=4,
+        )
     )
+    # TODO: Add Axis3 to BASE_THEME and only change what is not same <22-12-23> 
     # TODO: Margin figures have too fat spine <20-11-23> 
     MARGIN_THEME = hwratio -> Theme(
         figure_padding=3,
-        size=figsize(MARGIN_SIZE, hwratio)
-    )
+        size=figsize(MARGIN_SIZE, hwratio),
+        Axis=(
+            spinewidth=0.5,
+            titlesize=10,
+            xticklabelsize=8, yticklabelsize=8,
+            xlabelpadding=-1.5, ylabelpadding=1.5,
+            xtickwidth=0.5, ytickwidth=0.5,
+            xticksize=2.5, yticksize=2.5,
+        ),
+        Axis3=(
+            titlesize=10,
+            viewmode=:stretch,
+            xspinewidth=0.5, yspinewidth=0.5, zspinewidth=0.5,
+            xticklabelsize=8, yticklabelsize=8, zticklabelsize=8,
+            xticklabelpad=2, yticklabelpad=2, zticklabelpad=2,
+            xlabelpadding=0, ylabelpadding=0, zlabelpadding=0,
+            xtickwidth=0.5, ytickwidth=0.5, ztickwidth=0.5,
+            xticksize=2.5, yticksize=2.5, zticksize=2.5,
+            xautolimitmargin=(0, 0), yautolimitmargin=(0, 0), zautolimitmargin=(0, 0),
+            xgridvisible=false, ygridvisible=false, zgridvisible=false,
+        ),
+        Legend=(
+            colgap=2,
+            labelsize=8,
+            padding=(0, 0, 0, 0),
+            nbanks=4,
+            patchsize=(10, 10)
+        ),
+        Hist=(
+            normalization=:density,
+            strokewidth=0.5
+        ),
+        Colorbar=(
+            labelsize=8,
+            width=3,
+            leftspinevisible=false, rightspinevisible=false, topspinevisible=false, bottomspinevisible=false,
+            ticklabelsize=8,
+            # tellheight=false,
+            labelpadding=1.5,
+            tickwidth=0.5,
+            ticksize=2.5,
+            # spinewidth=0.5,
+        ))
 
-
-    # NOTE: https://docs.makie.org/stable/how-to/save-figure-with-transparency/#glmakie <20-11-23> 
+    # TODO: https://docs.makie.org/stable/how-to/save-figure-with-transparency/#glmakie <20-11-23> 
     const GL_THEME = Theme(
         figure_padding=3,
-        Axis=axis_theme,
-        # Lines=line_theme,
-        # Scatter=scatter_theme,
-        Legend=legend_theme,
-        Image=(; interpolate=false)
     )
 
     const CAIRO_THEME = Theme(
-        Figure=(; backgroundcolor=:transparent),
-        Scatter=scatter_theme,
+        px_per_unit=20,
+        backgroundcolor=:transparent
     )
 
-    # FIX: I have an issue with MAKIE, this theming does not work. <20-11-23> 
-    OVERRIDE_THEMES = Dict(
-        :latex_format_xticklabels => Theme(Axis=(; xtickformat=latexstring)),
-        :latex_format_yticklabels => Theme(Axis=(; ytickformat=latexstring)),
-    )
-    OVERRIDE_THEMES[:latex_format_ticklabels] = merge(OVERRIDE_THEMES[:latex_format_xticklabels], OVERRIDE_THEMES[:latex_format_yticklabels])
+    const INTERACTIVE_THEME = merge(GL_THEME, FULL_THEME(1920 / 1080), BASE_THEME)
 
-    const INTERACTIVE_THEME = merge(BASE_THEME, GL_THEME)
-    set_theme!(INTERACTIVE_THEME)
+    include("override_themes.jl")
+
+else
+    @info "Skipping loading Makie themes"
 end
