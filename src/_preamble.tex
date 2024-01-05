@@ -1,7 +1,9 @@
+\synctex=1
 % TODO: When finished, search for "??" to identify missing references <22-11-23> 
 % Load the kaobook class
 \documentclass[
 	fontsize=10pt,
+	footnotesize=8pt,
 	twoside=true,
 	open=any, % uncomment this to force new chapters to start on any page, not only on right (odd) pages
     chapterentrydots=true, % dots in the TOC
@@ -33,10 +35,17 @@
 
 \makeindex[columns=3, title=Alphabetical Index, intoc] % Make LaTeX produce the files required to compile the index
 
-\input{_packages.tex}
 \input{_acronyms.tex}
+\input{_packages.tex}
 \input{_commands.tex}
 
+
+% FIX: There is a vspace or a new paragraph indication when inserting a marginfigure. This can be handled using vspace
+% commands manually when the full content is finished <28-12-23> 
+% FIX: Reduce the vskip before section and subsection titles <26-12-23> 
+% FIX: Do not output chapter numbers in the sections title  <26-12-23> 
+% https://en.wikibooks.org/wiki/LaTeX/Counters
 \setcounter{chapter}{-1}
+\setcounter{secnumdepth}{2}
 
 \begin{document}

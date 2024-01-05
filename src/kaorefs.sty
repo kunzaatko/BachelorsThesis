@@ -37,6 +37,8 @@
 \newcommand{\tablenameshort}{}
 \newcommand{\eqname}{}
 \newcommand{\eqnameshort}{}
+\newcommand{\itmname}{}
+\newcommand{\itmnameshort}{}
 \newcommand{\defname}{}
 \newcommand{\assumname}{}
 \newcommand{\thmname}{}
@@ -97,6 +99,7 @@
 	\renewcommand{\tablenameshort}{Tab.}
 	\renewcommand{\eqname}{Equation}
 	\renewcommand{\eqnameshort}{Eq.}
+	\renewcommand{\itmname}{Item}
 	\renewcommand{\defname}{Definition}
 	\renewcommand{\assumname}{Assumption}
 	\renewcommand{\thmname}{Theorem}
@@ -141,6 +144,7 @@
 \newcommand{\labfig}[1]{\label{fig:#1}}
 \newcommand{\labtab}[1]{\label{tab:#1}}
 \newcommand{\labeq}[1]{\label{eq:#1}}
+\newcommand{\labitm}[1]{\label{itm:#1}}
 \newcommand{\labdef}[1]{\label{def:#1}}
 \newcommand{\labthm}[1]{\label{thm:#1}}
 \newcommand{\labassum}[1]{\label{assum:#1}}
@@ -201,6 +205,10 @@
 \newcommand{\refeqshort}[1]{\hyperref[eq:#1]\eqnameshort\xspace(\ref{eq:#1})}
 \newcommand{\refeq}[1]{\hyperref[eq:#1]\eqname\xspace\ref{eq:#1}}
 \newcommand{\vrefeq}[1]{\hyperref[eq:#1]\eqname\xspace\vref{eq:#1}}
+
+\newcommand{\refitmshort}[1]{\hyperref[itm:#1]{\ref{itm:#1}}}
+\newcommand{\refitm}[1]{\hyperref[itm:#1]\itmname\xspace\ref{itm:#1}}
+\newcommand{\vrefitm}[1]{\hyperref[itm:#1]\itmname\xspace\vref{itm:#1}}
 
 \newcommand{\refdef}[1]{\hyperref[def:#1]\defname\xspace\ref{def:#1}}
 \newcommand{\vrefdef}[1]{\hyperref[def:#1]\defname\xspace\vref{def:#1}}

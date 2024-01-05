@@ -2,10 +2,48 @@
 \newcommand{\distribution}[1]{\ensuremath{\mathcal{#1}}}
 % \declaremathoperator{\E}{\mathbb{E}}
 \newcommand{\E}{\ensuremath{\mathbb{E}}}
+\newcommand{\C}{\ensuremath{\mathbb{C}}}
 \DeclareMathOperator{\Var}{Var}
 % \newcommand{\D}{\ensuremath{\mathbb{D}}}
 \DeclareMathOperator{\SNR}{SNR}
-\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\NA}{NA}
+\DeclareMathOperator{\fwd}{Fwd}
+\DeclareMathOperator{\LinearSystem}{\mathscr{H}}
+\DeclareMathOperator{\reg}{Reg}
+\DeclareMathOperator*{\supp}{supp}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\correlation}{\mathcal{C}}
+% \DeclareMathOperator{\fourier}{\mathcal{F}}
+\DeclarePairedDelimiter\parsnospace{\lparen}{\rparen}
+\DeclarePairedDelimiter\bracksnospace{\lbrack}{\rbrack}
+\newcommand{\oneto}[1]{\ensuremath{[#1]}}
+
+\newcommand{\FourierSymbol}{\mathcal{F}}
+
+\makeatletter
+    \newcommand{\F}{\@ifstar{\@Fstar}{\@F}}
+    \newcommand{\@F}[2][\vec{k}]{
+        \FourierSymbol{\bracksnospace{#2}}{\parsnospace{#1}}
+    }
+    \newcommand{\@Fstar}[1]{
+        \FourierSymbol{\bracksnospace{#1}}
+    }
+    \newcommand{\Finverse}{\@ifstar{\@Finvevsestar}{\@Finverse}}
+    \newcommand{\@Finverse}[2][\vec{r}]{
+        \FourierSymbol^{-1}{\bracksnospace{#2}}{\parsnospace{#1}}
+    }
+    \newcommand{\@Finversestar}[1]{
+        \FourierSymbol^{-1}{\bracksnospace{#1}}
+    }
+\makeatother
+
+\makeatletter
+\newcommand\gobblepars{%
+    \@ifnextchar\par%
+        {\expandafter\gobblepars\@gobble}%
+        {}}
+\makeatother
 
 \newcommand{\dirac}{\ensuremath{\delta}}
 \newcommand{\R}{\ensuremath{\mathbb{R}}}
@@ -14,13 +52,37 @@
 \newcommand{\ball}{\ensuremath{B}}
 \newcommand{\closedball}{\ensuremath{\overbar{B}}}
 
-\newcommand{\sensed}{\ensuremath{f}}
-\newcommand{\source}{\ensuremath{s}}
-\newcommand{\reconstructed}{\ensuremath{u}}
-\newcommand{\noisefree}{\ensuremath{g}}
-\newcommand{\noise}{\ensuremath{\eta}}
-\newcommand{\psf}{\ensuremath{h}}
+\newcommand{\ip}{\ensuremath{i}}
+\newcommand{\Fip}{\ensuremath{I}}
 
+\newcommand{\conv}{\ensuremath{\ast}}
+
+\newcommand{\sensed}{\ensuremath{f}}
+\newcommand{\Fsensed}{\ensuremath{F}}
+
+\newcommand{\source}{\ensuremath{s}}
+\newcommand{\Fsource}{\ensuremath{S}}
+
+\newcommand{\model}{\ensuremath{\hat{m}}}
+\newcommand{\Fmodel}{\ensuremath{\hat{M}}}
+
+\newcommand{\Fcomponent}{\ensuremath{C}}
+
+\newcommand{\reconstructed}{\ensuremath{\hat{s}}}
+\newcommand{\Freconstructed}{\ensuremath{\hat{S}}}
+
+\newcommand{\noisefree}{\ensuremath{g}}
+\newcommand{\Fnoisefree}{\ensuremath{G}}
+
+\newcommand{\noise}{\ensuremath{\eta}}
+% NOTE: \Eta looks like H thus it cannot be used because of the OTF <17-12-23> 
+\newcommand{\Fnoise}{\ensuremath{\Nu}}
+
+\newcommand{\psf}{\ensuremath{h}}
+\newcommand{\otf}{\ensuremath{H}}
+\newcommand{\otfhr}{\ensuremath{H_{\text{\ac{HR}}}}}
+
+\newcommand{\loss}{\ensuremath{\ell}}
 
 % \newcommand{\transpose}{\mathsf{T}}
 \newcommand{\transpose}{\scalebox{0.8}{T}} % FIX: Shift to the top corner... <22-11-23> 
@@ -40,3 +102,11 @@
 
 \newcommand\mqty[1]{\begin{matrix}#1\end{matrix}}
 \newcommand\pmqty[1]{\begin{pmatrix}#1\end{pmatrix}}
+
+\makeatletter
+\renewcommand*\env@matrix[1][\arraystretch]{%
+  \edef\arraystretch{#1}%
+  \hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{*\c@MaxMatrixCols c}}
+\makeatother
