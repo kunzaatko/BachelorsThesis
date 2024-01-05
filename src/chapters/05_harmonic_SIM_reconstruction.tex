@@ -1,0 +1,888 @@
+\setchapterpreamble[u]{\margintoc}
+\chapter{\Ac{SIM} Reconstruction}
+\labch{sim-reconstruction}
+
+% FIX: Add note about notation... Small letters are spatial domain and capitals are in frequency domain <18-12-23> 
+
+It was laid-out in the theory part, how to achieve introducing higher frequencies in the output image, which would be 
+    otherwise lacking in the regular wide-field microscope acquisition outputs.
+The process of reconstruction concerns with 
+\begin{enumerate}[label=\roman*.]
+    \item determining the powers of these aliased frequencies and 
+    \item mapping their positions so that they are at the correct corresponding locations in the reconstructed image.
+\end{enumerate}
+If everything is done correctly, it is possible to recover all the additional information from the newly introduced 
+    frequencies in the estimate of the source signal.
+
+There is a multitude of approaches for performing these tasks, each of which has its own benefits and drawbacks.
+It is possible to categorise them into three broad categories based on the underlining theory that is used, namely:
+\begin{enumerate}[label=(\alph*)]
+    \item deconvolution based,
+    \item inversion/optimization based and
+    \item machine learning based.
+\end{enumerate}
+
+At the input of our reconstruction are 9 \acs{LR}\sidenote{
+    In the following text, sensed images (i.e. signal that we measure at the sensor) will be called a \acf{LR} image and
+        the reconstructed image will be called a \ac{HR} image. 
+    It is important to remember throughout the text that when talking about the sampled (discrete) \ac{LR} image, it has 
+        different pixel dimensions (sampling rate) from the \ac{HR} image.
+    } images acquired with 3 orientations (phase-shifts) that are spaced by approximately \(2\pi/3\) to maximize 
+    information gain in the reconstructed image and every orientation is acquired with 3 phase-offsets 
+    (\reffigshort{beads-LR-9-images}).
+The acquisition is made in an orientation-major fashion, meaning that all \ac{LR} images of the same orientation are
+    sensed before changing to the next orientation.
+
+For most methods from the first two categories it is necessary to estimate some or all of the illumination pattern 
+    parameters of the \ac{LR} images prior to the reconstruction.
+There again are many possible estimation algorithms relying on various assumptions, which are beneficial for
+    acquisitions with specific properties, importantly differing in their robustness to noise contained in the \ac{LR} 
+    images.
+
+First, one such estimation sequence for determining the parameters, that has been tested to work well for the data we 
+    are working with, will be described (\refsecshort{IP-parameter-estimation}).
+The following sections will demonstrate the deconvolution based approach 
+    (\refsecshort{deconvolution-reconstruction}) and then the inversion/optimization based approach 
+    (\refsecshort{inversion-reconstruction}).
+Lastly, some of the limitations and benefits of all three approaches will be discussed.
+
+% \begin{marginfigure}
+%     \marginpng{otf-model}
+%     \caption{The \ac{OTF} model of the optical system.}
+%     \labfig{otf-model}
+% \end{marginfigure}
+\begin{marginfigure}
+    \marginpng{otf-model-surf}
+    \caption{The \ac{OTF} model of the optical system.}
+    \labfig{otf-model}
+\end{marginfigure}
+
+In this chapter, we will be using a model \ac{OTF} (\reffigshort{otf-model}) supplied by the assembler of the 
+    microscope.
+It is derived from the ideal circular aperture \ac{OTF} model with a curvature degradation of \(\alpha = 0.9\).
+The formula for the \ac{OTF} is
+    \begin{equation*}
+        \otf(\vec{k}) = \frac{2}{\pi}\ab(\arccos\ab(\frac{|\vec{k}|}{2k_0}) - \frac{|\vec{k}|}{2k_0}\sqrt{1
+        - \frac{|\vec{k}|^2}{4k_0^2}}) \cdot \alpha^{|\vec{k}|/2k_0},
+    \end{equation*}
+    where \(k_0\) is the cut-off frequency of the \ac{OTF} and for \(\rho\) the pupil radius the emission wavelength 
+    \(\lambda_{\text{em}} = \qty{488}{\nano\meter}\), the distance between the entrance pupil and the focal plane \(f_R\) and the 
+    numerical aperture of the objective \(\NA\) is
+\begin{equation*}
+    k_0  = \frac{\rho}{\lambda_{\text{em}} \cdot f_R} = \frac{2\NA}{\lambda_{\text{em}}}.
+\end{equation*}
+
+% TODO: Change to margin figure? The differences are not so big anyway <22-11-23> 
+\begin{figure}
+  \png{beads-LR-imgs}
+  \caption{Acquisitions of 9 wide field images with harmonic patterned illuminations. The orientations are labelled
+     \(n = 1, 2, 3 \) and the phases \(\phi_\ip = \phi_1,\phi_2,\phi_3\). The order of acquisition is row-major in this
+    figure.}
+  \labfig{beads-LR-9-images}
+\end{figure}%
+
+\section{Parameter Estimation}
+\labsec{IP-parameter-estimation}
+The general form of the \ac{LR} image illumination patterns in one orientation, denoted \(\ip_{\phi_1}\), 
+    \(\ip_{\phi_2}\) and \(\ip_{\phi_3}\), that are at the input of the deconvolution reconstruction is
+    \begin{equation}
+        \labeq{ip-formula}
+        \ip_{\phi}(\vec{r}) = 1 + \frac{m}{2} \cos\ab(2\pi \vec{k}_\ip \cdot \vec{r} + \phi),
+    \end{equation}
+    where the phases \(\phi_1 \neq \phi_2 \neq \phi_3\) and \(\vec{k}_\ip\) is the wave vector of the illumination pattern.
+An assumption that is made in the our acquisition is that the phases differ by \(2\pi/3\), that is 
+    \[
+        \phi_0 \coloneqq \phi_1 = \phi_2 - 2\pi/3 = \phi_3 - 4\pi/3.
+    \]
+This assumption is based on the method that is employed for the generation of the illumination patterns, which should
+    approximately guarantee this.
+Equivalently, due to the \(2\pi\) period of the \(\cos(x)\) function in \refeq{ip-formula}, we adopt the notation
+    \begin{gather*}
+        \ip_{\phi_1} = \ip_{\phi_0} \eqqcolon \ip_0,\\
+        \phi_{-} \coloneqq \phi_0 - 2\pi/3 \quad\&\quad \ip_{\phi_3} = \ip_{\phi_{-}} \eqqcolon \ip_{-},\\
+        \phi_{+} \coloneqq \phi_0 + 2\pi/3 \quad\&\quad \ip_{\phi_2} = \ip_{\phi_{+}} \eqqcolon \ip_{+}.
+    \end{gather*}
+As was demonstrated in the theory part, the acquisition carried out with an illumination pattern \(\ip_\phi\) leads to
+    the sensed \ac{LR} image in the Fourier domain \(\Fsensed_\phi \coloneqq \F*{\sensed_\phi}\) being
+    \begin{equation}
+        \labeq{component-separation}
+        \begin{split}
+            \Fsensed_\phi &= \F*{\ip_\phi \cdot\source} \cdot \otf
+            + \Fnoise  = \ab(\Fip_\phi \conv \Fsource) \cdot \otf + \Fnoise\\[1ex]
+                          &= (\underbrace{\ab(\frac{me^{-i \phi}}{4} \dirac_{-\vec{k}_\ip} + \dirac +
+                          \frac{me^{i \phi}}{4} \dirac_{+\vec{k}_\ip})}_{\Fip_{\phi}} \conv \Fsource)\cdot\otf + \Fnoise,
+        \end{split}
+    \end{equation}
+    where \(\source\)/\(\Fsource\) is the source signal (i.e. the true structure), \(\otf\) is the \ac{OTF} of the
+    imaging system and \(\Fnoise\) is noise in the Fourier domain.
+It can be observed from \refeq{component-separation}, that the sensed \ac{LR} image contains 3 bands (components) of 
+    aliased signal frequencies with frequency shifts of \(-\vec{k}_\ip\), \(\vec{0}\) and \(+\vec{k}_\ip\).
+We can write the three acquisitions in one orientation as
+\begin{equation} \labeq{one-orientation-components}
+    \begin{pmatrix}[1.2]
+        \Fsensed_{\phi_{-}} \\ \Fsensed_{\phi_0} \\ \Fsensed_{\phi_{+}}
+    \end{pmatrix} = 
+    \begin{pmatrix}[1.2]
+        e^{\frac{+2\pi i}{3}}             & 1 & e^{\frac{-2\pi i}{3}} \\
+        1 & 1 &  1\\
+        e^{\frac{-2\pi i}{3}}             & 1 & e^{\frac{+2\pi i}{3}} \\
+    \end{pmatrix}
+    \begin{pmatrix}[1.2]
+        \frac{m}{4}  e^{-i\phi_0} \cdot \Fcomponent_{-\vec{k}_\ip} \\
+        \Fcomponent_{\vec{0}} \\
+       \frac{m}{4} e^{+i\phi_0} \cdot\Fcomponent_{+\vec{k}_\ip} \\
+   \end{pmatrix}
+    + \begin{pmatrix}[1.2]
+        N_{\phi_{-}}\\
+        N_{\phi_{0}}\\
+        N_{\phi_{+}}\\
+    \end{pmatrix},
+\end{equation}
+with the notation
+\begin{equation}
+    \begin{pmatrix}[1.2]
+       \Fcomponent_{-\vec{k}_\ip} \\
+       \Fcomponent_{\vec{0}} \\
+       \Fcomponent_{+\vec{k}_\ip} \\
+   \end{pmatrix}\hspace{-0.3em}(\vec{k}) \coloneqq
+   \otf(\vec{k}) \begin{pmatrix}[1.2]
+        \dirac_{-\vec{k}_\ip} \conv \Fsource \\
+        \Fsource \\
+        \dirac_{+\vec{k}_\ip} \conv \Fsource \\
+    \end{pmatrix}\hspace{-0.3em}(\vec{k}) =
+     \otf(\vec{k}) \begin{pmatrix}
+        \Fsource(\vec{k} + \vec{k}_\ip) \\
+        \Fsource(\vec{k})  \\
+        \Fsource(\vec{k} - \vec{k}_\ip)  \\
+    \end{pmatrix}.
+\end{equation}
+
+\subsection{Phase-shift Estimate}
+\labsubsec{shift-estimation}
+First of the parameters that must be estimated is the phase-shift (i.e. wave vector of the illumination pattern) 
+    \(\vec{k}_i\).
+First a separation of the shifted bands is performed while keeping the multiplicative coefficients\sidenote{The 
+    reference phase-offset \(\phi_0\) is yet to be determined.} \(\frac{m}{4} e^{-i\phi_0}\) and 
+    \(\frac{m}{4} e^{+i\phi_0}\).
+This can be done by solving the linear system in \refeq{one-orientation-components} for 
+    \begin{equation}
+        \labeq{tilde-components}
+        \begin{pmatrix}[1.2]
+            \tilde{\Fcomponent}_{-\vec{k}_\ip} \\
+            \Fcomponent_{\vec{0}} \\
+            \tilde{\Fcomponent}_{+\vec{k}_\ip} \\
+        \end{pmatrix} \coloneqq
+        \begin{pmatrix}[1.2]
+            \frac{m}{4}  e^{-i\phi_0} \cdot \Fcomponent_{-\vec{k}_\ip} \\
+            \Fcomponent_{\vec{0}} \\
+        \frac{m}{4} e^{+i\phi_0} \cdot\Fcomponent_{+\vec{k}_\ip} \\
+    \end{pmatrix},
+    \end{equation}
+    with disregard for noise.
+For the invertible symmetric matrix
+    \begin{equation*}
+        \tilde{M} \coloneqq \begin{pmatrix}
+            e^{\frac{+2\pi i}{3}}             & 1 & e^{\frac{-2\pi i}{3}} \\
+            1 & 1 &  1\\
+            e^{\frac{-2\pi i}{3}}             & 1 & e^{\frac{+2\pi i}{3}} \\
+        \end{pmatrix},
+    \end{equation*}
+    it is best to find \(\tilde{M}^{-1}\) using Cramer's rule, since many of the minors turn out to be equivalent
+    \begin{equation*}
+        \begin{split}
+            \tilde{M}^{-1} &= 
+        \begin{pmatrix}[1.4]
+            \phantom{-}\ab|\begin{smallmatrix}
+              \tilde{M}_{22} & \tilde{M}_{23} \\ \tilde{M}_{32} & \tilde{M}_{33}
+          \end{smallmatrix}| & 
+            -\ab|\begin{smallmatrix}
+              \tilde{M}_{21} & \tilde{M}_{23} \\ \tilde{M}_{31} & \tilde{M}_{33}
+          \end{smallmatrix}| &
+          \phantom{-}\ab|\begin{smallmatrix}
+              \tilde{M}_{21} & \tilde{M}_{22} \\ \tilde{M}_{31} & \tilde{M}_{32}
+            \end{smallmatrix}| \\
+            -\ab|\begin{smallmatrix}
+              \tilde{M}_{12} & \tilde{M}_{13} \\ \tilde{M}_{32} & \tilde{M}_{33}
+          \end{smallmatrix}| & 
+          \phantom{-}\ab|\begin{smallmatrix}
+              \tilde{M}_{11} & \tilde{M}_{13} \\ \tilde{M}_{31} & \tilde{M}_{33}
+          \end{smallmatrix}| &
+            -\ab|\begin{smallmatrix}
+              \tilde{M}_{11} & \tilde{M}_{12} \\ \tilde{M}_{31} & \tilde{M}_{32}
+            \end{smallmatrix}| \\
+            \phantom{-}\ab|\begin{smallmatrix}
+              \tilde{M}_{12} & \tilde{M}_{13} \\ \tilde{M}_{22} & \tilde{M}_{23}
+          \end{smallmatrix}| & 
+            -\ab|\begin{smallmatrix}
+              \tilde{M}_{11} & \tilde{M}_{13} \\ \tilde{M}_{21} & \tilde{M}_{23}
+          \end{smallmatrix}| &
+          \phantom{-}\ab|\begin{smallmatrix}
+              \tilde{M}_{11} & \tilde{M}_{12} \\ \tilde{M}_{21} & \tilde{M}_{22}
+            \end{smallmatrix}|
+        \end{pmatrix}^{\transpose} \cdot \frac{1}{|\tilde{M}|}\\[1em]
+        &= \begin{pmatrix}
+            e^{\frac{+2\pi i}{3}}  & -2\sin\ab(\frac{+2\pi}{3}) & -e^{\frac{-2\pi i}{3}} \\
+            e^{\frac{+2\pi i}{3}}  & 2\sin\ab(\frac{+2\pi}{3})   & e^{\frac{+2\pi i}{3}} \\
+            -e^{\frac{-2\pi i}{3}} & -2\sin\ab(\frac{+2\pi}{3}) & e^{\frac{+2\pi i}{3}}
+        \end{pmatrix}^{\transpose} \cdot \frac{1}{6\sin(\frac{-2\pi i}{3})}  \\[1em]
+        &= \begin{pmatrix}
+            \frac{-1}{4 \sqrt{3}} + \frac{i}{4} & \frac{-1}{4 \sqrt{3}} + \frac{i}{4} & \frac{-1}{4 \sqrt{3}}
+            - \frac{i}{4}\\
+            -\frac{1}{2} & \frac{1}{2} & -\frac{1}{2} \\
+            \frac{-1}{4 \sqrt{3}} - \frac{i}{4} & \frac{-1}{4 \sqrt{3}} + \frac{i}{4} & \frac{-1}{4 \sqrt{3}}
+            + \frac{i}{4}
+        \end{pmatrix}.
+        \end{split} 
+    \end{equation*}
+
+Finally, we have 
+    \begin{equation}
+        \begin{pmatrix}[1.2]
+            \tilde{\Fcomponent}_{-\vec{k}_\ip} \\
+            \Fcomponent_{\vec{0}} \\
+            \tilde{\Fcomponent}_{+\vec{k}_\ip} \\
+        \end{pmatrix}\hspace{-0.3em}(\vec{k}) \approx \tilde{M}^{-1} \cdot 
+        \begin{pmatrix}
+        \Fsensed_{\phi_{-}} \\ 
+        \Fsensed_{\phi_0} \\
+        \Fsensed_{\phi_{+}}
+        \end{pmatrix}\hspace{-0.3em}(\vec{k}).
+    \end{equation}
+
+It is assumed that there is some overlap of the components \(\Fcomponent_{\vec{0}}\) with both
+\(\Fcomponent_{-\vec{k}_\ip}\) and \(\Fcomponent_{+\vec{k}_\ip}\) within the support of the \ac{OTF}\sidenote{
+    Unfortunately, there is an inverse relationship between how large the overlapping area is (therefore how robust
+    the estimation is against noise) and the maximum achievable resolution, because, the larger the norm of
+    \(\vec{k}_{\ip}\) is, the higher the maximum aliased frequency of the component, but the lower the overlap with the
+    central component \(\Fcomponent_{\vec{0}}\). 
+    Ultimately, most acquisitions using a shift estimation based on the cross-correlation make a compromise of these two
+    effects and the phase-shift is placed approximately at \(0.95\) of the \ac{OTF} cut-off frequency.
+}.
+Accordingly, estimate of \(\vec{k}_\ip\) is performed using cross-correlation\sidecite{huang2018}
+    \begin{equation*}
+        \begin{split}
+            \correlation_{+\vec{k}_\ip}(\vec{p}) &= \sum_{\vec{k}} \ab(\otf(\vec{k} + \vec{p})
+            \Fcomponent_{\vec{0}}(\vec{k}))\cdot\ab(\otf(\vec{k})\tilde{\Fcomponent}_{+\vec{k}_{\ip}}(\vec{k}
+            + \vec{p})) \\[1.2em]
+                                 &\hspace{0.3em}\begin{aligned}
+                                     =\frac{m}{4}e^{+\phi_0} \sum_{\vec{k}} &\otf(\vec{k}
+                                     + \vec{p})\otf(\vec{k})\Fsource(\vec{k}) \\[-0.7em]
+                                                                            &  \hspace{1em} \cdot\otf(\vec{k})\otf(\vec{k} + \vec{p})\Fsource(\vec{k} - \vec{k}_\ip + \vec{p})
+                                 \end{aligned} \\[1.2em]
+                                 &= \frac{m}{4}e^{+\phi_0} \sum_{\vec{k}} \otf^2(\vec{k} + \vec{p}) \otf^2(\vec{k}) \Fsource(\vec{k})
+                                 \Fsource(\vec{k} - \vec{k}_\ip + \vec{p}).
+        \end{split}
+    \end{equation*}
+To make the estimate more robust to noise, we can instead use both components in the cross-correlation
+    \begin{equation}
+        \labeq{cross-correlation-shift}
+            \begin{split}
+                \correlation(\vec{p}) = &\sum_{\vec{k}} \ab(\otf(\vec{k} + \vec{p})
+                \Fcomponent_{\vec{0}}(\vec{k}))\cdot\ab(\otf(\vec{k})\tilde{\Fcomponent}_{+\vec{k}_{\ip}}(\vec{k}
+                + \vec{p})) \\
+                                                    + &\sum_{\vec{k}} \ab(\otf(\vec{k} - \vec{p})
+                \Fcomponent_{\vec{0}}(\vec{k}))\cdot\ab(\otf(\vec{k})\tilde{\Fcomponent}_{-\vec{k}_{\ip}}(\vec{k}
+                - \vec{p})).
+            \end{split}
+    \end{equation}
+We see from \refeq{cross-correlation-shift} that \(\mathcal{C}\) is maximized, when the source signal arguments match, 
+    \begin{equation*}
+        \Fsource(\vec{k}) = \Fsource(\vec{k} - \vec{k}_\ip + \vec{p}) \implies \vec{k}_\ip = \vec{p},
+    \end{equation*}
+    and consequently the estimate can be made by maximizing the cross-correlation over values of \(\vec{p}\)
+    \begin{equation}
+        \hat{\vec{k}_{\ip}} = \argmax_{\vec{p}} \mathcal{C}(\vec{p}).
+    \end{equation}
+
+In practice, we cannot evaluate the functions \(\Fcomponent_{-\vec{k}_\ip}(\vec{k})\) and 
+    \(\Fcomponent_{+\vec{k}_\ip}(\vec{k})\) directly for an arbitrary value of \(\vec{q} = \vec{k} + \vec{p}\)
+    / \(\vec{q} = \vec{k} - \vec{p}\), since they are computed from
+    the sampled, \ac{LR} images.
+The solution to this is to evaluate them for the closest sampled frequency\sidenote{The closest 
+    reciprocal of a multiple of the \ac{LR} image sampling step (i.e. pixel size).} \([\vec{q}]\) and performing a shift
+    by \(\ab(\vec{q} - [\vec{q}])\) using the Fourier shift theorem.
+
+\subsection{Phase-Offset and Modulation Estimate}
+\labsubsec{phase-offset-estimate}
+
+If we expand the components \(\tilde{\Fcomponent}_{-\vec{k}_\ip}\) and \(\Fcomponent_{\vec{0}}\) using 
+    \refeq{one-orientation-components} and \refeq{tilde-components} we get
+    \begin{align*}
+        \tilde{\Fcomponent}_{-\vec{k}_\ip}(\vec{k}) &= \frac{m e^{-i\phi_0}}{4} \Fcomponent_{-\vec{k}_\ip} 
+            = \frac{m e^{-i\phi_0}}{4} \otf(\vec{k}) \Fsource(\vec{k} + \vec{k}_\ip), \\
+        \Fcomponent_{\vec{0}}(\vec{k}) &= \otf(\vec{k}) \Fsource(\vec{k}).
+    \end{align*}
+We see that they differ only by the phase-shift \(\vec{k}_\ip\) and the complex coefficient \(me^{-i\phi_0}/4\).
+Using the phase-shift estimate \(\hat{\vec{k}}_\ip \eqqcolon \vec{k}_\ip\), estimates of the source signal
+    \(\Fsource(\vec{k})\) and can be made from both components
+    \begin{align*}
+        \tilde{\hat{\Fsource}_{-\vec{k}_\ip}}(\vec{k}) &= \frac{m e^{-i\phi_0}}{4}\hat{\Fsource}_{-\vec{k}_\ip}(\vec{k})
+        = \frac{m e^{-i\phi_0}}{4} \ab(\frac{\tilde{\Fcomponent}_{-\vec{k}_\ip}(\vec{k} - \vec{k}_\ip)}{\otf(\vec{k} - \vec{k}_\ip)}), \\
+        \hat{\Fsource}_{\vec{0}}(\vec{k}) &= \frac{\Fcomponent_{\vec{0}}(\vec{k})}{\otf(\vec{k})}.
+    \end{align*}
+Using complex linear regression from values in the intersection of \(\supp\otf(\vec{k} - \vec{k}_\ip)\) and
+\(\supp\otf(\vec{k})\), it is then possible to estimate \(\tilde{m}/4 \coloneqq me^{-i\phi_0}/4\) as
+    \begin{gather*}
+        \Omega = \supp\otf(\vec{k} - \vec{k}_\ip) \cap \supp\otf(\vec{k}) \\
+        \hat{\tilde{m}} =  \frac{4 \cdot\sum_{\vec{k} \in \Omega}
+            \ab(\tilde{\hat{\Fsource}}_{-\vec{k}_\ip}(\vec{k}))^{*} \cdot \hat{\Fsource}_{\vec{0}}(\vec{k})}{\sum_{\vec{k} \in \Omega}
+            \hat{\Fsource}_{\vec{0}}^{2}(\vec{k})}.
+    \end{gather*}
+The modulation factor and the phase-offset estimates are consequently
+\begin{equation*}
+    \hat{m} = |\hat{\tilde{m}}| \quad \& \quad \hat{\phi}_0 = \arg(\hat{\tilde{m}}).
+\end{equation*}
+
+% \subsection{Alternative Phase-Offset Estimate}%
+% \labsubsec{alternative_phase-offset_estimate}
+% TODO: Add the other estimation algorithm. This is not the one used for the estimation of modulation and phase-offset <17-12-23> 
+
+\section{Deconvolution Reconstruction}
+\labsec{deconvolution-reconstruction}
+
+The deconvolution approach consists of:
+\begin{enumerate}[label=\roman*.]
+    \item \labitm{component-separation} separation of the aliased components  
+        \begin{equation*}
+            \ab(\Fsensed_{\phi^{n}_{-}}^{n}, \Fsensed_{\phi^{n}_{0}}^{n}, \Fsensed_{\phi^{n}_{+}}^{n})_{n \in \oneto{3}} \mapsto
+            \ab(\Fcomponent_{-\vec{k}^{n}_\ip}^n, \Fcomponent_{\vec{0}}^n, \Fcomponent_{+\vec{k}^{n}_\ip}^n)_{n \in \oneto{3}}
+        \end{equation*}
+    \item \labitm{component-shift} shifting the components to their corresponding locations within the \ac{HR} image\sidenote{
+        In practice the components, when shifted, are placed within the \ac{HR} image's grid (in the Fourier domain).
+        We are working with a sensor that samples \(512\times 512\) pixels so these are the dimensions of the \ac{LR} 
+            sensed images that are due to the imaging equipment. 
+        The dimensions of the output \ac{HR} images are not predetermined or restricted by any external constraints and 
+            instead are a choice that is necessary to make.
+        There is no reason to make the dimensions unnecessarily high since the amount of information in the 
+            reconstructed image is constant for any choice that is greater than the Shannon sampling rate of the 
+            reconstructed \(\reconstructed(\vec{r})\).
+        Assuming that the \ac{LR} images are already sensed with a sampling rate above the Shannon threshold, we can set
+            the \ac{HR} image sampling rate to twice that of the \ac{LR} images since the maximum theoretical 
+            enhancement in physical resolution (encapsulated information gain) for a reconstruction with linear \ac{SIM}
+            is \(2\times\). With this in mind, the target dimensions of the reconstruction that we use is 
+            \(1024\times 1024\).
+        } 
+        \begin{equation*}
+            \ab(\Fcomponent_{-\vec{k}^{n}_\ip}^n, \Fcomponent_{\vec{0}}^n, \Fcomponent_{+\vec{k}^{n}_\ip}^n)_{n \in \oneto{3}} \mapsto 
+            \ab(\Fcomponent_{-\vec{k}^{n}_\ip}^{n'}, \Fcomponent_{\vec{0}}^{n'}, \Fcomponent_{+\vec{k}^{n}_\ip}^{n'})_{n \in \oneto{3}}
+        \end{equation*}
+    \item \labitm{otf-shift} determining the \ac{OTF} of the mapped components and the \ac{HR} image 
+        \begin{equation*}
+            \ab(\Fcomponent_{-\vec{k}^{n}_\ip}^{n'}, \Fcomponent_{\vec{0}}^{n'}, \Fcomponent_{+\vec{k}^{n}_\ip}^{n'})_{n \in \oneto{3}}
+            \mapsto \ab(\otf^{n'}_{-\vec{k}^{n}_\ip}, \otf^{n'}_{\vec{0}}, \otf^{n'}_{+\vec{k}^{n}_\ip})_{n \in \oneto{3}}
+        \end{equation*}
+    \item \labitm{deconvolution} deconvolution of the mapped components 
+        \begin{equation*}
+            \ab(\Fcomponent_{-\vec{k}^{n}_\ip}^{n'}, \Fcomponent_{\vec{0}}^{n'}, \Fcomponent_{+\vec{k}^{n}_\ip}^{n'})_{n \in
+           \oneto{3}},
+           \ab(\otf^{n'}_{-\vec{k}^{n}_\ip}, \otf^{n'}_{\vec{0}}, \otf^{n'}_{+\vec{k}^{n}_\ip})_{n \in \oneto{3}}
+            \mapsto \Freconstructed.
+        \end{equation*}
+\end{enumerate}
+
+\subsection{Separation of Components (\refitmshort{component-separation})}
+\labsubsec{component-separation}
+
+The procedure for \refitm{component-separation} was already described in \refsubsec{shift-estimation}.
+\marginnote{The necessity of the separation of components is one of the major drawbacks for the deconvolution approach,
+    since it requires the acquisition of 9 \ac{LR} images. We used all of the 9 \ac{LR} images for the parameter
+    estimation (\refsecshort{IP-parameter-estimation}), but if the parameters where known as a consequence to the method
+    of acquisition, or they where estimated using a lower number of \ac{LR} images, it wouldn't be possible to perform
+the reconstruction using the deconvolution approach. It would however be possible to use the other two methods.}
+At this moment, however, we have the estimates of the phase-offsets \(\phi_{-}, \phi_{0}, \phi_{+}\) and the 
+    modulations \(m\),  therefore, we use them to separate the weighted components \(\Fcomponent_{-\vec{k}_\ip}\), 
+    \(\Fcomponent_{\vec{0}}\) and \(\Fcomponent_{\vec{k}_\ip}\).
+The linear combination matrix is now
+    \begin{equation*}
+        \begin{split}
+            M(m, \phi_0) &= \begin{pmatrix}[1.2]
+            \frac{m}{4} e^{\frac{+2\pi i}{3} - i\phi_0}             & 1 & \frac{m}{4} e^{\frac{-2\pi i}{3}+i\phi_0} \\
+            \frac{m}{4}  e^{-i\phi_0} & 1 &  \frac{m}{4} e^{+i\phi_0}\\
+             \frac{m}{4} e^{\frac{-2\pi i}{3} - i\phi_0}            & 1 &  \frac{m}{4} e^{\frac{+2\pi i}{3}+i\phi_0}\\
+        \end{pmatrix} \\
+        &= \tilde{M}\cdot \pdiagmat[ empty = {\cdot} ]{\frac{m e^{ -i\phi_0}}{4}, 1,  \frac{me^{+i\phi_0}}{4} },
+        \end{split}
+    \end{equation*}
+    and \(M^{-1}\) is
+    \begin{equation}
+        \begin{split}
+            M^{-1}(m, \phi_0) &= \pdiagmat[ empty = {\cdot} ]{\frac{4 e^{ +i\phi_0}}{m}, 1,  \frac{4e^{-i\phi_0}}{m} } \cdot
+            \tilde{M}^{-1} \\
+                &= \begin{pmatrix}[1.2]
+                (\frac{-1}{\sqrt{3}} + i) \cdot \frac{e^{+i\phi_0}}{m} & \frac{-1}{4 \sqrt{3}} + \frac{i}{4} & (\frac{-1}{\sqrt{3}}
+                - i) \cdot \frac{e^{-i\phi_0}}{m}\\
+                -\frac{2e^{+i\phi_0}}{m} & \frac{1}{2} & -\frac{2e^{-i\phi_0}}{m} \\
+                (\frac{-1}{\sqrt{3}} - i) \cdot \frac{e^{+i\phi_0}}{m} & \frac{-1}{4 \sqrt{3}} + \frac{i}{4} & (\frac{-1}{\sqrt{3}}
+                + i) \cdot \frac{e^{-i\phi_0}}{m}
+            \end{pmatrix}.
+        \end{split}
+    \end{equation}
+For every orientation \(n \in \oneto{3}\) the separated components are
+    \begin{equation*}
+        \begin{pmatrix}
+        \Fcomponent^{n}_{-\vec{k}^{n}_\ip} \\
+        \Fcomponent^{n}_{\vec{0}} \\
+        \Fcomponent^{n}_{+\vec{k}^{n}_\ip} \\
+    \end{pmatrix}\hspace{-0.3em}(\vec{k}) 
+        \approx M^{-1}(m^{n}, \phi^{n}_0) \cdot \begin{pmatrix}
+            \Fsensed^{n}_{\phi^{n}_{-}} \\ \Fsensed^{n}_{\phi^{n}_0} \\ \Fsensed^{n}_{\phi^{n}_{+}}
+        \end{pmatrix}\hspace{-0.3em}(\vec{k}).
+    \end{equation*}
+
+\begin{figure}
+    \png{separated-components}
+    \caption{Separated components for orientation \(n=1\).}
+    \labfig{separated-components}
+\end{figure}
+
+\subsection{Shifting Components (\refitmshort{component-shift} and \refitmshort{otf-shift})}
+\labsubsec{shifting-component}
+
+It is necessary need to shift the components to their locations corresponding to their location within the
+    source signal.
+For a component \(\Fcomponent_{\vec{p}}\) which corresponds to the element of the \(\Fip_{\vec{p}}\) with 
+    \(\dirac_{\vec{p}}\) we want to get \(\Fcomponent_{\vec{p}}'(\vec{k}) = \Fcomponent_{\vec{p}}(\vec{k} + \vec{p})\).
+This is done using the Fourier shift theorem as
+    \begin{equation*}
+        \Fcomponent'_{\vec{p}}(\vec{k}) = \F{\Finverse{\Fcomponent_{\vec{p}}} \cdot e^{-2\pi i  \vec{p} \cdot \vec{r}}}.
+    \end{equation*}
+In this way, the shifting in \refitm{component-shift} is performed for every component \(\Fcomponent_{-\vec{k}^{n}_\ip}\),
+    \(\Fcomponent_{\vec{0}}\) and \(\Fcomponent_{+\vec{k}^{n}_\ip}\) and for every orientation \(n \in \oneto{3}\)
+    (\reffigshort{shifted-components}).
+
+
+\floatsetup[figure]{ % Captions for figueres
+    capbesideposition={top,outside},%
+}%
+\begin{figure}
+    \png{shifted-components}
+    \caption{The components shifted to their corresponding locations in the \ac{HR} image.}
+    \labfig{shifted-components}
+\end{figure}
+\floatsetup[figure]{ % Captions for figueres
+    capbesideposition={bottom,outside},%
+}%
+
+It is necessary to realize, how the frequencies in component \(\Fcomponent'_{\vec{p}}\) manifest themselves in the
+    sensed \ac{LR} images \(\Fsensed\).
+The whole point of illuminating the image in a way that shifts the components towards lower frequencies is, that it
+    moves them within the support of the \ac{OTF}.
+Accordingly to \refeq{component-separation}, the frequencies of the component \(\Fcomponent'_{\vec{p}}\) are the
+    projections of the source signal \(\Fsource(\vec{k} - \vec{p})\) frequencies, as if \(\vec{p}\) was the origin of
+    the Fourier transformed sensed signal \(\Fsensed\).
+That is, an estimate of the source signal from the information contained in the component \(\Fcomponent'_{\vec{p}}\) can
+    be illustratively\sidenote{The estimate is not obtained in this way precisely as will be demonstrated in
+    \refsubsec{deconvolution}.} written as
+    \begin{equation}
+        \labeq{component-with-OTF-mapping}
+        \hat{\Fsource}_{\Fcomponent'_{\vec{p}}}(\vec{k}) \cdot \otf(\vec{k} - \vec{p})
+        = \Fcomponent'_{\vec{p}}(\vec{k}).
+    \end{equation}
+As indicated in \refitm{otf-shift} an \ac{OTF} is assigned\sidenote{
+    When using a model \ac{OTF}, this is trivially done by evaluation with translated arguments. If a \ac{LR} measured 
+    transfer function is to be used it must be upsampled due to the mismatch of sampling rates of the \ac{HR} and 
+    \ac{LR} images, and the translation must be realized using the Fourier shift theorem. Alternatively, the evaluation
+    may be done of an interpolation of the measured data.
+    } to every component \(\Fcomponent'_{\vec{p}}\) of every orientation \(n \in \oneto{3}\)
+    \begin{equation*}
+        \otf'_{\vec{p}}(\vec{k}) = \otf(\vec{k} - \vec{p}).
+    \end{equation*}
+
+% \begin{figure}
+%   \png{shifted-otfs}
+%   \caption{\ac{OTF}s \(\otf_{\vec{p}}'\) of the \(\vec{p}\)-shifted components.}
+%   \labfig{shifted-otfs}
+% \end{figure}
+
+\begin{marginfigure}[*-16]
+  \marginpng{shifted-otfs}
+  \caption{\ac{OTF}s \(\otf_{\vec{p}}'\) of the \(\vec{p}\)-shifted components.}
+  \labfig{shifted-otfs}
+\end{marginfigure}
+
+\subsection{Deconvolution (\refitmshort{deconvolution})}
+\labsubsec{deconvolution}
+
+The state of the reconstruction is that we have frequency components, positioned at locations within the Fourier space 
+    that are in compliance with the physical structure that they represent in the source signal and have appropriate 
+    \acs{OTF}s for them.
+Each \ac{OTF} corresponding to a component acts as degradation function for the source signal \(\Fsource\) in the
+    components location (\refeqshort{component-with-OTF-mapping}).
+The degradation is embodied by a convolution of the source signal with a \ac{PSF} or in the frequency space
+    by multiplication with the \ac{OTF}.
+% TODO: Figure of degraded shifted components without deconvolution <18-12-23> 
+Inversion of this degradation process in image processing is called deconvolution (also restoration).
+There are many approaches with various purposes that attempt to achieve deconvolution each targeted for a different
+    purpose.
+
+One such approach, that is widely used is the \emph{Weiner} deconvolution (filter). 
+It is derived in as a least square error estimate of the original signal, given a noisy sensed signal and a known
+    transfer (degradation) function (\refch{deconvolution}).
+A simplified version of the Weiner filter estimate \(\Freconstructed\) of a noisy signal \(\Fsensed\) and an \ac{OTF} 
+    \(\otf\) is given by
+    \begin{equation*}
+        \Freconstructed = \frac{\otf^*\Fsensed}{\otf^*\otf + \omega^2},
+    \end{equation*}
+    where \(\omega\) is an empirically chosen real constant, which represents inverse \ac{SNR} in the noisy signal.
+For the purpose of restoring the relocated components the estimate is realized using frequency information from all of 
+    the components in the numerator and the full \ac{HR} image \ac{OTF} in the denominator
+    \begin{equation*}
+        \Freconstructed_{\text{\ac{SIM}}}(\vec{k}) = \frac{\sum\limits_{n = 1}^{3}\sum_{\vec{p} \in \{-\vec{k}^{n}_\ip,
+        \vec{0}, +\vec{k}^{n}_\ip\}} \ab(\otf^{n'}_{\vec{p}}(\vec{k}))^*
+        \Fcomponent^{n'}_{\vec{p}}(\vec{k})}{\sum\limits_{n = 1}^{3}\sum_{\vec{p} \in \{-\vec{k}^{n}_\ip,
+        \vec{0}, +\vec{k}^{n}_\ip\}} \ab(\otf^{n'}_{\vec{p}}(\vec{k}))^*
+\otf^{n'}_{\vec{p}}(\vec{k}) + \omega^2}.
+    \end{equation*}
+
+% TODO: Should be an option of the image <19-12-23> 
+% NOTE: This setup is to avoid overlapping of captions of this image with the next image  
+\floatsetup[figure]{ % Captions for figueres
+    capbesideposition={top,outside},%
+}%
+\begin{figure}
+    \png{weiner-reconstruction}
+    \caption{Reconstructed \ac{HR} image using \emph{Weiner} deconvolution.}
+    \labfig{weiner-reconstruction}
+\end{figure}
+\floatsetup[figure]{ % Captions for figueres
+    capbesideposition={bottom,outside},%
+}%
+
+% TODO: Side note about how an optimal Fourier domain image should look like <19-12-23> 
+It is visible (\reffigshort{weiner-reconstruction}), in particular in the Fourier domain, that the
+reconstruction is not optimal (\reffigshort{weiner-reconstruction-artifacts}). 
+The first aspect that is clearly not expected in an optimal reconstruction are noticeable peaks at the locations of the
+    shift frequencies \(\vec{k}_\ip^n\) for all orientations \(n \in \oneto{3}\).
+\begin{marginfigure}[*-24]
+    \marginpng{weiner-reconstruction-artifacts}
+    \caption{
+    At the top the full reconstructed image without any modifications and filtering.
+    There are visible periodic artefacts, in the \ac{SIM} terminology aptly named \emph{honey comb} artefacts, that are 
+        most prominent in the background area of the image. 
+    In the middle, the same reconstruction but after performing strong apodization filtering. 
+    It is apparent that the apodized image has less artefacts in the background but is also noteworthy, that the image 
+        also has a lower resolution that can be observed by comparing the sizes of the beads in the filtered and 
+        non-filtered reconstructions. 
+    At the bottom, difference between the two reconstructions that accents the form of \emph{honey comb} artefacts.
+}
+    \labfig{weiner-reconstruction-artifacts}
+\end{marginfigure}
+
+There is no physical reason for the presence of these peaks.
+One explanation is incorrect parameter estimation that leads to an incorrect component separation.
+This is partly the case as we can see that the left-top and right-bottom components have slightly more prominent peaks
+    than the other two orientations, which suggests that there are "leftover" parts of the central component, which
+    should physically have the strongest intensity within the Fourier domain.
+
+
+However, this reasoning fails to fully explain the deficiency of the reconstruction which reveals itself by the pronounced
+    circumference of the Fourier spectrum.
+This cannot be explained by inferior component separation, but instead points toward a suboptimal transfer function
+    used for the reconstruction which admits frequencies that should be dismissed as being beyond the \ac{OTF} support 
+    of the imaging system.
+We will tackle this issue in \refch{tf-measurement}.
+
+\subsection{Apodization}
+\labsubsec{apodization}
+One more tool which commonly gets employed to counter these high-frequency artefacts is apodization of the output 
+    Fourier domain \ac{HR} image.
+% TODO: Figure apodization relief <kunzaatko> 
+Apodization is in effect a low-pass filter which is constant \(1\) near the origin and beyond some predefined radius, 
+    decreases to \(0\) according to some smooth function that is termed the \emph{apodization function}. 
+The smoothness of the decrease is important for suppressing the formation of artefacts that occur from using the 
+    \ac{DFT} on a signal with abrupt edges.
+There are many possibilities to use as apodization functions, but in this particular use-case, there is no significant 
+    difference between using any of them.
+One that is used commonly is the \emph{cosine apodization function}
+    \begin{equation*}
+        A_{a}(r) = \cos\ab(\frac{\pi r}{2a}),
+    \end{equation*}
+    where \(a\) is a chosen constant parameter of the apodization.
+\begin{marginfigure}
+    \marginpng{weiner-reconstruction-surface-apo}
+    \caption{The apodization filter used in \reffig{apo-weiner}.}
+    \labfig{apo-surface}
+\end{marginfigure}
+
+A disadvantage of using apodization for countering these artefacts is that it dismisses the information in the image
+    from the high frequencies and essentially acts as a denoising procedure during which inherently some features of the
+    image are lost.
+Due to this, correctly determining and eliminating the attributes that cause the formation of artefact in the
+    reconstruction in the first place is regarded as a better, yet more demanding and non-universal, approach.
+The artefacts that are filtered from the original non-apodized image are shown in 
+    \reffig{weiner-reconstruction-artifacts} on a cut-out from the spatial reconstructed image, and the full apodized
+    reconstruction is in \reffig{apo-weiner}.
+
+\begin{figure}[h]
+    \png{weiner-reconstruction-apodization}
+    \caption{Reconstructed image after using apodization to suppress artefacts of incorrect reconstruction parameters
+    and \ac{OTF}.}
+    \labfig{apo-weiner}
+\end{figure}
+
+
+\section{Inversion Reconstruction}
+\labsec{inversion-reconstruction}
+
+The principle of the inversion reconstruction is in many ways easier compared to the deconvolution reconstruction
+    (\refsecshort{deconvolution-reconstruction}).
+It relies on formulating a forward model \(\fwd\) that, when applied to the true source signal \(\source\) yields the
+    expectation of the sensed \ac{LR} images \(\hat{\sensed}\).
+Unlike the deconvolution optimization, we do not attempt to develop an estimate for \(\fwd^{-1}\), but instead, it is
+    sufficient to formulate the forward model and rely on mathematical optimization for estimating the correct desired
+    input \(\source\), minimizing some defined loss \(\loss\) between \(\fwd[\source]\) and the sensed \(\sensed\).
+A simplified outline of the solution that inversion reconstruction gives is
+    \begin{equation*}
+        \reconstructed = \argmin_{\source} \loss[\sensed,  \fwd[\source] ].
+    \end{equation*}
+
+
+\subsection{Forward Model}
+\labsubsec{forward-model}
+
+The forward model for one \ac{LR} acquisition \(\sensed\) with a specified illumination \(\ip_\sensed\) is apparent from
+    \refeq{component-separation}
+    \begin{equation}
+        \labeq{fwd-one-lr}
+        \hat{\sensed} = \ab(\ip_\sensed \cdot\source) \conv \psf,
+    \end{equation}
+    where \(\psf\) is the \ac{PSF} of the optical system.
+One difference that is necessary to make from \refeq{fwd-one-lr}, is, that the optimized \(\reconstructed\) must 
+    minimize concurrently the loss \(\loss\) for all of the forward model expectations of the \ac{LR} acquired images at
+    the input, with a single estimate of \(\reconstructed\).
+An obvious and easiest way to achieve this is to minimize the sum of loss \(\ell\) evaluated for every input image
+    \begin{equation*}
+        \loss_\Sigma[\{\sensed_n\},  \{\fwd_n[\source]\} ] = \sum_{n} \loss[\sensed_n,  \fwd_n[\source] ].
+    \end{equation*}
+
+\subsection{Loss Function}
+\labsubsec{loss-function}
+
+A choice that is necessary to make is, the form of the loss \(\loss\).
+The role of the loss function is mapping the parameters of the optimization problem (in our case the values of the
+    pixels of the forward model carried out on the source signal \(\source\)) onto a real number.
+The important aspect of loss that is necessary to redeem is, that minimization of the loss leads to a better estimate of
+    the parameters that we want to determine.
+One very common choice for the loss in deep learning applications is the \(\ell_2\) norm between the measurement and the
+    prediction.
+It is possible however, to choose a better loss, that is directly linked to the nature of our optimization problem.
+An ideal choice is dependent on the nature\sidenote{Similarly to mathematical statistics, there is no optimal choice 
+    for an estimate. Instead we can choose to value some of its properties such
+    as it being non-biased, its speed of convergence or its robustness to spurious input data (such as outlying
+    measurements). From a standpoint of mathematical optimization, also the numerical stability of the optimization must
+    be taken into account.} of the estimate \(\reconstructed\) that we want to achieve.
+In microscopy (especially in low \ac{SNR} acquisitions), the dominant source of noise is due to photon (Poisson) shot noise
+    (\refsubsecshort{noise}).
+Assuming a correct forward model \(\fwd\), we can specify the probability of a sensed signal in relation to the true 
+    source signal \(\source\) as
+    \begin{equation*}
+        \labeq{poisson-probablility-sensed}
+        \distribution{P}[\sensed \mid \fwd[\source]] = \prod_{\vec{r}}
+        \frac{\ab(\fwd[\source](\vec{r}))^{\sensed(\vec{r})}}{\Gamma(\sensed(\vec{r}) + 1)} \cdot e^{-\fwd[\source](\vec{r})}.
+    \end{equation*}
+Based on this, assumption, we want to get a reconstruction \(\reconstructed\) such that the probability
+    \(\distribution{P}[\sensed(\vec{r}) \mid \fwd[\reconstructed](\vec{r})]\) is as large as possible, since this would
+    be the reconstruction that is most probable to describe the sensed \ac{LR} images \(\sensed\).
+To reach this goal the loss is set to be the negative log-likelihood\sidenote{
+        Using this loss during the optimization, if we disregarded the regularization term (\refsubsecshort{regularizer}), is 
+            equivalent to performing the \ac{MLE} of the \(\source\) in mathematical statistics.
+    } of the sensed \ac{LR} images (taking \(e\) for the 
+    base of the logarithm)
+    \begin{equation}
+      \labeq{log-likelihood-poisson-loss-long}
+      \begin{split}
+          \tilde{\ell}_{\distribution{P}}[\sensed, \fwd[\source]] &= -\ln(\distribution{P}[\sensed(\vec{r}) \mid
+          \fwd[\source](\vec{r})]) \\[0.7em]
+                                                                            &= \sum_{\vec{r}}\fwd[\source](\vec{r}) + \ln(\Gamma(\sensed(\vec{r}) + 1)) \\[-0.7em]
+                                                                            &\hspace{3em}- \sensed(\vec{r})\cdot\ln(\fwd[\source](\vec{r})).
+      \end{split}
+    \end{equation}
+The term \(\ln(\Gamma(\sensed(\vec{r}) + 1))\) in the loss of \refeq{log-likelihood-poisson-loss-long} is constant for
+    any source \(\source\) so we can ignore it.
+The final loss for the optimization problem then becomes
+\begin{equation}
+      \labeq{log-likelihood-poisson-loss}
+          \ell_{\distribution{P}}[\sensed, \fwd[\source]] = \sum_{\vec{r}}\fwd[\source](\vec{r})- \sensed(\vec{r})\cdot\ln(\fwd[\source](\vec{r})).
+\end{equation}
+
+\subsection{Regularization Term}
+\labsubsec{regularizer}
+
+To prevent over-fitting of the reconstructed \(\reconstructed\) during the optimization, it is necessary to add
+    regularization to the optimization problem.
+Regularization leads to a simpler solution, that may be more robust to the unwanted influence of noise that would 
+    otherwise be inflicted by the optimization.
+In general, it is necessary to add some form of regularization into the optimization problem, if the ratio  of the 
+    number of parameters in the output to number of input data points is large.
+The principle of regularization is to impose some additional constraint to the output parameters that forces against
+    outputs that would be in conflict with what is physically expected of the output.
+
+
+Here the regularization is added explicitly in the form of a regularization term.
+The form of the regularization term can highly influence the output and so it is necessary to choose it carefully.
+Most regularization terms used in the context of images are defined in favour of the principle, that the output should 
+    be reasonably smooth.
+In other words, it attempts to penalize variation in the output.
+
+One of the most commonly used regularization terms is \emph{\ac{TV}} in the form
+\begin{equation*}
+    \reg_{\text{TV}}[\source] = \sum_{\vec{r}}| \nabla \source(\vec{r})|,
+\end{equation*}
+where \(\nabla\source\) is approximated for the discretely sampled \(\source\) and the resulting formula, for \(u\) and
+    \(v\) being the pixel indices, is given by
+\begin{equation*}
+    \reg_{\text{TV}}[\source] = \sum_{u,v} \sqrt{| \source(u + 1, v) - \source(u,v)|^2 + | \source(u, v + 1)
+    - \source(u,v)|^2}.
+\end{equation*}
+
+Another option that is frequently used for images is \emph{\ac{GR}} for which the continuous formula is
+\begin{equation*}
+    \reg_{\text{GR}}[\source] = \sum_{\vec{r}} \sqrt{\source(\vec{r})}(\Delta \sqrt{\source})(\vec{r}),
+\end{equation*}
+where \(\Delta \sqrt{\source}\) is the Laplace operator and it is approximated in the discrete domain as
+\begin{multline*}
+        \reg_{\text{GR}}[\source] = \sum_{u,v} \sqrt{\source(u,v)} \cdot \left(\frac{\sqrt{\source(u + u_{\Delta}, v)}
+        + \sqrt{\source(u - u_{\Delta}, v)}}{u_{\Delta} v_{\Delta}} \right. \\
+        + \left.\frac{\sqrt{\source(u, v + v_{\Delta})} + \sqrt{\source(u, v - v_{\Delta})}
+        - 4\cdot \sqrt{\source(u,v)}}{u_{\Delta} v_{\Delta}}\right).
+\end{multline*}
+
+% TODO: Add note about what is u_Δ  and v_Δ <19-12-23> 
+
+\subsection{Optimization}
+\labsubsec{optimization}
+
+The final reconstruction optimization problem is posed as
+\begin{equation*}
+    \reconstructed =  \argmin_{\source} \ab(\loss_{\Sigma}\ab[\{\sensed_n\},\{\fwd_n[\source]\}]
+    + \lambda\reg[\source]),
+\end{equation*}
+    where \(\lambda\) is the regularization parameter, that is set empirically and the loss is the sum of Poisson
+    losses \(\loss_{\distribution{P}}\).
+
+The numerical optimization itself is performed using gradient descent with the use of source-to-source backward 
+    propagated automatic differentiation for computing the gradient and hessian.
+
+\floatsetup[figure]{ % Captions for figueres
+    capbesideposition={top,outside},%
+}%
+\begin{figure}
+    \png{optimization-reconstruction-both}
+    \caption{Reconstructed \(\reconstructed\) using optimization reconstruction with \ac{TV} (top row) and \ac{GR}
+        (bottom row) for regularization and \(\lambda = 0.05\).
+        A big difference in the two reconstructions is not visible in this case.}  % TODO: Add more context to why there
+        % is not much of a difference <26-12-23> 
+    \labfig{reconstruction-optimization-both}
+\end{figure}
+\floatsetup[figure]{ % Captions for figueres
+    capbesideposition={bottom,outside},%
+}%
+
+% TODO: Either the figures must be wide over the full page along with the weiner reconstruction or there must be some
+% text in-between the figures or the image must be in one image <26-12-23> 
+
+% \begin{figure}
+%     \png{optimization-reconstruction-GR_0_05}
+%     \caption{Reconstructed \(\reconstructed\) using optimization reconstruction with \ac{GR} for regularization
+%         and \(\lambda = 0.05\).} 
+%     \labfig{reconstruction-GR_0_05}
+% \end{figure}
+
+\begin{marginfigure}[*-17]
+    \marginpng{optimization-reconstruction-compare-regularization}
+    \caption{Comparison of the two reconstructions using \ac{GR} and \ac{TV} for regularization (\(\lambda = 0.05\)) on
+    a cut-out of the image. It is important to note that \(\lambda\) does not have the same effect for one value on any
+    regularization.}
+    \labfig{comparison-GR-TV}
+\end{marginfigure}
+
+\section{Discussion}%
+\labsec{reconstruction_methods_discussion}
+
+There has been a lot of research on the use of different reconstruction methods and their benefits have been
+    demonstrated on particular datasets.
+% TODO: Add reference to comparison paper for reconstruction methods <26-12-23> 
+To this date, no reconstruction method has been distinguished as the "holy grail" that is best for any dataset
+    universally, as is often the case for any set of algorithms developed for a particular purpose.
+Benefits can be attributed to each method.
+More limiting are the drawbacks that may deem an approach utterly inappropriate for a particular methodology of 
+    observation.
+
+One such example is the use of machine learning based methods.
+The major drawback that they inherently posses is the lack of fidelity of the output.
+This is due to the way machine learning methods work in most implementations.
+Usually the training dataset is generated by modifying the source similarly to how it was expressed in 
+    \refsubsec{forward-model} and the user formulating a procedure to generate model sources \(\source\) that are
+    applicable for the given observation.
+Generating the training dataset in this manner ensures that the learning can be supplied with a ground truth of the
+    source signal.
+This means that the training dataset is not necessarily natural in the sense that the data used for training may not be
+    variable enough to encompass the structure of the real world data input for reconstruction and the resulting
+    model can be biased in the direction of data that it was supplied with during training.
+The quality of the model that is problematic in this regard is termed in literature as the \emph{ability of the model to
+    generalize} and although it is possible to minimize the issue to a certain extent, it is always present at some 
+    degree.
+Due to this, machine learning methods are hard to justify in the reconstruction of biological structures which are not 
+    yet fully understood to the level of being able to generate models of their structure that are absolutely 
+    dependable.
+On the other hand, the fact that the reconstruction is "aware" of the source structure that it should output can lead to
+    machine learning reconstructions, that use appropriate source models, to be vastly less noisy and visually and 
+    structurally more appealing than reconstruction based on other methods.
+
+Another benefit is that the reconstruction using machine learning can be supplied with data without any preparation
+    steps.
+Denoising and other procedures that ensure the visual quality of the reconstruction can be incorporated into the
+    reconstruction step itself which means that there is no information lost before the actual reconstruction is 
+    performed.
+In general, there is a trend for new algorithms to consolidate all the steps into one single model precisely due to this
+    reasoning.
+
+An aspect that must be considered when choosing a reconstruction method, if the object of the observation is not static 
+    (e.g. \emph{in vivo} acquisitions), is the value of temporal resolution and the photon efficiency of the 
+    observation.
+There is an intrinsic deficiency of the deconvolution reconstruction in the fact that it is necessary to sense the image
+    \(3\) times in a single orientation to be able to linearly separate the components.
+Machine learning and optimization based reconstruction procedures do not posses this limitation, as long as we are able 
+    to estimate the parameters of the illumination patterns.
+This can be recognized from the \refeq{ip-formula}, which suggests that we gain no additional information from the two
+    additional acquisitions having different phase-offsets.
+An equivalent optimization reconstruction is therefore in theory possible to perform using only \(3\) \ac{LR} images, 
+    one for each orientation (\reffigshort{optimization-reconstruction-3LR-vs-9LR}).
+The difference in these two reconstructions should be explainable only through the additional optimization parameters
+    that should benefit the robustness towards noise.
+
+\begin{marginfigure}[*-18]
+    \marginpng{optimization-reconstruction-3LR-vs-9LR}
+    \caption{Comparison of optimization reconstruction performed from 3 and 9 \ac{LR} images. }
+    \labfig{optimization-reconstruction-3LR-vs-9LR}
+\end{marginfigure}
+
+A further, very interesting, possible enhancement to the machine learning and optimization approaches is to apprehend
+    the estimated parameters of the illumination pattern as random variables with a certain distribution instead of 
+    constant estimates or to perform the estimates as part of the reconstruction.
+That can be leveraged in the reconstruction to further fine tune the properties we are expecting from the output
+    without overly relying on the correctness of the estimates.
+Within the machine learning approach this can be achieved by training the reconstruction model without supplying the 
+    correct parameters as part of the data.
+For the optimization reconstruction, this can be done by Bayesian inversion\sidecite{orieux2012} using Bayes rule in the
+    form
+    \begin{equation*}
+        \distribution{P}[\source, \lambda \mid \sensed] = \frac{\distribution{P}[\sensed \mid \source,
+        \lambda] \cdot \distribution{P}[\source, \lambda]}{\distribution{P}[\sensed]},
+    \end{equation*}
+    where \(\lambda\) are the parameters of the illumination patterns during acquisition of \(\sensed\)
+    \(\distribution{P}[\source , \lambda] = \distribution{P}[\source] \cdot \distribution{P}[\lambda]\) due to
+    independence, \(\distribution{P}[\source]\) can be set either as the uninformative prior or as a conjugate prior
+    to the noise distribution \(\distribution{P}[\sensed \mid \source, \lambda]\) and the prior 
+    \(\distribution{P}[\lambda]\) can be formed by randomizing the parameter estimates.
+
+One hybrid approach to integration of parameter estimation into the reconstruction is tiled \ac{SIM}
+    reconstruction.
+The idea is that the \ac{LR} images are subdivided into tiles and the reconstruction is performed for each tile
+    individually.
+The parameters are estimated independently for the tiles.
+This has been shown to lead to better results in some cases\sidecite{hoffman2020}.
+
+% TODO: Note about tiled reconstruction <26-12-23> 
+    
+% TODO: The reconstruction should be shown of the CCPs instead of the beads <26-12-23> 

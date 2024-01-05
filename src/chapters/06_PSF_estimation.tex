@@ -1,0 +1,927 @@
+\setchapterpreamble[u]{\margintoc}
+\chapter{Measurement of the Transfer Function}
+\labch{tf-measurement}
+
+If we have an optical system and want to model the way light passes through that system, either in order to enhance our
+    estimate of the structure (source) that causes the output signal or to establish characteristics of that system, we 
+    need to determine one of the transfer functions introduced in \refch{transfer-functions}. % TODO: reference <14-11-23> 
+Of the transfer functions, it is most intuitive to directly measure the \ac{PSF} or more specifically the
+    magnitude of the \ac{PSF}.
+We disregard the phase change that the optical system may introduce, because in most set-ups it is practically 
+    impossible to directly measure the imaginary part of the \ac{PSF}\sidenote[][*+12]{%
+    It is possible in some cases to determine the imaginary part (i.e. the phase change \ac{PSF}) from the magnitude 
+        \ac{PSF} algorithmically if we assume certain properties of the complex \ac{PSF}. 
+    This algorithmic restoration of the phase is called phase-retrieval. However, in order for the phase to be 
+        unambiguous, thus for the phase-retrieval algorithm to be stable, it is necessary that the phase retrieved 
+        function to be non-symmetric with respect to the origin, which is often the case for the \ac{PSF}
+        \sidecite[*+2]{goodman2005b}.
+    } , since 
+    the light sensors (In our case the \ac{CMOS}) only measure the energy that hits the sensor elements which is 
+    equivalent for all possible phases of the \ac{EM} wave, since it only depends on the intensity of the \ac{EM} 
+    wave~(\refchshort{light}). % TODO: Add closer reference. <14-11-23> 
+
+For estimating the transfer function, it is necessary to make an acquisition of a known source signal.
+It is possible to categorize the following methods of estimation into two parts.
+At first, we will avoid creating a model of the whole source image \(\source\) and only leverage the knowledge of the
+    objects that are being observed.
+For this, a more comprehensive formulation of the image formation will be discussed in \refsec{image-formation-model} 
+    and then the model-free estimate of the \ac{PSF} will be performed~(\refsecshort{psf-from-beads}).
+Next, a complete model \(\model\) of the source signal \(\source\) will be determined~(\refsecshort{source-model}) and a 
+    method for estimation of the \ac{OTF} using this model will be demonstrated.
+Afterwards, one more estimate of the \ac{PSF} that leverages the model and recognizes the fact that the data is from a 
+    \ac{SIM} acquisition will be performed~(\refsecshort{psf-from-sim})
+Finally, we will return to the topic from \refch{sim-reconstruction} and compare the reconstructions that use the 
+    transfer function estimates from this chapter~(\refsecshort{revised-reconstruction}).
+
+\section{Image Formation Model}%
+\labsec{image-formation-model}
+
+% TODO: First step, noise. Measure noise from the background of the beads image. <14-11-23> 
+Devising an image formation model means to formulate the manner in which, we expect light from the source to manifest 
+    itself in the resulting sensed signal.
+For reasoning about the later estimates of the transfer functions, it is necessary to express this image formation model
+    mathematically.
+It is sensible to proceed in the same chronological order as the light passing through the apparatus.
+With this in mind, we will start off with the illumination of the focal plane.
+
+\subsection{Illumination}%
+\labsubsec{illumination}
+The transfer function of the optical system, is given by measuring the way that light passes though the apparatus given 
+    a uniformly illuminated focal plane.
+However, we do not have data directly observed using a regular uniformly illuminated wide field microscopy system.
+% TODO: Reference specific section <22-11-23> 
+Our images are acquired with the harmonic illumination~(\refchshort{SR-microscopy}). 
+This means that for a still\sidenote{Meaning that the source of the light is stationary in contrast to \emph{in 
+    vivo} biological acquisitions, where this is not the case.} image, we have 9 wide field images with 3 different 
+    pattern orientations and 3 different phases\sidenote[][*+5]{In accordance with the method that is used to generate 
+    the patterns in the case of our \ac{SIM} setup, we are assuming that the phases differ by \(2\pi/3\) from one 
+    another and do not determine them independently~(\refsecshort{IP-parameter-estimation}).} for each of those.
+
+In order to account for this discrepancy, we will emulate the uniform illumination by summing all the images acquired
+    with different illuminations together (this will also reduce noise~(\refsubsecshort{noise})).
+Due to additivity of the optical system, this results in the same signal, as if an acquisition was made with the sum
+    of the illumination patterns.
+    For three patterns in one orientation \(\ip_-\), \(\ip_0\) and \(\ip_+\), where the phases are \(\phi_0
+    - \tfrac{2\pi}{3}\), \(\phi_0\)
+    and \(\phi_0 + \tfrac{2\pi}{3}\), let us, without loss of generality, assume that \(\phi_0 \equiv 0\) (since we can move the 
+    origin as we please), simplifying the sum \(\ip_\Sigma\)~(\reffigshort{sum-of-ips}) along the line of the wave 
+    vector of the harmonic pattern i.e. \(\vec{r} = \alpha(\vec{k}_\ip)^{\transpose}\), gives % TODO: Graphic of the line in the pattern <22-11-23> 
+    \begin{equation*}
+        \begin{split}
+            \ip_\Sigma (\vec{r}) &= \sum_{i=1}^3 1 - \frac{m_i}{2} \cos\ab(2\pi \vec{k}_\ip \cdot \vec{r} 
+                + \frac{2\pi i}{3}) \\
+                               &= 3 - \sum_{i=1}^3 \frac{m}{2} \cos\ab(2\pi \vec{k}_\ip \cdot \vec{r} + 
+                                \frac{2\pi i}{3}) \\
+                               &\begin{split}
+                                   = 3 &-\frac{m}{2} \cos\ab(2\pi \vec{k}_\ip \cdot \vec{r})
+                                    \underbrace{\sum_{i=1}^3\ab(\cos\frac{2\pi i}{3})}_{=0} \\
+                                       &- \frac{m}{2} \sin\ab(2\pi  \vec{k}_\ip \cdot \vec{r})
+                                    \underbrace{\sum_{i=1}^3\ab(\sin\frac{2\pi i}{3})}_{=0},
+                                \end{split}
+        \end{split}
+    \end{equation*}
+    where, in the second step, we made the assumption that \(m_1 = m_2 = m_3\)\sidenote{This assumption holds 
+    precisely if the illumination pattern is generated by a diffraction grating, which is our case, and also 
+    theoretically if laser interference is used.}.
+
+\begin{marginfigure}[*-16]
+\marginpdftex{sum-of-patterns}
+\caption{Sum of the illumination pattern intensity along the wave vector for the first orientation, results in a uniform 
+    intensity.}
+\labfig{sum-of-ips}
+\end{marginfigure}
+
+% TODO: Show that along another line, this only projects the wave vector on the line, and the phases do not change so
+% the sum is also uniform <22-11-23> 
+
+% TODO: Section about the images <16-11-23> 
+% TODO: Figure: Add reconstructed (HR) image figure and LR image figures <16-11-23> 
+
+% TODO: Second step, illumination... The sum <16-11-23> 
+    % TODO: Side figure of the z-x axis cut of the illumination intensity cut <16-11-23> 
+    % TODO: Note about additivity and why the 3× illuminated signal is the same as if we would have illuminated it all at
+    % once <16-11-23> 
+
+\subsection{Noise}%
+\labsubsec{noise}
+
+As a first step towards developing a faithful image formation model of a uniformly illuminated source, we need to 
+    consider noise.
+
+The mode of noise, that we will be particularly interested in is \emph{additive noise}, for which the strength of the 
+    noise is added to the noise free source signal\sidenote[][*-4]{The location in the apparatus in which noise corruption 
+        happens is particularly interesting for the purpose of 
+        estimating the transfer function, because if the noise is added to the signal before the pass through the 
+        optical system, it is degraded with the transfer function along with the signal and if the corruption 
+        happens after, the noise affects the already degraded signal and is independent of the transfer function. 
+    As a simplification measure, and in compliance with the major sources of noise, we will only regard noise that 
+        corrupts the signal after the pass through the optical system.
+        }:
+\begin{equation} \labeq{additive-noise-model}
+    \sensed(\vec{r}) = \overbrace{\noisefree(\vec{r})}^{\mathclap{\text{signal}}}
+    + \underbrace{\noise(\vec{r})}_{\mathclap{\text{noise}}}.
+\end{equation}
+Additionally, in~\refeq{additive-noise-model} the noise \(\noise(\vec{r})\) has a specified distribution\sidenote[][*+6]{It is not 
+    uncommon to choose to model the noise by a Gaussian distribution (\(\distribution{P} \equiv \distribution{N}\)) even
+    if the Gaussian distribution is physically unrealistic for the given noise source. This assumption is often made 
+    for the purpose of simplifying computation.}
+    \begin{equation*}
+        \noise(\vec{r}) \sim \distribution{P}_{\vec{r}},
+    \end{equation*}
+    where we often assume that the distribution is location independent (i.e. \(\distribution{P}_{\vec{r}} \equiv
+    \distribution{P}\)).
+An important property to consider when characterising noise from different sources is \emph{signal independence}, i.e. 
+    whether the strength of the noise is independent from the intensity of the signal in the sense of a random variable
+\begin{equation*}
+    \left\{ \noise(\vec{r}) \mid \noisefree(\vec{r})  \right\} = \noise(\vec{r}).
+\end{equation*}
+
+There are many sources of noise that should be considered in the acquisition model.
+The most prominent of these sources are caused by the image sensor (the \ac{CMOS}), especially in low \ac{SNR}
+    acquisitions.. %  and the fluorescent proteins (\ac{EGFP}).
+It is also common to regard the variations in the ambient (background) illumination i.e. the light that is not part of 
+    the source we are measuring as noise.
+The sources, that are the greatest contributors to the noise corruption of the expected signal are:
+\marginnote{
+    A popular measure used in signal processing to quantify the relative power of noise is the \ac{SNR}. For an image it is 
+        defined as
+        \begin{equation*}
+            \SNR=\frac{\sum\limits_{u, v}\ab|\noisefree(u,v)|^2}{\sum\limits_{u, v}\ab|\noise(u,v)|^2}.
+        \end{equation*}
+}
+\begin{marginfigure}
+    \marginpdftex{poisson-distribution}
+    \caption{The Poisson distribution and its continuous equivalent 
+        \begin{equation*}
+            \tilde{\distribution{P}}_{\lambda}(x) = \frac{e^{-\lambda}(\lambda)^x}{\Gamma(x + 1)},
+        \end{equation*}
+        for \(\lambda = 4\).
+    }
+    \labfig{pois-dist}
+\end{marginfigure}
+\vspace{-0.8em}
+\begin{description}
+    % TODO: Add figure of the relation of the SNR ratio against the signal strength in this source of noise <24-11-23> 
+    % TODO: Add figure with the Poisson distribution <25-11-23> 
+    \item[Photon noise]
+        Inherent to the quantized nature of energy transmission of light. 
+        Sensors measure irradiance by counting the number of discrete photons that land on the sensor in a given time
+            interval \(\Delta \tau\). 
+        The arrivals of individual photons are independent and can therefore be regarded as a Poisson process.
+        The number \(N\) of photons detected in the time interval \(\Delta\tau\) can thus be described by the
+            distribution~(\reffigshort{pois-dist})
+            \begin{equation*}
+                \distribution{P}\left[ N = x \right] = \frac{e^{-\lambda'\Delta\tau}(\lambda'\Delta\tau)^x}{x!},
+            \end{equation*}
+            where the rate parameter \(\lambda'\) corresponds to the expected incident photon count per unit 
+            time, i.e. the expected number of photon detections per a unit of time.
+        It is dependent on the source luminance.
+        Since \(\E N = \Var(N) = \lambda'\Delta\tau \eqqcolon \lambda\), the ratio of signal to noise increases 
+            with \(\sqrt{\lambda'\Delta\tau}\) and so the corruption due to this source of noise is greatest in 
+            situations with low signal levels.
+        For larger counts of photons, we can use the central limit theorem to approximate the photon noise by a Gaussian
+            additive noise \sidecite{hasinoff2021}, whose variance and mean both depend on the signal luminance level
+            \begin{equation*}
+                \noise(\vec{r}) \sim \distribution{N}\left(\lambda'(\vec{r})\cdot\Delta\tau, 
+                                                         \lambda'(\vec{r})\cdot\Delta\tau \right).
+            \end{equation*}
+    \item[Dark current]
+        Semiconductor detectors in the image sensor are susceptible to thermal agitation\sidecite{aguet2009}, which can 
+            cause the photocapacitors to charge even in the absence of light (hence the name dark current) leading to 
+            false signals.
+        Due to the phenomenon of dark current, the sensors are often cooled during acquisition to reduce this effect.
+        Noise from this source is signal independent and additive.
+    \item[Background noise]
+        Additive and independent noise from the ambient light that reaches the sensor or unwanted light caused by other
+            effects.
+        An example can be the lagged emission of the fluorescent proteins.
+        This effect of ambient light from outside sources is most prominent for low energy light (i.e. light with low 
+            frequencies, e.g. infrared light), which is more prone to scattering and harder to effectively suppress.
+        In the case of biological sensing however, a majority of what we consider background noise comes from the light 
+            that is far from the focal plane and defocus causes it to blur and appear as ambient light with locally 
+            (meaning in a small bounded region) limited variation.
+        This is the principal reason for the use of a \ac{TIRFM} setup.
+    \item[Auxiliary sources]
+        A variety of causes, mainly in the imaging sensor, that are produced at the read-out time\sidenote[][*-4]{%
+        The phases after the photo activation of the sensor elements (consisting of amplification, digitization of the 
+            analog signal etc.).%
+        }.
+        Notably the charge transfer in the \ac{CMOS} sensor can be the cause of noise although, modern \ac{CMOS} sensors
+            are seeing much improvement in this direction in the recent past \sidecite[*-3]{holst2014}.
+        Auxiliary sources can be both signal dependent and independent.
+\end{description}
+
+If we know or assume a distribution of additive noise, it is possible to estimate its parameters using regions of the
+    image with approximately or theoretically constant intensity (e.g. background regions)
+    \begin{equation*}
+        A \coloneq \left\{ \vec{r} \mid \noisefree(\vec{r}) \approx c  \right\}.
+    \end{equation*}
+\marginnote{% [*-4]
+    It is often the case that we assume, or in approximation assume, that the distribution of the additive noise is 
+        Gaussian and we can estimate the parameters of the noise using the for example \ac{MLE}
+        \begin{gather*}
+            \hat{\mu}_{\noise} = \frac{1}{|A|} \sum_{\vec{r} \in A} (\sensed(\vec{r}) - c) \\
+            \hat{\sigma^2}_{\noise} = \frac{1}{|A|} \sum_{\vec{r} \in  A} (\sensed(\vec{r}) - \hat{\mu}_{\noise})^2.
+        \end{gather*}
+    }
+Moreover, if the limitation to the theorized noise distribution is to be avoided, it can be eyeballed from the histogram
+    or the histogram, kernel or other empirical estimate of the intensity distribution within \(A\) can be used.
+
+\begin{marginfigure}
+    \marginpng{otsu-threshold-leakage}
+    \caption{
+        The windowed Otsu threshold leads to lower intensities of some beads to be passed as background. 
+        On the left, side, Otsu threshold \(t_o(\vec{r})\) is used for classifying the image pixels into background and 
+            foreground by selecting the locations which have a higher intensity than \(t_o(\vec{r})\).
+        On the right, the threshold is lowered to \(\tilde{t}_o(\vec{r}) \coloneqq 0.3 \cdot t_o(\vec{r})\) and the same 
+            classification is performed.
+        At the bottom, difference between rejected pixels by \(t_o\) and accepted by \(\tilde{t}_o\) as foreground are 
+            shown.
+    }
+    \labfig{beads-leakage}
+\end{marginfigure}
+
+In our case, the premise that allows us to select such a set \(A\) is the lack of other non-ambient signal sources 
+    besides the beads.
+The problem therefore reduces to the distinction of the beads from the background, for which we can use the Otsu 
+    threshold\sidecite{otsu1979}, which minimizes the intra-class variance for two classes of within the image
+    \begin{multline*}
+        t_o = \argmin_{t}\left( \ab|\{\sensed(\vec{r}) \mid \sensed(\vec{r}) > t\}|\cdot\Var\{\sensed(\vec{r}) \mid \sensed(\vec{r})
+        > t\}\right. \\
+        \left. + \ab|\{\sensed(\vec{r}) \mid \sensed(\vec{r}) \leq t\}| \cdot \Var\{\sensed(\vec{r}) \mid \sensed(\vec{r}) \leq
+        t\}\right).
+    \end{multline*}
+It is not effective, though, to use the global Otsu threshold, because the image does not have a uniform distribution of
+    intensity due to the aberrations and vignetting and partly due to the varying concentration of beads within the
+    image source.
+What turns out to be a better choice is a windowed Otsu threshold determined for each pixel.
+Even with this enhancement though, the threshold does not achieve to completely eliminate the lower intensities at the
+    edges of beads from the background which we want to determine~(\reffigshort{beads-leakage}).
+Because background covers the majority of the image region and we have a lot of data points available to estimate the
+    noise distribution from, we can afford to reduce the threshold for the benefit of only accepting noise at the cost 
+    of rejecting some of the background in the process.
+Empirically the choice was for the final lowered windowed threshold to be
+    \begin{equation*}
+        \tilde{t}_o = 0.3 \cdot t_o,
+    \end{equation*}
+    which is used in the thresholding for estimation of \(A\), the background.
+
+A well established model of the noise distribution that is used in low \(\SNR\) acquisitions is noise consisting of two
+    components that are assumed to be independent.
+A Poisson distributed signal-dependent component \(\noise_{\distribution{P}}\) that represents the photon shot noise and 
+    a Gaussian signal-independent component \(\noise_{\distribution{N}}\) for the read-out noise\sidecite{foi2008}.
+An \(a\) and \(b\) parametrized formulation of the model that we are to estimate can be written as
+\begin{equation}
+    \labeq{noise-distribution-model}
+    \begin{gathered}
+        \begin{aligned}
+            \begin{aligned}
+                \noise_{\distribution{P}}(\vec{r}) &= \frac{1}{a}\cdot \alpha(\vec{r}) \\
+                \noise_{\distribution{N}} &= \beta 
+            \end{aligned} \quad&\quad
+            \begin{aligned}
+                \alpha(\vec{r}) &\sim \distribution{P}(a \cdot \noisefree(\vec{r}))\\ 
+                \beta &\sim \distribution{N}(0, b^2)
+            \end{aligned}
+        \end{aligned}\\
+        \noise(\vec{r}) = \noise_{\distribution{P}}(\vec{r}) + \noise_{\distribution{N}}.
+    \end{gathered}
+\end{equation}
+For the estimate of this model, it is easiest to assume some form of the noise-free signal \(\noisefree\).
+
+We selected \(A\) as the background exactly for the reason that we may make some deductions about \(\noisefree\) within
+    the region of \(A\).
+Unfortunately the assumption stated as a premise for selecting \(A\) as the appropriate region was too crude. 
+It is not viable to assume that \(\noisefree(\vec{r}) \equiv 0\) for \(\vec{r} \in A\) according to the premise, because
+    of the ambient light background noise.
+We will estimate the ambient light background \(\hat{\noisefree}\) that will play the role of \(\noisefree\) within 
+    \(A\) by taking a windowed mean of the background regions~(\reffigshort{ambient-light}).%
+\begin{marginfigure}
+    \marginpng{ambient-light}
+    \caption{The estimate \(\hat{\noisefree}\) using the windowed mean of the background.}
+    \labfig{ambient-light}
+\end{marginfigure}%
+There is an unequivocal scheme for roughly verifying the sensibility of the 
+    model~(\refeqshort{noise-distribution-model}) taking the advantage of additivity of the Poisson and Gaussian 
+    distributions
+    \begin{align}
+        \labeq{gaussian-poisson-additivity}
+        \begin{gathered}
+            X \sim \distribution{N}(0, \sigma^2_X),\, Y \sim \distribution{N}(0, \sigma^2_Y)\\
+            X \sim \distribution{P}(\lambda_X),\,Y \sim \distribution{P}(\lambda_Y)
+        \end{gathered}
+        &\begin{gathered}
+           \,\implies\,\\
+           \,\implies\,
+        \end{gathered}
+        \begin{aligned}
+            X + Y &\sim \distribution{N}(0, \sigma^2_X + \sigma^2_Y) \\
+            X + Y &\sim \distribution{P}(\lambda_X + \lambda_Y).
+        \end{aligned}
+    \end{align}
+    The verification is done by inspecting the histogram of \(\sensed(\vec{r}) - \hat{\noisefree}(\vec{r})
+    = \hat{\noise}(\vec{r})\) for \(\vec{r} \in A\), which according to~\refeq{gaussian-poisson-additivity} should be a 
+    mixture of the Poisson and Gaussian distributions (\reffigshort{demeaned-noise-histogram}) in the form
+    % FIX: This needs a better formulation <29-12-23> 
+    \begin{gather*}
+        \sum_{\vec{r} \in A} \noise(\vec{r}) = \sum_{\vec{r} \in A} \noise_{\distribution{P}}(\vec{r})
+        + \sum_{\vec{r} \in A} \noise_{\distribution{N}} = \frac{1}{a} \cdot \sum_{\vec{r} \in A}
+        \alpha(\vec{r})
+    + \sum_{\vec{r} \in A} \beta \\
+\sum_{\vec{r} \in A} \alpha(\vec{r}) \sim \distribution{P}\ab(a \cdot \sum_{\vec{r} \in A} \noisefree(\vec{r})) \\
+\sum_{\vec{r} \in A} \beta \sim \distribution{N}\ab(0, |A| \cdot b^2) 
+    \end{gather*}
+\begin{marginfigure}
+    \marginpdftex{noise-distribution-hist-demeaned}
+    \caption{%
+        The histogram of \(\sensed(\vec{r}) - \hat{\noisefree}(\vec{r})\) for \(\vec{r} \in A\).
+        The Poisson component of the histogram is apparent which should in part imply that the Gaussian component does 
+            not play a large role in our acquisition (i.e. that \(b \ll a\)).%
+        }
+    \labfig{demeaned-noise-histogram}
+\end{marginfigure}%
+
+An estimate is made using the unbiased cumulant estimates from the data\sidecite{bahler2022}.
+
+% TODO: Add SNR estimation and reason, why the noise is reduced if we add multiple acquisitions together <25-11-23> 
+
+It is practical to assume that the, yet unknown, source signal \(\source(\vec{r})\), is directly proportional to the
+    concentration of the fluorescent molecules, which in turn is directly proportional to their illuminated volume.
+For this, it is necessary, that, besides the background noise\sidenote{Which can be reasonably well removed, but it is 
+    important to note that only the power of the noise, linked to the mean value, is effectively reduced, not the 
+    variation as such. Methods of removing the background noise generally remove the low spatial frequencies, however 
+    the background noise is also prone to the photon shot phenomenon and other signal dependent noise sources, which 
+    reside even after the background removal.}, to disregard the noise sources, which arise at the source 
+    level.
+This is a reasonable proposition, owing to the fact, that most of the noise can be attributed to the sensor and is added
+    to the sensed signal after the pass through the optical apparatus.
+
+\subsection{The Transfer Function}%
+\labsubsec{the-transfer-function}
+
+Next step is to consider how the source signal \(\source(\vec{r})\) is affected by the pass through the optical system.
+This has been developed in~\refch{transfer-functions}.
+As a reminder, in general, for a linear system \(\LinearSystem\), the Fredholm equation of the first kind applies \(\forall \vec{r}
+    \in \R^2\)
+    \begin{multline} \labeq{non-aplanatic-psf-light-formation}
+        \noisefree(\vec{r}) = \LinearSystem\ab[\source(\vec{r})] = \LinearSystem\ab[\iint_{\R^2} \source(\vec{x}) \dirac(\vec{r} - \vec{x})
+        \odif{\vec{x}}]  \\
+            = \iint_{\R^2} \source(\vec{x}) \LinearSystem\ab[\dirac(\vec{r} - \vec{x})] \odif{\vec{x}} = \iint_{\R^2} \source(\vec{x}) \psf(\vec{r} -\vec{x}; \vec{r}) \odif{\vec{x}},
+    \end{multline}
+    or without the focal plane simplification \(\forall\vec{r} \in \R^3\)
+    \begin{equation*}
+        \noisefree(\vec{r}) = \iiint_{\R^3} \source(\vec{x}) h_3(\vec{r} - \vec{x}; \vec{r}) \odif{\vec{x}},
+    \end{equation*}
+    where we are using the same notation as in \refeq{additive-noise-model} and
+    \begin{equation*} \labeq{PSF-in-fredholm}
+        \psf(\vec{r} - \vec{x}; \vec{r}) \coloneq \LinearSystem\ab[\dirac(\vec{r} - \vec{x})]
+    \end{equation*}
+    denotes the \ac{PSF}.
+
+Estimating the \ac{PSF} \(h\) that is location dependent like in \refeq{non-aplanatic-psf-light-formation} is badly
+    conditioned, so we need to restraint ourselves to a model or a simplification of the transfer.
+One option to handle this, is to make the assumption that the system is aplanatic%
+\sidenote{%
+    An optical system, or more specifically the lens configuration is aplanatic, if it is free of both spherical and 
+        coma aberrations~(\refchshort{transfer-functions}).
+    The aplanatic system assumption is not fully justified and there is a slight location dependence in practice.
+    This issue can be addressed by estimating the \ac{PSF} on patches of the sensed image separately. 
+    This will be done in later sections.
+    % TODO: Closer reference <24-11-23> 
+}.
+This assumption makes the \ac{PSF} focal plane location independent i.e. \(\forall\vec{x},\vec{r} \in \R^2\)
+    \begin{equation*} \labeq{aplanar-psf-light-formation}
+        \psf(\vec{r} - \vec{x}; \vec{r}) = \psf(\vec{r} - \vec{x})
+    \end{equation*}
+     within the same \(z\)-offset plane from the focal plane%
+\sidenote{%
+    However it is important to realize that it is not true that under the assumption of an aplanatic system that 
+        \ac{PSF} \(h_3\) is identical as a function \(\R^3 \to \R\) for the whole imaged volume.
+    The lack of spherical aberration and coma only fixes \(h\) on the \(x\) and \(y\) axes of the object space, so for 
+    \(\vec{x},\vec{r} \in \R^3\)
+    \begin{equation*}
+       h_3(\vec{r} - \vec{x}; \vec{r})  \equiv h_3(\vec{r} - \vec{x}; z).
+    \end{equation*}
+}.
+
+For the location invariant \(h\), we can rewrite \refeq{non-aplanatic-psf-light-formation} as
+    \begin{equation}
+        \labeq{convolution-psf}
+        \noisefree(\vec{r}) = \iint_{R^2} \source(\vec{x}) \psf(\vec{r} - \vec{x}) \odif{\vec{x}} = 
+            (\source \conv \psf)(\vec{r}),
+    \end{equation}
+    where \(\conv\) denotes the convolution operation.
+The locality\sidenote{Locality is understood here as the property that if \(\supp(\psf) \subset 
+    \ball_\alpha\), then for a source \(\source\) for which \(\supp(\source) \subset \ball_\beta\) we
+    there exists a \(\gamma\) such that \(\supp(\source \conv \psf) \subset \ball_\gamma.\)} of the convolution is key to making the 
+    \ac{PSF} more intuitive and easier in practice to measure.
+It is, because unlike the \ac{OTF}, we are not forced to make the estimate from the full image or strenuously map the
+    frequency domain of the parts used for measurement onto the frequencies of the acquisition image.
+% TODO:  What changes when the PSF changes...  <22-11-23, kunzaatko> 
+% TODO: What changes when the OTF changes <22-11-23> 
+Consequently, parts that are easiest to work with can be selected.
+% TODO: Another condition for this to work is that the PSF has a bounded support with a bound that is limited by the
+% region sizes that we select. This should be argued. It is not the case but the PSF has is small enough to consider
+% this as true <27-11-23> 
+This can be beneficial in eliminating noisy or inconsistent data, or data, that our model does not consider.
+
+
+\subsection{The Source}
+\labsubsec{the-source}
+In order to devise \(\psf\) from \refeq{convolution-psf}, it is necessary to determine \(\source(\vec{r})\), for the
+    parts that are used for the measurement.
+Consider what it would would mean for the acquisition, if \(\source= \sum_{\vec{a} \in A} \dirac_{\vec{a}}\).
+The sensed image, where noise is disregarded, would be
+    \begin{equation}
+        \labeq{noisefree-with-sum-of-dirac-sources-psf-general}
+        \noisefree(\vec{r}) = \ab(\source \conv \psf)(\vec{r}) = \ab(\ab(\sum_{\vec{a} \in A} \dirac_{\vec{a}}) \conv
+            \psf)(\vec{r}) = \sum_{\vec{a} \in A} \psf(\vec{r} - \vec{a}),
+    \end{equation}
+    and if adapted to the more natural notation, where we emphasize, which point underlines the term of the expansion in
+    the image formation formula, i.e. \(\psf(\vec{r} - \vec{a}) \eqqcolon \psf_{\vec{a}}
+    (\vec{r})\), \refeq{noisefree-with-sum-of-dirac-sources-psf-general} changes to
+    \begin{equation}
+        \labeq{noisefree-with-sum-of-dirac-sources-psf-natural}
+        \noisefree(\vec{r}) = \sum_{\vec{a} \in A} \psf_{\vec{a}}(\vec{r}),
+    \end{equation}
+    and we see that the noise-free sensed signal is merely a set of copies of the \ac{PSF} at the locations of the
+    initial \(\dirac\) sources.
+\marginnote[*-5]{\refeq{noisefree-with-sum-of-dirac-sources-psf-natural} is also applicable for the non-aplanatic 
+    transfer, but it is important to realize that in that case the index \(\vec{a}\) of the \ac{PSF} does not denote 
+    only a change in coordinates (translation by \(\vec{a}\)), but also the change in the function \(\psf_{\vec{a}}\) 
+    itself.} %  This can be used alongside partitioning the sensed image into regions and measuring the relation of the 
+    % \ac{PSF} to the location with in the \refsec{location-dependent-psf}}
+
+In practice, this type of source is generated by imaging microspheres most commonly made from plastics, stained with 
+    fluorescent dyes.
+Acquisitions of fluorescent beads is often used by biologists for many purposes such as calibrating equipment, because 
+    it is possible to manufacture them with a high degree of precision and modeling the source that is generated by them
+    is straightforward as we will observe in~\refsec{source-model}.
+
+An important aspect that is essential to be able to measure the \ac{PSF} in a direct manner is that the diameter of the
+    bead is sub-diffraction-resolution\sidenote[][*-3]{It is possible, and even beneficial if the diameter is not
+    sub-pixel-resolution, but it does not make a difference in the principle of the \ac{PSF} measurement.}.
+If the diameter were not to be sub-diffraction-resolution the source signal would be different from the
+    \(\dirac_{\vec{a}}\) of \refeq{noisefree-with-sum-of-dirac-sources-psf-general}, but rather some other support 
+    limited source for which a model \(\hat{\source}_{\vec{a}}\) would be necessary to develop, and the noise-free
+    sensed signal \(\noisefree\) would not be direct copies of the \ac{PSF} \(\psf\) but
+    \begin{equation}
+        \labeq{non-sub-diffraction-resolution-source}
+        \noisefree(\vec{r}) = \sum_{\vec{a} \in A} \ab(\hat{\source}_{\vec{a}} \conv \psf)(\vec{r})
+    \end{equation}
+    instead.
+Deriving the \ac{PSF} \(\psf\) from the signal in \refeq{non-sub-diffraction-resolution-source} would require 
+    deconvolution of the individual components \((\hat{\source}_{\vec{a}} \conv \psf)\) with the assumed model 
+    \(\hat{\source}_{\vec{a}}\) and due to noise, this would necessarily mean that we would need to make further 
+    assumptions either about the deconvolved \(\hat{\psf}\) or the noise.
+
+The acquisition that is used for the \ac{PSF} estimation is done by imaging a suspension of \emph{TetraSpeck\TM 
+    microspheres, \(\qty{0.1}{\micro\metre}\)}, where the diameter is 
+    \(\qty{0.099 \pm 0.008}{\micro\metre}\)\sidecite{smith2020}, which is safely below the diffraction resolution of 
+    \begin{equation*}
+        \frac{\lambda_{\text{em}}}{2\NA} = \frac{\qty{488}{\nano\meter}}{2\cdot 1.4} \approx \qty{174}{\nano\meter}
+        = \qty{0.174}{\micro\metre}.
+    \end{equation*}
+
+% TODO: Figure with selected beads marked from the acquisition <28-11-23> 
+
+% TODO: Either in this section or in the section about the Abbe resolution limit, there should be the two point
+% resolution definition <27-11-23> 
+
+
+\section{\ac{PSF} from  Beads}%
+\labsec{psf-from-beads}
+
+It is common in among biologists to select the sensed signal produced by one bead near the centre of the acquisition 
+    image and pronounce it as the \ac{PSF} of the optical system.
+% TODO: References (these references should be those which are used elsewhere 
+% (perhaps in the SIM reconstruction papers)) <28-11-23> 
+There is ample room for improvement from this approach. 
+Noteworthy drawbacks of this approach are that
+    \begin{enumerate}[label=(\alph*)]
+        \item noise contained in a single bead sample can be substantial, \labitm{noise}
+        \item the bead centre may not be exactly located at the centre of a pixel and therefore the \ac{PSF} might be 
+            biased, \labitm{pixel-centring}
+        \item it disregards the dependence on the \(z\)-offset from the focal plane of the particular bead 
+            sample used, \labitm{z-offset}
+        \item it is negligent towards the potential dependence of the sampled bead position within the focal plane.
+            \labitm{position-dependence}
+    \end{enumerate}
+
+A simplest alternative that addresses all of the aforementioned drawbacks and fixes most of them to certain extent is 
+    averaging multiple bead samples.
+The steps of performing an estimate from multiple bead samples are:
+\begin{enumerate}[label=\roman*.]
+    % TODO: Add a figure of the beads and the focal plane <28-11-23> 
+    % TODO: Add a mathematical explanation based on defocus "operator" (diffusion), why the same model of beads
+    % leads to a lower centre intensity if it is shifted by some Δz <28-11-23> 
+    \item Selecting approximate centres \(C\) of isolated beads with the highest intensity%
+        \sidenote[][*-3]{%
+            Beads with the highest intensity can be assumed to have the tip closest to the focal plane of the optical 
+                system.
+            Since we are looking for the \ac{PSF} at the focal plane (i.e. \(z = 0\)), these beads are selected for the 
+                estimate.
+        }.
+            % \[
+            %     C \coloneqq \ab\{\vec{c}_i \coloneqq (u_i, v_i) \mid i \in \hat{n}\}.
+            % \] 
+    \item Cutting a patch around each centre \(\vec{c}_i\) containing the whole bead sample.
+        % \begin{gather*}
+        %     U_i \coloneqq \ab\{u_i - \Delta u, \ldots, u_i + \Delta u\} \\
+        %     V_i \coloneqq \ab\{v_i - \Delta v, \ldots, v_i + \Delta v\} \\
+        %     P \coloneqq \ab\{ P_i \coloneqq (\sensed_{uv})_{u \in U_i, v \in V_i} \mid i \in \hat{n} \}.
+        % \end{gather*}
+    \item Subtracting the ambient light background from each patch. 
+        The intensity of the ambient light in the location of the bead is estimated by the \(0.15\) quantile of the 
+            intensities of a larger patch around the bead sample.
+    \item Finding the sub-pixel centres of the beads by \ac{LSE} fitting a Gaussian%
+        \sidenote[][*-5]{%
+            Any other unimodal function, which has its mode at the origin would suffice.
+            The Gaussian is strategic here, since the \ac{PSF} has close shape to the Gaussian.
+            In fact, it is often modelled by a it.
+        }
+        to the sample array \labitm{centring}
+    \item Shifting by sub-pixel offsets of the estimated beads centres from \refitm{centring} to fix the them to a whole
+        pixel value via Fourier shift theorem.
+    \item Averaging the patch pixels to obtain the \ac{PSF} estimation.
+\end{enumerate}
+
+We subtract the backgrounds of the sample beads before averaging them, therefore, we may assume that their noise is 
+    centred, i.e. \(\E\noise =~0\).
+The variance of the \ac{PSF} values contained in the estimate is reduced regardless of the distribution of the noise 
+    in the sensed samples due to the law of large numbers.
+
+We will perform the estimate of the hypothesised focal plane global \ac{PSF} on bead samples from the center of the
+    image~(\reffigshort{selected-beads-CC}).
+The cut-outs along with the fitted centres of the bead samples are shown in~\reffig{selected-beads-patches-CC}.
+The final \ac{PSF} estimate and its comparison with the model introduced in~\refch{sim-reconstruction} is visible 
+    in~\reffig{psf-avg-estimate-CC}.
+
+\begin{marginfigure}[*-15]
+  \marginpng{selected-beads-CC}
+  \caption{Bead samples selected from the center of the image. For better accuracy the locations were selected from the
+  \ac{HR} reconstructed image.}
+  \labfig{selected-beads-CC}
+\end{marginfigure}
+
+\floatsetup[figure]{ % Captions for figueres
+    capbesideposition={top,outside},%
+}%
+\begin{figure}[h]
+    % \png{selected-beads-patches-CC-noticks}
+    \png{selected-beads-patches-CC}
+    \caption{The bead samples cut-outs from the center of the image and their fitted centres.}
+    \labfig{selected-beads-patches-CC}
+\end{figure}
+\floatsetup[figure]{ % Captions for figueres
+    capbesideposition={bottom,outside},%
+}%
+
+% TODO: Here figure with one cutout before and after centering <30-12-23> 
+
+\begin{marginfigure}[*-7]
+    \marginpng{model-vs-avg-psf}
+    \caption{%
+        The \ac{PSF} estimate versus the model. 
+        The model is clearly wider, which implies that the diffraction-resolution was overestimated by the model which
+            is in line with the reconstruction flaws we discussed in \refsec{deconvolution-reconstruction}.
+    }
+    \labfig{psf-avg-estimate-CC}
+\end{marginfigure}
+
+A first test to see if the estimate is better than the proposed model is to compare the deconvolution of the \ac{LR}
+    image with the proposed \ac{PSF}~(\reffigshort{model-vs-avg-deconv-CC}).
+The deconvolution in this case is performed by formulating an optimization problem very similar to the formulation of 
+    the optimization problem of reconstruction~(\refsecshort{inversion-reconstruction}), with the sole
+    difference that the forward model is the convolution from~\refeq{convolution-psf} and no regularization is 
+    performed.
+Importantly for assessing the accuracy of the deconvolution, we need to realize, what an ideal deconvolution should look
+    like.
+The key is that the beads are sub-diffraction-resolution and as such, they should have a single intensity and should be
+    comprehended by the optical system as a single point as defined by the two-point resolution, but they do not have a 
+    sub-pixel-resolution so they are supposed to be visible over multiple pixels.
+The sampling rate of our setup is \(\qty{61}{\nano\meter}\) so, since the beads have a diameter of
+    \(\approx\qty{99}{\nano\meter}\), they should have a image plane diameter of about \(\qty{1.6}{\pixel\lowres}\).
+
+\begin{figure}[h]
+    \png{model-vs-avg-psf-deconv-CC-vs-sensed}
+    \caption{%
+        Deconvolution of the \ac{LR} images performed with the \ac{PSF} model and the \ac{PSF} estimate.
+        The beads size (\(\qty{99}{\nano\meter}\)) in the \ac{LR} sampled (\(\qty{61}{\nano\meter/\pixel}\)) source 
+            should be approximately \(\qty{1.6}{\pixel\lowres}\).
+        The possible explanation for the deviation from this expectation is the varying \(z\)-offset from the focal plane 
+            which of the individual beads that causes defocus.
+    }
+    \labfig{model-vs-avg-deconv-CC}
+\end{figure}
+
+% TODO: Here fig of the inds where we estimate the location dependent PSF with the beads selected in them <30-12-23> 
+% TODO: Here comparison of the psf estimates from the sections of the image <30-12-23> 
+
+% TODO: Here for the estimate of the noise variance of the estimate from the determined distribution of noise <29-12-23> 
+% TODO: Here fig of the selected beads for all patches <29-12-23> 
+
+% SSIM s modelem
+% TODO: Here comparison of the parameters of the fit from different locations of the object field <31-12-23> 
+
+\section{The Source Model}
+\labsec{source-model}
+
+For establishing a model of the source signal, we need to
+\begin{enumerate}[label=\roman*.]
+    \item \labitm{bead-model} determine the model of a single bead sampled in the destinations image sampling rate (i.e. for
+        \ac{LR} images the sampling rate is \(\qty{61}{\nano\meter\per\pixel\lowres}\) and for \ac{HR} images the
+        sampling rate is \(\qty{30.5}{\nano\meter\per\pixel\highres}\))
+    \item \labitm{locations-of-beads} find the bead locations within the object field and create the full image model as
+        a sum of the single bead model from \refitm{bead-model} centred at each location.
+\end{enumerate}
+
+\subsection{Single Bead Model (\refitmshort{bead-model})}%
+\labsubsec{single-bead-model}
+
+The beads are effectively balls that are suspended at some \(z\)-offset from the focal plane within the object field. %
+% TODO: Here a figure of the beads ball and the focal plane that touches the tip of the balls <31-12-23> 
+We will model them as such balls with a uniform distribution of fluorescent particles at their surface.
+A simplification that is made is the, not fully accurate, assumption that the \(z\)-offset of all the beads is
+    \(\qty{0}{\nano\meter}\).
+One consideration must be kept in mind and that is the \ac{TIR} nature of the acquisition.
+This means that the illumination intensity, more befittingly termed excitation intensity in this context, 
+    \(\ip_{\text{ex}}\) is according to the theory from \refch{light} attenuated by \(e^{\alpha z}\) where \(\alpha\) is 
+    the attenuation constant that is determined by the super-critical angle of the illumination and \(z\) denotes the 
+    \(z\)-offset from the focal plane of the location of the point in the object field. %
+% TODO: Closer reference <31-12-23> 
+A full formulation of \(\ip_{\text{ex}}\) is therefore
+    \begin{equation*}
+        \ip_{\text{ex}}(x,y,z) = \ip_{\text{ex}}(x,y,0) \cdot e^{\alpha z},
+    \end{equation*}
+    where \(\ip_{\text{ex}(x,y,0)}\) is constant in our case and can be set to equal \(1\) without loss of generality to
+    the bead model.
+
+The \(z\)-offset of a given patch of the surface of a ball with its tip at the point \((0,0,0)\) is 
+    \begin{equation*}
+      z(x,y) = R - \sqrt{R^2 - (x^2 + y^2)},
+    \end{equation*}
+    where \(R\) is the radius of the ball.
+
+We are working with sub-saturation excitation intensities and time intervals, which means that
+    \begin{equation*}
+        \ip_{\text{ex}}  \cdot d_{\text{fl}} \propto \ip_{\text{em}},
+    \end{equation*}
+    where \(\ip_{\text{em}}\) is the emission intensity and \(d_{\text{fl}}\) is the distribution of the
+    fluorescent particles in the object field which was already assumed to be constant for the beads surfaces.
+This means that the emission intensity \(\ip_{\text{em}}\) of a bead at the point \((x,y)\) in the focal 
+    plane~(\reffigshort{bead-model}) is
+    \begin{equation*}
+        \ip_{\text{em}}(x,y) = \ip_{\text{ex}}(x,y,z) = \ip_{\text{ex}}(x,y,0) \cdot e^{\alpha z(x,y)}
+            = \frac{e^{\alpha R}}{ e^{\alpha\sqrt{R^2 - (x^2 + y^2)}}}.
+    \end{equation*}
+It is crucial to emphasize another simplification that is made and is quite comical considering the goal of developing
+    this model.
+We are projecting the emission intensity from the \((x,y,z)\) location directly to the emission intensity at the 
+    \((x,y)\) location on the focal plane.
+This is not correct, due to the \(z\)-offset plane not having the same transfer function as the focal plane.
+The major impact of this omission is that we do not consider defocus (as part of the \ac{PSF} difference) in any way.
+
+The sampling in done by integration of the point emission function \(\ip_{\text{em}}(x,y)\) over the sensor element that
+    corresponds to a given pixel
+    \begin{equation*}
+        m(u,v) \coloneqq \ip_{\text{em}}(u,v) = \iint\limits_{\mathclap{u - \tfrac{\Delta_{x}}{2},\, v - \tfrac{\Delta_{y}}{2}}}^{\mathclap{u + \tfrac{\Delta_{x}}{2},\, v + \tfrac{\Delta_{y}}{2}}} \ip_{em}(x,y) \odif{x} \odif{y},
+    \end{equation*}
+    where \(\Delta_{x}\) and \(\Delta_{y}\) are the dimensions of the sensor element (i.e. the sampling rates in the
+    \(x\) and \(y\) axes).
+
+\begin{marginfigure}
+    \marginpng{source-model-single-bead}
+    \caption{\ac{LR} and \ac{HR} bead models. The radius of the bead in the \ac{LR} sampling rate is \(\approx
+        \qty{1.6}{\pixel\lowres}\), and for the \ac{HR} bead is is \(\approx\qty{3.2}{\pixel\highres}\).}
+    \labfig{bead-model}
+\end{marginfigure}
+    
+
+\section{Locating the Beads (\refitmshort{locations-of-beads})}%
+\labsec{locating-the-beads}
+
+The locations of the beads are determined by an empirically constructed algorithm that is inspired by the general Hough
+    transform and image feature location algorithms.
+The idea is to
+    \begin{enumerate}[label=\roman*.]
+        \item select locations that are candidate to the positions of beads, using a global algorithm with a very low 
+            threshold such that no true location of a bead gets discarded, \labitm{global-candidates}
+        \item filter the candidate locations by a local algorithm to discard the false positives \labitm{local-filter}
+        \item determine the final sub-pixel locations of the beads \labitm{final-location}.
+    \end{enumerate}
+The reason for finding the initial candidates by a global algorithm~(\refitmshort{global-candidates}) is induced by the 
+    preference of an algorithm that has a simple formulation and for which there is not a overwhelming number of 
+    empirical parameters that have to be set.
+The local filtering of the locations~(\refitmshort{local-filter}) is motivated by the fact that the bead samples are 
+    typically locally dependent and therefore to robustly discard the false positive locations cannot to be done by 
+    comparing all the locations, but only the ones that are comparable with their properties to the one that is being 
+    judged, i.e. the locations in the neighbourhood of the bead in consideration.
+
+
+% \begin{marginfigure}
+%     \marginpng{source-model-ccorr}
+%     \caption{%
+%         Normalized cross-correlation of the Weiner filter reconstructed \ac{HR} image with the \ac{HR} bead model 
+%             \(m_{\ac{HR}}\).
+%         }
+%     \labfig{source-model-ccorr}
+% \end{marginfigure}
+
+\floatsetup[figure]{ % Captions for figueres
+    capbesideposition={top,outside},%
+}%
+\begin{figure}
+    \png{source-model-ccorr}
+    \caption{%
+        Normalized cross-correlation \(\correlation_{m_{\ac{HR}} \times \reconstructed}\) of the Weiner filter 
+        reconstructed \ac{HR} image with the \ac{HR} bead model \(m_{\ac{HR}}\).
+        }
+    \labfig{source-model-ccorr}
+\end{figure}
+\floatsetup[figure]{ % Captions for figueres
+    capbesideposition={bottom,outside},%
+}%
+
+The global algorithm that is used for selecting the candidates is based on thresholding the cross-correlation of the
+    \ac{HR} reconstruction \(\reconstructed\) with the \ac{HR} bead model 
+    \(m_{\ac{HR}}\)~(\reffigshort{source-model-ccorr}) in the form
+    \begin{equation*}
+        \correlation_{m_{\ac{HR}} \times \reconstructed}(u,v) = 
+        \frac{\sum\limits_{m,n}\reconstructed(u + m,v + n) \cdot m_{\ac{HR}}(m,n)}{\sqrt{\sum\limits_{m,n} m^2_{\ac{HR}}(m,n)
+        \sum\limits_{m,n}\reconstructed^2(u + m,v + n)}},
+    \end{equation*}
+    where the limits of summation of \(m,n\) are taken to be the overlap regions of the \((m,n)\)-shifted 
+    \(\reconstructed\) and \(m_{\ac{HR}}\) and \(\reconstructed\) is constantly replicated beyond its sampled borders by 
+    the border value\sidecite[*-23]{gonzalez2008a} in order to account for \((u,v)\) in the full sampled
+    area\sidenote[][*-21]{%
+    It is often the case that we instead perform the correlation of the demeaned (centred) functions \(f - \bar{f}\)
+    and \(g - \bar{g}\) in which case the correlation has the meaning of the correlation coefficient and the has values
+    inclusively between \(-1\) and \(1\).}.
+The areas where the cross-correlation \(\correlation_{m_{\ac{HR}} \times \reconstructed}\) is above \(\alpha = 0.62\) 
+are considered to be candidates for beads locations (\reffigshort{ccorr-discarded})
+    \begin{equation*}
+        \correlation_{m_{\ac{HR}} \times \reconstructed}(u,v) > \alpha.
+    \end{equation*} % TODO: Here margin figure Correlation above <31-12-23> 
+
+
+\begin{marginfigure}[*-20]
+    \marginpng{source-model-ccorr-discarded}
+    \caption{%
+        The cross-correlation to establish the beads locations candidates.
+        It is visible that some locations within the background are passed as candidates. 
+        This is even more pronounced in the distal areas of the image near the edges.
+    }
+    \labfig{ccorr-discarded}
+\end{marginfigure}
+
+
+The filtering of the candidate locations (\refitmshort{local-filter}) is then made by comparing the locations to a wide
+and narrow neighbourhood mean intensity of the image, \(\reconstructed_{\text{W}}\) and
+    \(\reconstructed_{\text{n}}\) respectively.
+In order for the bead \ac{ROI} to be considered as a true bead \ac{ROI} and pass to the next filtering step, the ratio
+    of its \ac{ROI} intensities to the mean intensities must be above some threshold.
+The comparison with the wide mean of intensity \(\reconstructed_{\text{W}}\) is taken with the motivation of 
+    discarding the false positive locations that are due to noise that is reminiscent of the bead model.
+It is made by a windowed mean with a window size of \(201 \times 201~\unit{\pixel\highres}\) and the ideal threshold is empirically determined 
+    to be \(\beta_\text{W} = 8.0\). 
+The final filter (\reffigshort{wide-discarded}) of the candidate \acp{ROI} by the wide mean is done as
+\begin{equation*}
+  \reconstructed(u,v) > \beta_\text{W} \cdot \reconstructed_{\text{W}}(u,v).
+\end{equation*}
+
+\begin{marginfigure}[*-15]
+    \marginpng{source-model-wide-mean-discarded}
+    \caption{%
+        The wide mean filter of the candidate bead \acp{ROI}.
+        It is effective in discarding the false positive locations that are due to the background noise and therefore
+            have a low intensity in comparison with the mean of their neighbourhood intensities.
+    }
+    \labfig{wide-discarded}
+\end{marginfigure}
+
+The comparison with the narrow mean \(\reconstructed_{\text{n}}\) is performed in order to discard the false 
+    positive locations that are present because of the reconstruction artefacts that occur using the deconvolution 
+    reconstruction~(\refsecshort{deconvolution-reconstruction}) and to discard the pixels connecting \acp{ROI} of beads
+    that are close together, which is necessary for the \refitm{final-location}. % TODO: Closer reference <04-01-24> 
+It is made by a windowed mean with the window size of \(15\times 15~\unit{\pixel\highres}\) and the empirical threshold 
+    is determined to be \(\beta_\text{n} = 2.46\)
+Similarly to the wide mean threshold, the filtering of the \acp{ROI} is done as
+    \begin{equation*}
+    \reconstructed(u,v) > \beta_\text{n} \cdot \reconstructed_{\text{n}}(u,v).
+    \end{equation*}
+The final narrow mean filter that is used on the \acp{ROI} of the candidate beads is in \reffig{narrow-discarded}
+\begin{marginfigure}[*-13]
+    \marginpng{source-model-narrow-mean-discarded}
+    \caption{%
+    In the wide mean, the \acp{ROI} of these beads remain connected.
+    This is not desired for in the next step, where the centroids of the \acp{ROI} are used as initial locations of the 
+        candidate beads for the Gaussian fit.
+    A filter that has a narrow window size is efficient in reducing these connections.
+    Another possibility would be to use the morphological operation of \emph{thinning}\sidecite[*+3]{gonzalez2008b} on the binary image
+        after the wide mean filter to remove the connections.
+}
+    \labfig{narrow-discarded}
+\end{marginfigure}
+% TODO: Here margin figure. The discarded locations by narrow mean <04-01-24> 
+
+The sub-pixel center localization~(\refitmshort{final-location}) is performed similarly as in~\refsec{psf-from-beads} by
+    fitting a Gaussian to the centroids of the individual \acp{ROI}.
+It assumes that the \acp{ROI} of two neighbouring beads does not overlap, which is ensured (at a best effort bases) by 
+    setting the thresholds \(\alpha\), \(\beta_\text{W}\) and \(\beta_\text{n}\) in the previous steps.
+The fitted Gaussian are further utilized to filter the artefacts that are passed as beads from the previous steps.
+This is done by setting a threshold on the ratio of means \(\mu\) and deviations \(\sigma\) of the fitted Gaussian in
+    a neighbourhood and also by noticing that the artefacts are at set relative locations from the bead that causes
+    them~(\reffigshort{weiner-reconstruction-artifacts}).
+
+% \begin{marginfigure}
+%     \marginpng{source-model-gaussian-sum}
+%     \caption{}
+%     \labfig{gaussian-sum-model}
+% \end{marginfigure}
+
+\begin{figure}[h]
+    \png{source-model-gaussian-sum}
+    \caption{%
+        Comparison of the reconstructed \(\reconstructed\) along with the sum of the fit Gaussian functions for every
+            candidate location and the assumed artefacts are filtered by their location and the relative fitted mean
+            \(\mu\) and deviation \(\sigma\).
+        Even though many of the artefact candidate locations are filtered out, the outcome is not ideal and it could be
+            a better strategy to use both the \ac{HR} reconstructed image for its better resolution and the \ac{LR}
+            deconvolved image, perhaps in the form of a cross-correlation with the \ac{LR} bead model to filter out the
+            artefact candidates.
+    }
+    \labfig{gaussian-sum-model}
+\end{figure}
+
+The final source model (\reffigshort{source-model}) \(\hat{m}\) is then obtained by summing the single bead models 
+    \(m_\text{\ac{HR}}\) at the filtered locations, weighted in order for the maximum intensity of the bead at the 
+    location to match the intensity of the fitted Gaussian.
+Weighting is done to account for the different \(z\)-offsets as mentioned in \refsubsec{single-bead-model}.
+
+% \begin{marginfigure}
+%     \marginpng{source-model}
+%     \caption{}
+%     \labfig{source-model}
+% \end{marginfigure}
+
+\begin{figure}[h]
+    \png{source-model}
+    \caption{The reconstructed \ac{HR} image and the final model of the source.}
+    \labfig{source-model}
+\end{figure}
+
+\section{Estimating the PSF from the Model}%
+\labsec{estimating_the_psf_from_the_model}
+
+The estimate of the degradation function, which for an invariant (aplanatic) system corresponds to the transfer 
+    function, supported that we have a source model and its acquisition can be made very trivially 
+    \sidecite{gonzalez2008c}. 
+If we write the noisy transfer in the Fourier domain, we get
+    \begin{equation}
+      \Fsensed(\vec{k}) = \otf(\vec{k}) \cdot \Fsource(\vec{k}) + \Fnoise(\vec{k}),
+    \end{equation}
+    where \(\otf\) is the transfer what we want to estimate.
+Therefore in a noisy acquisition if \(\Fnoise\) is sufficiently small relative to \(\otf \cdot \Fsource\), the \ac{SNR} 
+    is sufficiently large, then
+    \begin{equation*}
+        \frac{\Fsensed(\vec{k})}{\Fsource(\vec{k})} \approx \otf(\vec{k}).
+    \end{equation*}
+Thus, if we have the model of the source \(\hat{m} \approx \source\), it is sufficient to make the Fourier transform and 
+    pixel-wise division with the sensed image in the Fourier domain and we have an estimate \(\hat{\otf}\) of the 
+    \ac{OTF}.
+
+% TODO: Here fig of the estimate that is from the full source model <05-01-24> 
+% TODO: Here fig of the simple estimate of the OTF from a model from multiple locations within the image <04-01-24> 
+
+\section{\ac{PSF} from \ac{SIM}}
+\labsec{psf-from-sim}
+
+Since our terminal goal is to perform the \ac{SIM} reconstruction using the transfer function, we can use the model
+    \(\hat{m}\), and a similar optimization problem as in \refsec{inversion-reconstruction} and try to determine the
+    best transfer function specifically for this purpose.
+The optimization problem given a model \(\hat{m}\) of the source, given as
+    \begin{equation}
+        \labeq{optimization-psf}
+        \hat{\otf} = \argmin_{\otf} \loss[\sensed,  \fwd[\otf]],
+    \end{equation}
+The only change from \(\fwd\) in \refsubsec{forward-model} in \refeq{optimization-psf} is that now we view the \(\otf\) as the variable
+    instead of the source \(\source\) and we substitute the source in the forward mapping \(\fwd\) by \(\hat{m}\).
+We can use the same loss \(\loss\) in \refeq{optimization-psf} as in \refsubsec{loss-function}.
+It is not necessary to perform regularization if instead of the \ac{OTF} \(\otf\) the optimization done for the \ac{PSF}
+    \(\psf\) which can be sampled over a small region and therefore we can avoid the optimization problem to be
+    underspecified, since we have many more data points within the data \(\sensed\) than we want to optimize over in the
+    \ac{PSF} \(\psf\).
+
+% TODO: Here reconstruction through optimization of the global and for the individual parts <05-01-24> 
+
+\section{Revised Reconstruction}%
+\labsec{revised-reconstruction}
+
+\section{Discussion}%
+\labsec{discussion}
+
+% TODO: This section should probably be removed and the introduction should only state the possibility and cite Fourier
+% Optics instead of implementing this. <31-12-23> 
+% \section{Phase Retrieval}%
+% \labsec{phase-retrieval}
