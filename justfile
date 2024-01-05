@@ -15,7 +15,7 @@ build-all-figs:
         echo 'Building figure' (basename $i) '…'
         julia --project=src/figures/src --color=yes $i 
     end
-alias baf := build-all-figs
+alias Bf := build-all-figs
 
 # Update all figures (build them skipping the ones for which the source has not changed)
 update-all-figs:
@@ -35,7 +35,28 @@ update-all-figs:
             julia --project=src/figures/src --color=yes $i 
         end
     end
-alias uaf := update-all-figs
+alias Uf := update-all-figs
+
+# Update figures and build document
+update-all:
+    #! /bin/env fish
+    for i in src/figures/src/fig_*.jl 
+        set -l currentfigs src/figures/(basename $i .jl |cut -c 5-)*
+        set -l skip 0
+        if test (count $currentfigs) -ne 0
+            if test (stat -c '%Y' $i) -lt (stat -c '%Y' $currentfigs[1])
+                set skip 1
+            end
+        end
+        if test $skip -eq 1
+            echo 'Skipping figure' (basename $i)  '… (unmodified source)'
+        else
+            echo 'Building figure' (basename $i) '…'
+            julia --project=src/figures/src --color=yes $i 
+        end
+    end
+    tectonic -X build
+alias U := update-all
 
 # TODO: should give a pick of the figures
 
@@ -44,7 +65,7 @@ build-fig FIG:
     #! /bin/env fish
     echo Building figure {{FIG}} …
     julia --project=src/figures/src --color yes src/figures/src/fig_{{FIG}}.jl
-alias bf := build-fig
+alias f := build-fig
 
 update-fig FIG:
     #! /bin/env fish
@@ -84,5 +105,15 @@ clean-figs:
         end
     end
 alias cf := clean-figs
+
+# Build all figures and document
+build-all:
+    #! /bin/env fish
+    for i in src/figures/src/fig_*.jl 
+        echo 'Building figure' (basename $i) '…'
+        julia --project=src/figures/src --color=yes $i 
+    end
+    tectonic -X build
+alias B := build-all
 
 # TODO: add some checks with `prosecheck` etc.
