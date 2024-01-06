@@ -71,7 +71,50 @@ Further mathematical structure to the notion of interference emerging from the d
 The brilliant mathematician \nameemph{James Clerk Maxwell} later in 1873 gave a unified and robust theoretical framework
     for \ac{EM} fields, which light is a manifestation of.
 
-\section{Wave Theory of Light}%
+\section[Wave Theory of Light]{Foundations of the Wave Theory of Light}%
 \labsec{wave-theory-of-light}
+% TODO: Explanations of ∇ × and ∇ ⋅ in the margin with Einstein's summation (nabla is also called del...)<06-01-24> 
+
+Maxwell's unification of the theory of \ac{EM} fields came in the manner of twenty differential equations which were 
+    later condensed by \nameemph{Oliver Heaviside} into the notorious forms of the four equations that are today known 
+    as \emph{Maxwell's equations}.
+Given in their most general differential form in \acs{SI} units, they are
+    \begin{align}
+        \nabla \cdot \permittivity \E &= \rho, \tag{\text{Gauss's law for \(\E\)}}\labeq{gausses-law-E}\\ 
+        \nabla \cdot \permeability \B &= 0, \tag{\text{Gauss's law for \(\B\)}}\labeq{gausses-law-B}\\  
+        \nabla \times \E &= -\pdif{t}\B, \tag{\text{Faraday's law}} \labeq{faradays-law} \\
+        \nabla \times \B &= \permeability \J  + \permittivity \permeability \pdif{t}\E, \tag{\text{Ampère-Maxwell's law}} \labeq{amperes-law}
+    \end{align}
+    where \(\E=\E(\vec{r}, t)\) and \(\B=\B(\vec{r}, t)\) are the electric and magnetic fields respectively, 
+    \(\J=\J(\vec{r}, t)\) is the current density, \(\rho = \rho(\vec{r})\) is the electric charge density, \(\permittivity = 
+    \permittivity(\vec{r})\) and \(\permeability = \permeability(\vec{r})\) are permittivity and permeability of the 
+    propagation medium respectively.
+These equations can be simplified for the case of the medium that is applicable to us \sidecite{goodman2005c}.
+As a first simplification, we assume the absence of free charges (\(\rho \equiv 0\)) and free currents (\(\J \equiv 0\)) 
+    which lead to the simplification of \refeqraw{gausses-law-E} and \refeqraw{amperes-law}.
+We postulate a well-behaved \emph{insulating} (\emph{dielectric}) medium in its response to the electric field, where 
+    \(\D = \permittivity \E + \Pol\) is the electric displacement field and \(\Pol\) is the field of polarization, in 
+    the form of an assumption of \emph{linearity} implying that the polarization \(\Pol\) is proportional to the 
+    electric field, that is \(\Pol \propto \E\), \emph{non-dispersiveness} meaning that the polarization \(\Pol(t)\) is 
+    dependent on \(\E(t)\) only at the same time instant, \emph{local homogeneity} meaning that the dependence of 
+    \(\Pol\) on \(\E\) is the same at every point \(\vec{r}\) within a neighbourhood and \emph{isotropy} meaning that 
+    the relation is identical for every direction of \(\E\). 
+In the terms of a medium within which the light propagates \emph{non-dispersiveness} implies that
+    \(\permittivity(\lambda) \equiv~\text{const.}\) where \(\lambda\) is the wavelength of the propagating \ac{EM} wave,
+    \emph{homogeneity} implies \(\permittivity(\vec{r}) \equiv~\text{const.}\) in some neighbourhood and \emph{isotropy}
+    implies that \(\permittivity({\E}/{|\E|}) \equiv~\text{const.}\) so in all directions of the field, the permitivity is
+    the same.
+Also the medium in optics is assumed to be \emph{non-magnetic} and so \(\permeability \equiv \permeability_0\), which is
+    the permeability in vacuum.
+The applicable simplified equations are
+    \begin{equation}
+        \labeq{maxwell-simplified}
+        \begin{aligned}
+            \nabla \cdot  \E &= 0, &   \nabla \cdot  \B &= 0, \\  
+            \nabla \times \E &= -\pdif{t}\B, & \nabla \times \B &= \permittivity \permeability_0 \pdif{t}\E.
+        \end{aligned}
+    \end{equation}
+Notice that due to the \emph{homogeneity}, the permittivity \(\permittivity\) and permeability \(\permeability\), no
+    longer appear in Gauss's law for \(\E\) and \(\B\) in the simplified equations.
 
 % TODO: Note about the paraxial approximation <07-11-23> 
