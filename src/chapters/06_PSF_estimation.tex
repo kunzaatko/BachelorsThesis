@@ -15,6 +15,8 @@ We disregard the phase change that the optical system may introduce, because in 
         unambiguous, thus for the phase-retrieval algorithm to be stable, it is necessary that the phase retrieved 
         function to be non-symmetric with respect to the origin, which is often the case for the \ac{PSF}
         \sidecite[*+2]{goodman2005b}.
+    There are other algorithms that for phase retrieval that leverage the fact that the prior knowledge of the \ac{PSF}
+    \sidecite[*+3]{hanser2003}.
     } , since 
     the light sensors (In our case the \ac{CMOS}) only measure the energy that hits the sensor elements which is 
     equivalent for all possible phases of the \ac{EM} wave, since it only depends on the intensity of the \ac{EM} 
@@ -176,7 +178,7 @@ The sources, that are the greatest contributors to the noise corruption of the e
             where the rate parameter \(\lambda'\) corresponds to the expected incident photon count per unit 
             time, i.e. the expected number of photon detections per a unit of time.
         It is dependent on the source luminance.
-        Since \(\E N = \Var(N) = \lambda'\Delta\tau \eqqcolon \lambda\), the ratio of signal to noise increases 
+        Since \(\Expected N = \Var(N) = \lambda'\Delta\tau \eqqcolon \lambda\), the ratio of signal to noise increases 
             with \(\sqrt{\lambda'\Delta\tau}\) and so the corruption due to this source of noise is greatest in 
             situations with low signal levels.
         For larger counts of photons, we can use the central limit theorem to approximate the photon noise by a Gaussian
@@ -547,7 +549,7 @@ The steps of performing an estimate from multiple bead samples are:
 \end{enumerate}
 
 We subtract the backgrounds of the sample beads before averaging them, therefore, we may assume that their noise is 
-    centred, i.e. \(\E\noise =~0\).
+    centred, i.e. \(\Expected\noise =~0\).
 The variance of the \ac{PSF} values contained in the estimate is reduced regardless of the distribution of the noise 
     in the sensed samples due to the law of large numbers.
 
