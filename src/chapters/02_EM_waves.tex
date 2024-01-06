@@ -160,4 +160,105 @@ This is in accordance with the known value of the speed of light in vacuum \(c
     = \frac{1}{\sqrt{\permittivity_0\permeability_0}} = \qty{299 792 458}{\meter/\second}\).
 
 
+\section[Wave Equation Solutions]{Solutions to the Wave Equation of Light}
+\labsec{solutions-wave-equation}
+
+There are two solutions to \refeq{wave-equation} that will be of interest to us.
+They differ by the shape of the wave-front surface that is produced.
+First we have the \emph{spherical wave}, that is more aligned with the apprehension of light sources in \ac{FM} in
+    theory theory as will become apparent.
+There is a problem with the spherical wave solution that will be demonstrated, hence, the \emph{planar wave} solution 
+    will be also derived.
+
+% TODO: subsection Solution for light <05-01-24> 
+
+\subsection{Spherical Wave}
+\labsubsec{spherical-wave}
+
+Let us consider a solution \(\wavescal\) to the \(3\)-dimensional wave equation (\refeqraw{wave-equation}) that is dependent
+    only on the radial distance from the origin \linebreak \(r = \sqrt{x^2 + y^2 + z^2}\) and time \(t\).
+The Laplace operator \(\nabla^2\) of \(\wavescal\) gives us
+    \begin{align*}
+        \nabla^2\wavescal &= \sum_{i = 1}^{3} \pdv[order={2}]{\wavescal(r)}{x_i}  = \sum_{i = 1}^{3}
+        \pdv{}{x_i}\ab(\pdv{\wavescal(r)}{x_i}) = \sum_{i = 1}^{3} \pdv{}{x_i}\ab(\pdv{\wavescal(r)}{r}\pdv{r}{x_i}) \\
+                      &= \sum_{i = 1}^{3} \pdv{}{x_i}\ab(\pdv{\wavescal(r)}{r}\frac{x_i}{r}) 
+                      = \sum_{i = 1}^{3} \frac{x_i}{r} \pdv{\wavescal(r)}{x_i, r}
+                      + \pdv{}{x_i}\ab(\frac{x_i}{r})\pdv{\wavescal(r)}{r} \\
+                      &= \sum_{i = 1}^{3} \ab(\frac{x_i}{r})^2 \pdv[order={2}]{\wavescal(r)}{r} + \frac{1}{r}\ab(1
+                      - \frac{x_i^2}{r^2}) \pdv{\wavescal(r)}{r} = \pdv[order={2}]{\wavescal(r)}{r}
+        + \frac{2}{r}\pdv{\wavescal(r)}{r} \\
+                      &= \frac{1}{r}\pdv[order={2}]{}{r}(r\wavescal(r)).
+    \end{align*}
+If rewrite the wave equation with this result and expand both sides by \(r\), we get 
+    \begin{align*}
+        \frac{1}{r}\pdv[order={2}]{}{r}(r\wavescal) - \frac{1}{v^2}\pdv[order={2}]{\wavescal}{t} &= 0, \\
+        \pdv[order={2}]{}{r}(r\wavescal) - \frac{1}{v^2}\pdv[order={2}]{r\wavescal}{t} &= 0, \\
+        \nabla^2(r\wavescal) - \frac{1}{v^2}\pdv[order={2}]{r\wavescal}{t} &= 0, \\
+    \end{align*}
+    which is the wave equation (\refeqraw{wave-equation}) in one dimension for the function~\(r\wavescal\).
+The solution to the one-dimensional wave equation is in the form the d'Alembert's solution
+    \begin{equation}
+        \tilde{\wavescal}(r,t) = \phi_{\rightarrow}(r - vt) + \phi_{\leftarrow}(r + vt).
+    \end{equation}
+Of the two solutions, only the outwards propagated component \(\phi_{\rightarrow}\) makes physical sense for a point 
+    source generating the spherical wave, so in the standard result, \(\phi_{\leftarrow}\) is omitted by setting it to a zero function 
+    \(\phi_{\leftarrow} \equiv 0\).
+The final spherical solution \(\wavescal_{\circ}\) for light at the point \(\vec{r}=(x,y,z)\) is
+    \begin{equation}
+        \wavescal_\circ(\vec{r},t) = \frac{\phi_{\rightarrow}(|\vec{r}| - vt)}{|\vec{r}|}.
+    \end{equation}
+
+One consideration is left to be discussed about this solution before reinterpreting it for the \ac{EM} field.
+As you may have noticed in this section, the notation of \(\wavescal\) has been used instead of \(\wave\).
+Before pronouncing the solution as a \ac{EM} field solution, it is imperative to verify the consistency of it with
+    Maxwell's equations, because it is implied that the solution to Maxwell's equations are also \ac{EM} wave equation 
+    solutions, but the inverse is not true.
+In fact this solution is a counter example to the inverse implication, since due to Birkhoff's theorem, this solution is
+    in conflict with source-free Maxwell's equations while assuming that the solution is \emph{non-static}, which means 
+    \(v \neq 0\) in the terms of the derived \(\wavescal_\circ\).
+To see this, let us start with the ansatz of a spherically symmetric field
+    \begin{gather*}
+    \E(\vec{r}, t) = \Escal(r,t) \unitvec{r}, \\
+    \B(\vec{r}, t) = \Bscal(r,t) \unitvec{r},
+    \end{gather*}
+    where \(\unitvec{r}\) is the unit vector in the direction of \(\vec{r}\).
+Plugging this into the right sides of Faraday's and Ampère-Maxwell's equations gives
+    \begin{gather*}
+        \nabla \times \E = \nabla \times \Escal(r,t) \unitvec{r} = \vec{0}, \\
+        \nabla \times \B = \nabla \times \Bscal(r,t) \unitvec{r} = \vec{0},
+    \end{gather*}
+    hence the left sides follow as
+    \begin{gather*}
+    - \pdif{t}\B = \vec{0}, \\
+    \permittivity\permeability_0\pdif{t}\E = \vec{0},
+    \end{gather*}
+    so the field is necessarily static for non-zero \(\permittivity\) and \(\permeability\), which is the only physical
+    possibility for these quantities.
+It may be argued that a static solution, is also a possible solution, but it must be realized, that a static field
+    implies an energy flux of zero and therefore cannot be a manifestation of light since no energy is transmitted.
+
+A thought that we went astray with this solutions derivation is wrong however.
+Even though the solution is non-physical, it is widely used in optics, especially in diffraction theory, as an
+    approximation to the true physical solution to avoid analytical dead-ends in the calculations.
+To this purpose, in conclusion, the approximation of the \(\E\) component of the \ac{EM} field solution is
+    \begin{equation*}
+      \Escal_{\circ}(\vec{r},t)  = \frac{F\ab(|\vec{r}| - \frac{t}{\sqrt{\permittivity\permeability_0}})}{|r|},
+    \end{equation*}
+    where \(F \coloneqq \phi_{\rightarrow}\) is a chosen function.
+An analogous expression is available for \(\B\).
+
+The interesting observation to be made is that the intensity of the \ac{EM} field declines in an inverse proportion to
+    the radial distance \(r\) from the source.
+This can be intuitively realized by considering the fact that the wave-front surface is growing in a quadratic relation 
+    with distance \(r\) and the energy transmitted by the wave is also in a quadratic relation to \(\Escal\).
+Since the medium is non-dispersive, energy is not lost during the transmission and \(\Escal^2 \cdot S_{\text{wave-front}}
+    \propto 1(r)\).
+
+As for the adequacy of the spherical solution compared to the planar wave solution, we can conceptualize the source of
+    radiation in \ac{FM} as an electron of a fluorescent molecule in an excited state falling to the ground state while
+    releasing a photon of a particular wavelength.
+Due to the small size of an atom with the dimensionality in the order of \(\qty{1}{\angstrom}\) relative to the
+    dimensionality of the field quantities such as the wavelength in the order of \(\qty{100}{\nano\meter}\), the source
+    of the field may be imagined as a point source, which is consistent with the imagination of the source, causing
+    a spherical wave.
 % TODO: Note about the paraxial approximation <07-11-23> 
