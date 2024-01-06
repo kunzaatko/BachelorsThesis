@@ -116,4 +116,28 @@ build-all:
     tectonic -X build
 alias B := build-all
 
+install-textlint:
+    #! /bin/env fish
+    npm init --yes
+    npm install --save-dev textlint    
+    # PLUG-INS
+    npm install --save-dev textlint-plugin-latex2e
+    # RULES
+    npm install --save-dev textlint-rule-no-todo
+    npm install --save-dev textlint-rule-write-good
+    npm install --save-dev textlint-rule-no-start-duplicated-conjunction
+    npm install --save-dev textlint-rule-common-misspellings
+    npm install --save-dev textlint-rule-rousseau
+    # npm install --save-dev textlint-rule-ginger
+    npm install --save-dev textlint-rule-spellchecker
+    npm install --save-dev textlint-rule-apostrophe
+    npm install --save-dev textlint-rule-diacritics
+    npm install --save-dev textlint-rule-stop-words
+    npm install --save-dev textlint-rule-doubled-spaces
+    npm install --save-dev textlint-rule-terminology
+
+textlint:
+    #! /bin/env fish
+    npx textlint 'src/chapters/*.tex'
+
 # TODO: add some checks with `prosecheck` etc.
