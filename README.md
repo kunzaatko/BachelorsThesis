@@ -14,8 +14,8 @@ This repository contains the LaTeX source code for my bachelors thesis on [struc
 2. **Light in a Microscope**
     - [ ] Historical context
     - [ ] Wave theory of light introduction
-        - Maxwell's equations (+ planar wave solution)
-        - Linearity of the Maxwell's equations
+        - Maxwell’s equations (+ planar wave solution)
+        - Linearity of the Maxwell’s equations
         - Light mediation through a medium (For purposes of defocus aberration)
     - [ ] Total Internal Reflection
         - Light passing through a interface with a different refractive index
@@ -68,8 +68,8 @@ This repository contains the LaTeX source code for my bachelors thesis on [struc
 --- 
 (part II - Experiment)
 
-5. **Measuring the Transfer Functions**
-6. **SIM reconstruction**
+5. **SIM reconstruction**
+6. **Measuring the Transfer Functions**
 
 ---
 (Appendix)
