@@ -117,4 +117,47 @@ The applicable simplified equations are
 Notice that due to the \emph{homogeneity}, the permittivity \(\permittivity\) and permeability \(\permeability\), no
     longer appear in Gauss's law for \(\E\) and \(\B\) in the simplified equations.
 
+\subsection[Wave Equation of Light]{The Wave Equation for Light}
+\labsubsec{wave-equation}
+
+The goal is to transform the equations of \refeqraw{maxwell-simplified} to the wave equation for both \(\E\) and \(\B\)
+% TODO: Note about the vector laplacian operator ∇² and the normal laplacian operator <06-01-24> 
+    \begin{equation*}
+        \nabla^2 \wave - \frac{\pdif[order={2}]{t}\wave}{v^2} = 0,
+        \labeq{wave-equation}\tag{\(\dAlembert_{v}\wave\)}
+    \end{equation*}
+    where \(v\) is the waves propagation speed.
+For \(\E\), this can be done starting from Faraday's law in the simplified form~(\refeqshort{maxwell-simplified}) by 
+    applying the curl operation to both sides~\sidecite{feynman2011a}.
+Customarily, starting from Faraday's law, we get for the left side
+    \begin{equation*}
+      \nabla \times (\nabla \times \E) = \nabla(\nabla\cdot\E) - \nabla^2\E = - \nabla^2\E,
+    \end{equation*}
+    where we used, in order, the \emph{curl of curl} identity and Gauss's law for \(\E\) and for the right side
+    \begin{equation*}
+        -\nabla\times(\pdif{t}\B) = - \pdif{t}(\nabla \times \B) = - \pdif{t}(\permittivity
+        \permeability_0 \pdif{t} \E) = - \permittivity \permeability_0 \pdif[order={2}]{t} \E,
+    \end{equation*}
+    where we used the fact that the \(\pdif{t}\) operation is scalar (does not introduce ties between the positional
+    dimensions) and therefore the order of operations can be swapped and Ampère-Maxwell's law.
+% TODO: Here include the relation of double rot in the margin proved <06-01-24> 
+Putting these two results together gives the wave equation for \(\E\)
+    \begin{equation}
+        \nabla^2\E - \permittivity \permeability_0 \pdif[order={2}]{t}\E = 0 \tag{\(\dAlembert\E\)}\labeq{wave-equation-E}. 
+    \end{equation}
+An analogous sequence of operations leads to the wave equation for~\(\B\)
+    \begin{equation}
+        \nabla^2\B - \permittivity \permeability_0 \pdif[order={2}]{t}\B = 0 \tag{\dAlembert\B}\labeq{wave-equation-B}.
+    \end{equation}
+
+Comparing the general \(n\)-dimensional wave equation (\refeqraw{wave-equation}) with the wave equations 
+    \refeqraw{wave-equation-E} and \refeqraw{wave-equation-B}, we can determine the propagation speed~\(v\) of the 
+    \ac{EM} wave in the medium as
+    \begin{equation}
+           \permittivity \permeability_0 = 1/v^2 \implies v = \frac{1}{\sqrt{\permittivity\permeability_0}}.
+    \end{equation}
+This is in accordance with the known value of the speed of light in vacuum \(c
+    = \frac{1}{\sqrt{\permittivity_0\permeability_0}} = \qty{299 792 458}{\meter/\second}\).
+
+
 % TODO: Note about the paraxial approximation <07-11-23> 
