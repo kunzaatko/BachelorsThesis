@@ -263,7 +263,6 @@ Due to the small size of an atom with the dimensionality in the order of \(\qty{
     a spherical wave.
 
 
-% FIX: We should surround the component in bases by ()... (x⃑)ᵢ instead of x⃑ᵢ<07-01-24> 
 \subsection{Planar Wave}
 \labsubsec{planar-wave}
 
@@ -275,48 +274,48 @@ Next let us rewrite Gausses law for \(\E\) (\refeqshort{maxwell-simplified}) in 
     \((\unitvec{n}, \unitvec{n}_{\perp_1}, \unitvec{n}_{\perp_2})\)
     \begin{equation}
         \labeq{unitvec-basis-gauss-E}
-        \nabla \cdot \E = \pdif{\unitvec{n}}\E_{\unitvec{n}} + \pdif{\unitvec{n}_{\perp_1}}\E_{\unitvec{n}_{\perp_1}}
-        + \pdif{\unitvec{n}_{\perp_2}}\E_{\unitvec{n}_{\perp_2}} = 0,
+        \nabla \cdot \E = \pdif{\unitvec{n}}(\E)_{\unitvec{n}} + \pdif{\unitvec{n}_{\perp_1}}(\E)_{\unitvec{n}_{\perp_1}}
+        + \pdif{\unitvec{n}_{\perp_2}}(\E)_{\unitvec{n}_{\perp_2}} = 0,
     \end{equation}
     where \(\pdif{\unitvec{v}}\) is the spatial partial derivative in the direction of \(\unitvec{v}\) and 
-    \(\E_{\unitvec{v}}\) is the basis vector \(\unitvec{v}\) component of \(\E\).
+    \((\E)_{\unitvec{v}}\) is the basis vector \(\unitvec{v}\) component of \(\E\).
 The assumption that the wave is propagating in the direction \(\unitvec{n}\) implies
     \begin{gather*}
-        \pdif{\unitvec{n}_{\perp_1}}\E_{\unitvec{n}_{\perp_1}} = 0, \\
-        \pdif{\unitvec{n}_{\perp_2}}\E_{\unitvec{n}_{\perp_2}} = 0,
+        \pdif{\unitvec{n}_{\perp_1}}(\E)_{\unitvec{n}_{\perp_1}} = 0, \\
+        \pdif{\unitvec{n}_{\perp_2}}(\E)_{\unitvec{n}_{\perp_2}} = 0,
     \end{gather*}
     which when plugged into \refeq{unitvec-basis-gauss-E} in turn implies
     \begin{equation*}
-        \pdif{\unitvec{n}}\E_{\unitvec{n}} = 0.
+        \pdif{\unitvec{n}}(\E)_{\unitvec{n}} = 0.
     \end{equation*}
 If we now consider Ampère-Maxwell's law of \refeq{maxwell-simplified} and again assume that the \(\B\)-wave is
     propagating in the direction of \(\unitvec{n}\), meaning
     \begin{gather*}
-        \pdif{\unitvec{n}_{\perp_1}}\B_{\unitvec{n}_{\perp_1}} = 0, \\
-        \pdif{\unitvec{n}_{\perp_2}}\B_{\unitvec{n}_{\perp_2}} = 0,
+        \pdif{\unitvec{n}_{\perp_1}}(\B)_{\unitvec{n}_{\perp_1}} = 0, \\
+        \pdif{\unitvec{n}_{\perp_2}}(\B)_{\unitvec{n}_{\perp_2}} = 0,
     \end{gather*}
     and therefore
     \begin{equation*}
         (\nabla \times \B)_{\unitvec{n}} = 0,
     \end{equation*}
-    so we obtain that \(\E_{\unitvec{n}}\) is constant in time.
-This implies, that is we assume a dynamic \(\E\)-field, \(\E_{\unitvec{n}} \equiv 0\).
-To put this into words, we can say that for the propagation of planar waves in the direction \(\unitvec{n}\), \E is
+    so we obtain that \((\E)_{\unitvec{n}}\) is constant in time.
+This implies, that is we assume a dynamic \(\E\)-field, \((\E)_{\unitvec{n}} \equiv 0\).
+To put this into words, we can say that for the propagation of planar waves in the direction \(\unitvec{n}\), \(\E\) is
     perpendicular to the direction of propagation, \(\E \perp \unitvec{n}\).
 Since we know that \(\E\) lies in the plane \(\unitvec{n}_{\perp_1} \times \unitvec{n}_{\perp_2}\), we can denote the
-    direction \(\E/|\E| \eqqcolon \unitvec{m}\) and change reinterpret \(\E\) in the basis 
+    direction \({\E/|\E| \eqqcolon\unitvec{m}}\) and change reinterpret \(\E\) in the basis 
     \((\unitvec{n}, \unitvec{m}, \unitvec{x}_{\perp})\).
-The calculation of \(\nabla \times \E\) is now trivial, as the only non-zero component of \(\E\) is \(\E_{\unitvec{m}}\) and
-    so
+The calculation of \(\nabla \times \E\) is now trivial, as the only non-zero component of \(\E\) is 
+    \((\E)_{\unitvec{m}}\) and so
     \begin{gather*}
         (\nabla\times\E)_{\unitvec{n}}  =  (\nabla\times\E)_{\unitvec{m}} = 0,\\
-        (\nabla\times\E)_{\unitvec{x}_{\perp}}  =  \pdif{\unitvec{n}}\E_{\unitvec{m}}.
+        (\nabla\times\E)_{\unitvec{x}_{\perp}}  =  \pdif{\unitvec{n}}(\E)_{\unitvec{m}}.
     \end{gather*}
 Now we can see that if \(\E\) is in the direction of \(\unitvec{m}\) then substituting the curl of \(\E\) into Faraday's
     law (\refeqshort{maxwell-simplified})
     \begin{gather*}
-        \pdif{t} \B_{\unitvec{m}} =  \pdif{t} \B_{\unitvec{m}} = 0, \\
-        \pdif{t} \B_{\unitvec{x}_{\perp}} =  \pdif{\unitvec{n}} \E_{\unitvec{m}}, \\
+        \pdif{t} (\B)_{\unitvec{m}} =  \pdif{t} (\B)_{\unitvec{m}} = 0, \\
+        \pdif{t} (\B)_{\unitvec{x}_{\perp}} =  \pdif{\unitvec{n}} (\E)_{\unitvec{m}}, \\
     \end{gather*}
     and we can again leverage the assumption of a dynamic \(\B\)-field and conclude that if the wave propagates in the
     direction \(\unitvec{n}\), then the direction of the \(\E\)-field is \(\unitvec{m}\) and the direction of the
@@ -325,13 +324,13 @@ In summary \(\E \perp \B \perp \unitvec{n}\).
 The same argument can be used to determine the curl \(\nabla \times \B\) which results in the singular non-zero
     component 
     \begin{equation*}
-        (\nabla \times \B)_{\unitvec{m}} = \pdif{\unitvec{n}}\B_{\unitvec{x}_{\perp}} = \permittivity\permeability_0
-        \pdif{t}\E_{\unitvec{m}}.
+        (\nabla \times \B)_{\unitvec{m}} = \pdif{\unitvec{n}}(\B)_{\unitvec{x}_{\perp}} = \permittivity\permeability_0
+        \pdif{t}(\E)_{\unitvec{m}}.
     \end{equation*}
 We have arrived at two equations that tie the \(\E\)-field and \(\B\)-field together
     \begin{align}
-        \pdif{t} \B_{\unitvec{x}_{\perp}} &=  \pdif{\unitvec{n}} \E_{\unitvec{m}},\labeq{diftBdifnE} \\
-        \pdif{\unitvec{n}}\B_{\unitvec{x}_{\perp}} &= \permittivity\permeability_0 \pdif{t}\E_{\unitvec{m}}.
+        \pdif{t} (\B)_{\unitvec{x}_{\perp}} &=  \pdif{\unitvec{n}} (\E)_{\unitvec{m}},\labeq{diftBdifnE} \\
+        \pdif{\unitvec{n}}(\B)_{\unitvec{x}_{\perp}} &= \permittivity\permeability_0 \pdif{t}(\E)_{\unitvec{m}}.
         \labeq{difnBdiftE}
     \end{align}
 To put this all together and finish the planar wave solution we only need to apply \(\pdif{\unitvec{n}}\) to 
@@ -339,32 +338,32 @@ To put this all together and finish the planar wave solution we only need to app
     identical implying the equality of the left sides
     \begin{equation}
         \labeq{plane-wave-E}
-        \pdif[order={2}]{\unitvec{n}}\E_{\unitvec{m}} - \permittivity\permeability_0 \pdif[order={2}]{t}\E_{\unitvec{m}} = 0.
+        \pdif[order={2}]{\unitvec{n}}(\E)_{\unitvec{m}} - \permittivity\permeability_0 \pdif[order={2}]{t}(\E)_{\unitvec{m}} = 0.
     \end{equation}
 If we make the analogous last step for the \(\B\)-field, we get
     \begin{equation}
         \labeq{plane-wave-B}
-        \pdif[order={2}]{\unitvec{n}}\B_{\unitvec{x}_{\perp}} - \permittivity\permeability_0 \pdif[order={2}]{t}\B_{\unitvec{x}_{\perp}} = 0.
+        \pdif[order={2}]{\unitvec{n}}(\B)_{\unitvec{x}_{\perp}} - \permittivity\permeability_0 \pdif[order={2}]{t}(\B)_{\unitvec{x}_{\perp}} = 0.
     \end{equation}
 
 Observing the equations \refeq{plane-wave-E} and \refeq{plane-wave-B}, it is clear that they are one-dimensional wave
     equations and the \refeqraw{d-alembert-solution-1d}, can be used to specify the form of the fields
     \begin{gather*}
-        \E_{\unitvec{m}}(\vec{r}, t) = \phi^{\E}_{\rightarrow}\ab((\vec{r})_{\unitvec{n}}  - \frac{t}{\sqrt{\permittivity\permeability_0}})
+        (\E(\vec{r}, t))_{\unitvec{m}} = \phi^{\E}_{\rightarrow}\ab((\vec{r})_{\unitvec{n}}  - \frac{t}{\sqrt{\permittivity\permeability_0}})
         + \phi^{\E}_{\leftarrow}\ab((\vec{r})_{\unitvec{n}} + \frac{t}{\sqrt{\permittivity\permeability_0}}) \\
-        \B_{\unitvec{x}_{\perp}}(\vec{r}, t) = \phi^{\B}_{\rightarrow}\ab((\vec{r})_{\unitvec{n}}  - \frac{t}{\sqrt{\permittivity\permeability_0}})
+        (\B(\vec{r}, t))_{\unitvec{x}_{\perp}} = \phi^{\B}_{\rightarrow}\ab((\vec{r})_{\unitvec{n}}  - \frac{t}{\sqrt{\permittivity\permeability_0}})
         + \phi^{\B}_{\leftarrow}\ab((\vec{r})_{\unitvec{n}} + \frac{t}{\sqrt{\permittivity\permeability_0}}).
     \end{gather*}
 Based on empirical physical properties of the wave, in contemporary physics, we omit \(\phi_{\leftarrow}\) and are left
     with the retarded time solutions
     \begin{gather}
-        \labeq{E-plane-wave}\E_{\unitvec{m}}(\vec{r}, t) = \phi^{\E}\ab((\vec{r})_{\unitvec{n}}  - \frac{t}{\sqrt{\permittivity\permeability_0}}), \\
-        \labeq{B-plane-wave}\B_{\unitvec{x}_{\perp}}(\vec{r}, t) = \phi^{\B}\ab((\vec{r})_{\unitvec{n}}  - \frac{t}{\sqrt{\permittivity\permeability_0}}).
+        \labeq{E-plane-wave}(\E(\vec{r}, t))_{\unitvec{m}} = \phi^{\E}\ab((\vec{r})_{\unitvec{n}}  - \frac{t}{\sqrt{\permittivity\permeability_0}}), \\
+        \labeq{B-plane-wave}(\B(\vec{r}, t))_{\unitvec{x}_{\perp}} = \phi^{\B}\ab((\vec{r})_{\unitvec{n}}  - \frac{t}{\sqrt{\permittivity\permeability_0}}).
     \end{gather}
 
 To clean up the notation, we restore the standard Cartesian coordinate system as 
-    \((\unitvec{n}, \unitvec{m}, \unitvec{x}_{\perp}) = (\unitvec{x}, \unitvec{y}, \unitvec{z})\) and \(\E = (\E_x,
-    \E_y, \E_z)\), \(\B = (\B_x, \B_y, \B_z)\) and denote the retarded \(x\)-coordinate 
+    \((\unitvec{n}, \unitvec{m}, \unitvec{x}_{\perp}) = (\unitvec{x}, \unitvec{y}, \unitvec{z})\) and \(\E = (\Escal_x,
+    \Escal_y, \Escal_z)\), \(\B = (\Bscal_x, \Bscal_y, \Bscal_z)\) and denote the retarded \(x\)-coordinate 
     \(x - \frac{t}{\sqrt{\permittivity\permeability_0}}\) as \(\xi\).
 
 This is not the final result though, since se can determine the relation of \(\phi^{\E}\) and \(\phi^{\B}\) by using one
@@ -390,8 +389,8 @@ We first substitute \(\E\) and \(\B\) into the equation \refeqraw{diftBdifnE} fr
 Putting everything together using equations \refeqraw{E-plane-wave}, \refeqraw{B-plane-wave} and 
     \refeqraw{phiB-phiE-rel}, we get the \ac{EM} plane wave 
     \begin{gather}
-        \E_y(\vec{r}, t) = F\ab(x - \frac{t}{\sqrt{\permittivity\permeability_0}}), \\
-        \B_z(\vec{r}, t) = \frac{1}{\sqrt{\permittivity\permeability_0}}F\ab(x - \frac{t}{\sqrt{\permittivity\permeability_0}}),
+        \Escal_y(\vec{r}, t) = F\ab(x - \frac{t}{\sqrt{\permittivity\permeability_0}}), \\
+        \Bscal_z(\vec{r}, t) = \frac{1}{\sqrt{\permittivity\permeability_0}}F\ab(x - \frac{t}{\sqrt{\permittivity\permeability_0}}),
     \end{gather}
     where \(F \coloneqq \phi^{\E}_{\rightarrow}\) is a chosen function.
 
