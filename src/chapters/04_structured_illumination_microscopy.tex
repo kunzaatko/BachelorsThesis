@@ -1,0 +1,408 @@
+\setchapterpreamble[u]{\margintoc}
+\chapter{Super-resolution Microscopy}
+\labch{SR-microscopy}
+
+In the realm of optical microscopy, the pursuit of enhanced spatial resolution has led to the development of various 
+    techniques collectively known as \ac{SR} microscopy.
+The central aspect to the term \acl{SR} is the ability to surpass the classical established diffraction resolution
+    limit by means of the technique.
+\marginnote[*+8]{%
+    An important fact that should be realized is that that mostly none of the \ac{SR} methods described here are useful in 
+        other optical acquisition contexts then in microscopy.
+    This is due to the property, that the methods rely on the ability to closely control the environment of the observation
+        in various ways.
+    As an example, \acs{SIM} is impossible to mimic, within the context of astronomy because we can not vary the
+        illumination and in fact do not observe reflections of or emission due to illuminating the field.
+}
+
+\ac{SR} microscopy has been a term and a topic of study for almost half a century now.
+In 1978, the first method to be developed, that may be categorized as a \ac{SR} method, is the so called
+    \ac{4PIM} by \nameemph{Christoph} and \nameemph{Thomas Cremer} \sidecite{cremer1978b}.
+It rethinks the classical design of sample illumination and attempts to limit the volume that is excited by the
+    radiation within the sample space within one acquisition.
+The light in the image space is thus reduced to the emission of the fluorescent molecules within this volume of the 
+    sample and a reduction in uncertainty of the location within this volume of the sample is achieved.
+By the repetition of these localized acquisitions, it is then possible to systematically cover the sample space and
+    reconstruct the full sample estimate based on information from all of the acquisitions.
+The realization that outperforming the classical diffraction limit by means of a specialized modality or setup of the 
+    microscope is possible resulted in a rapid pace of innovation and lead to the invention of novel techniques, 
+    altering the way of illuminating the sample and the preparation of the imaged sample itself.
+
+A major breakthrough was presented in 1995 by \nameemph{J. Guerra}, who made use of a non-physical method to achieve 
+    \ac{SR} in theory by including a modulation of the transfer function into the acquisition process and evaluating the 
+    effect on the dependence of observed light in the image space on the source signal \sidecite{guerra1995}.
+Later in 1999 \nameemph{Heintzmann} and \nameemph{Gustafsson} developed a deconvolution based reconstruction algorithm
+    for \nameemph{Guerra's} method \sidecite{heintzmann1999}.
+This change in perspective was also met with a large number of follow-ups which explored further approaches of
+    utilizing the concept transfer function manipulation and pre-transfer inferred response signal control for the
+    purpose of achieving \ac{SR}.
+
+The culminated effort within the microscopy field lead to numerous advancements and unprecedented observations mostly in
+    biology.
+As a result and a appreciation was the granting of the Nobel Prize in Chemistry in 2014 shared three scientists who
+    developed the \ac{STED} method \sidecite{weiss2014}.
+
+\section{Comparison of \ac{SR} Methods}
+\labsec{sr-comparison}
+
+To this date, there are two major broad approaches of achieving \ac{SR} that have been demonstrated in practice 
+    \sidecite{lal2016}.
+In some modern cases a combination of methods one from each of the approach can be used alongside each other for
+    achieving a greater resolution than one that is achievable by using them in isolation.
+These broad categories are:
+    \begin{description}
+        \item[localization]%\labitm{localization}
+            Concerns with reducing signal from the source structure to a limited volume or volumes that are sparse 
+                within the image plane. 
+            This bypasses the resolving limit using employing the aspect of the sensed signal, that there is assumed to 
+                be little superposition from the individual fluorescent molecules.
+            Lack of superposition can be used to distinguish individual emitting particles and if enough photons from
+                one such particle is collected, its position can be determined with a low uncertainty.
+        \item[modulation]%\labitm{modulation}
+            By altering one of the aspect of generation of signal from the source structure, it induces a
+                superposition of source signals caused by a range or discrete set of scales within the source structure.
+            With a prior expectation or design of the set of scales superposed (aliased) and often by use of more than
+                one such acquisition with different sets of scales admitted or included with a different factor within
+                the superposition, the scales can be distinguished and mapped to the original scale of the source by
+                reconstruction from the individual acquisitions.
+    \end{description}
+
+% FIX: Use references for the "localization" and "modulation" <kunzaatko> 
+% https://tex.stackexchange.com/questions/1230/reference-name-of-description-list-item-in-latex
+Usually a \emph{localization} based method uses illumination volume reduction for the purpose of limiting the volume of
+    source structure originated signal in the sensed signal, it requires scanning or varying the location of the volume
+    in a different manner in order to make a reconstruction of the full field source signal.
+This is often at the demise of temporal resolution or alternatively an acquisition prioritizing temporal speed can
+    severely reduce the resolution gain in the space axes.
+In other words, fast localization \ac{SR} acquisitions usually do not retain their advertised \ac{SR} to the extent of
+    still and long lasting acquisitions.
+Aforementioned is a substantial case for using \emph{modulation} based methods for dynamic sources acquisitions.
+
+The \emph{modulation} approach is a good fit for a dynamic (video) acquisition, since the photon efficiency relative to
+    the efficiency of a standard acquisition is not lowered by a significant amount.
+That is important due to the fact that if we want to acquire a live-cell for a period of time, it is desirable to limit
+    the fluorophore bleaching caused by the cumulative effect of illumination during this time.
+A popular choice for live-cell acquisitions is therefore \ac{SIM}.
+
+A non-exhaustive table of \ac{SR} methods is presented in \reftab{sr-methods}.
+
+% TODO: The table should not leave a half blank page. After the completed version of this chapter, the table should be
+% moved to the place where a natural pagebreak would occur <08-01-24> 
+\pagelayout{wide} % No margins
+\begin{table*}
+\vspace*{\fill}
+    \RawFloats
+    \centering
+    \small
+    \begin{tabularx}{\textwidth+\marginparsep+\marginparwidth}{l X c c c c}%{@{}l @{\extracolsep{\fill}} *{4}{l} @{}}
+        \toprule
+        \multirow[b]{2}{*}{\thead{\ac{SR}\\ Method}} & \multirow[b]{2}{*}{\thead{Method \\ Summary}}
+                                                     & \multicolumn{3}{c}{\thead[b]{Resolution}}
+                                                     & \multirow[b]{2}{*}{\thead{Year of \\ Origin}} \\
+        \cmidrule(lr){3-5} 
+                                                     & & {\centering\textbf{Lateral}} & {\centering\textbf{Axial}}
+                                                     & {\centering\textbf{Temporal}} & \\
+        \midrule
+        \multirowcell{3}[0pt][l]{\acs{FIONA} \cite{yildiz2003}\\ \textbullet widefield \\ \textbullet localization } & {\footnotesize %
+            Labels the sample with a single fluorophore within a diffraction radius. 
+            Collects a sufficient number of photons from the isolated fluorophores to alleviate location noise and uses 
+                curve fitting to find the center of the diffraction pattern that is assumed to be the true fluorophore 
+            location.} & \(\qty{1.5}{\nano\meter}\) & \na & \(\qty{0.5}{\second}\) & 2003 \\
+        \addlinespace
+        \multirowcell{3}[0pt][l]{\acs{STED} \cite{hell1994} \\ \textbullet scanning \\ \textbullet localization} & {\footnotesize%
+            Uses two laser beams for illumination: an excitation beam and a \acs{STED} beam. 
+            The excitation beam excites the fluorophore photons and therefore causes fluorescence in the sample, while 
+                the \acs{STED} beam, focused with small lateral offsets, depletes fluorescence in the outer regions of 
+                the excitation spot reducing the volume where fluorophores are excited.%
+            } & \(\qty{25}{\nano\meter}\) & \(\qty{100}{\nano\meter}\) & \(\qty{5}{\milli\second}\) & 1994 \\
+        \addlinespace
+        \multirowcell{3}[0pt][l]{\acs{PALM} \cite{betzig2006} \\ \textbullet widefield \\ \textbullet localization} & {\footnotesize%
+            Stimulates the fluorophore labels in the sample with light and switching them from between the states of
+                emitting and bleached, which is a state due to over activation of the fluorophore that wears off with 
+                passing time.
+            This is done in such a manner that the number of activated fluorophores is low and sparse within the sample.
+            Similarly to \acs{FIONA}, this ensures their precise localization.
+            It enough cycles are performed for a each set of fluorophores, a full image can be obtained by stacking the
+                source estimations from each stack.
+        } & \(\qty{2}{\nano\meter}\) & \(\qty{10}{\nano\meter}\) & \(\qty{5}{\second}\) & 2006 \\
+        \addlinespace
+        \multirowcell{3}[0pt][l]{\acs{STORM} \cite{rust2006,rahmanseresht2018} \\ \textbullet widefield \\ \textbullet  localization} & {\footnotesize%
+                The idea is the same as in \acs{PALM}.
+                Unlike \acs{PALM}, the sample is stained with specialized dyes that are photo-switchable.
+                This means unlike \acs{PALM} no reliance is placed on the time it takes for the fluorophores to revive
+                    from the bleached state and the switching may be done faster to the benefit of the temporal
+                    resolution.
+            } & \(\qty{4}{\nano\meter}\) & \(\qty{10}{\nano\meter}\) & \(\qty{1}{\second}\) & 2006  \\
+        \addlinespace
+        \multirowcell{3}[0pt][l]{\acs{4PIM} \cite{cremer1978b} \\ \textbullet scanning \\ \textbullet localization} & {\footnotesize%
+            Uses the two opposing objective lenses focused on the same location within the sample.
+            Further more, it uses a laser that is via reflection directed from both sides precisely aligned in relation
+                to the sample and the reflected and emitted light can be collected leading to the ability of detecting
+                the depth of the fluorophores by the effect of assessing, where relative to the laser beam wavelength
+                the emission happens with better resolution.
+                It improves only the axial resolution (using a classical wide-field microscope it is about
+                    \(\qty{500}{\nano\meter}\)).
+        } & \(\qty{180}{\nano\meter}\) & \(\qty{100}{\nano\meter}\) & \(\qty{50}{\milli\second}\) & 1978 \\
+        \addlinespace
+        \multirowcell{3}[0pt][l]{\acs{SIM} \cite{gustafsson2008, guerra1995, heintzmann1999} \\ \textbullet widefield \\ \textbullet modulation } & {\footnotesize%
+            An illumination with non-uniform (modulated) intensity is used with sub-diffraction resolution lateral 
+                variations.
+            These variations modify the signal produced by the sample structure and shifts some of its variations that 
+                are too rapid for the diffraction-limit and would not "survive" the optical system into lesser ones.
+            This leads to aliasing within the sensed signal.
+            It is possible to determine and the original locations of the variations, by an acquisition of multiple
+                modulations and a reconstruction can be performed.
+            % (Note, that variations are not meant in the literal sense of the mathematics definition, but rather
+            %    variations as thought of intuitively)
+        } & \(\qty{40}{\nano\meter}\) & \(\qty{300}{\nano\meter}\) & \(\qty{100}{\milli\second}\) & 1995 \\
+        \bottomrule
+    \end{tabularx}
+    \normalsize
+    \caption[skip=6pt]{%
+        The most prolific\ac{SR} methods and their approximate optimal resolutions achievable in each axis as of January 
+            2024.
+        Keep in mind that the resolutions listed are optimal and are not, and often can not, be achieved in one 
+            acquisition, because there is in most cases a compromise to be made. 
+        If the resolving power for a single axis is optimized, the others suffer a loss in attainable resolution.
+        An extreme example of this is \acs{PALM}, where the maximum frame rate is about \(\qty{12}{\per\minute}\) but an
+            acquisition with the best lateral resolution of \(\qty{2}{\nano\meter}\) can take up to \(\qty{12}{\hour}\).
+        \emph{Widefield} signifies that the acquisition of the full frame is performed in one take and \emph{scanning}
+            that the acquisition of the full frame requires the accumulation of acquisition of multiple patches of
+            different volumes of the sample space.
+        Besides the impressive resolutions that are achieved by the \ac{SR} methods, it speaks volumes about their 
+            inventors that they came up with some of the cheekiest acronyms widely used in contemporary science of 
+            today.
+    }
+    \labtab{sr-methods}
+\vspace*{\fill}
+\end{table*}
+\pagelayout{margin} % Restore margins
+
+% TODO: Add labels <20-05-23> 
+\section{Principle of SIM}
+\labsec{sim-principle}
+
+The principle which \ac{SIM} and other modulation based \ac{SR} methods stand on will be demonstrated by harmonic
+    \ac{SIM}.
+Harmonic \ac{SIM} alters the signal generated by the source structure via non-uniform illumination.
+The illumination intensity takes the form of a \(2\)D harmonic function.
+
+As a first step, let us consider, how a harmonic may affect aliasing of a signal in a one-dimensional example.
+Let us have a model source structure, i.e. what we want to estimate, to be
+    \begin{equation*}
+        \source(x) = \cos(\omega x).
+    \end{equation*}
+Now, we want to imitate the illumination.
+We can set the "illumination" as a harmonic in analog to the \(2\)D harmonic in \ac{SIM} that we want to get the 
+    intuition for
+    \begin{equation*}
+        \ip(x) = \cos(\alpha\cdot\omega x),
+    \end{equation*}
+    where \(\alpha\) is a constant.
+If we want to imitate \ac{SIM} \(\alpha \approx 1\) but \(\alpha \neq 1\).
+To imitate the optical system, due to its linearity, it is adequate to perform the transfer of the "illumination", we
+    multiply the source structure by it
+    \begin{align*}
+        \noisefree(x) &= \source(x) \cdot \ip(x) = \cos(\omega x)\cdot\cos(\alpha\omega x) \\[0.5em]
+                      &= \cos\ab(\ab(\tfrac{\alpha + 1}{2} - \tfrac{\alpha - 1}{2})\cdot\omega
+                      x)\cdot\cos\ab(\ab(\tfrac{\alpha + 1}{2} + \tfrac{\alpha - 1}{2})\cdot\omega x) \\[0.5em]
+                      &= \frac{\cos\ab((1 + \alpha)\cdot\omega x) + \cos\ab((\alpha - 1) \cdot\omega x)}{2}
+    \end{align*}
+We can see from the above that some of the scales of variation of \(\source\)\sidenote[][*-20]{%
+    Here, variations are not in the literal sense of the mathematics definition but rather intuitive variations as can
+        be seen in \reffig{beats-mult}.
+    Later in the \(2\)D case, we will do all the operations in Fourier space and the so called scales of variation will 
+        be frequencies for us and the notion will stand on a firmer basis.
+    } were approximately doubled (\(\alpha \approx 1\)) but some on the other hand are very close to \(0\).
+This is the idea behind \ac{SIM}, where the variation that is lowered can now be observed.
+
+% \pagebreak
+\begin{marginfigure}[*-15]
+    \marginpdftex{principle-of-sim-beats-mult}
+    \caption{%
+        We can see how the multiplication with the "illumination" affects the signal \(\noisefree\) that is generated. 
+        Here, \(\alpha = 1.1\).
+        It is clear from the graph, what we intuitively mean by the variation.
+    }
+    \labfig{beats-mult}
+\end{marginfigure}
+
+Even better than observing the exact case of a \(1\)D imitation of \ac{SIM} is to observe a physical analog in
+    acoustics, that is often observed in real life.
+If two harmonic acoustic waves with similar frequencies are superposed a \emph{beat} pattern emerges.
+The real life use of this phenomenon is in sirens on an ambulance or on a police vehicle.
+If we listen to them closely, it is possible to distinguish the high frequency harmonics and the low frequency beat
+    sound.
+A depiction of this phenomenon can be seen in \reffig{beats-add}.
+
+\begin{marginfigure}[*-4]
+    \marginpdftex{principle-of-sim-beats}
+    \caption{Acoustic beat pattern that emerges when two close frequency harmonics are superposed.}
+    \labfig{beats-add}
+\end{marginfigure}
+
+There is also an illustrative phenomenon that is commonplace in the real world of the above concept from \(1\)D in the 
+    \(2\)D of \ac{SIM}.
+It is in the form of \emph{moiré fringes} (or patterns).
+They are present when two high-frequency patterns are superposed.
+Examples of this in common use (\reffigshort{moire-real-life}) are:
+    \begin{itemize}
+        \item%
+            A news anchorman with a striped shirt on an old low-resolution television.
+            The patterns that are superposed are the stripes on the shirt and the scan-lines of the television.
+        \item%
+            A close-up photo of an \acs{LCD} or \acs{LED} screen  monitor. 
+            The pattern are the pixels rows and columns of the camera and the monitor. 
+            Scale of the patterns change when distance of the camera from the monitor.
+        \item%
+            The citizenship \acs{ID} card or a banknote, where moiré patterns are intensionally incorporated as
+            a safety feature of the print.
+    \end{itemize}
+
+\begin{marginfigure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{moire-art} \\[\medskipamount]
+    \includegraphics[width=0.9\textwidth]{moire-screen}
+    \caption{%
+        Moiré fringes are present when two high-frequency patterns are superposed.
+        \vspace{-1.5em}
+        \begin{center}
+            {\scriptsize (courtesy of Emin Gabrielyan)}
+        \end{center}
+    }
+    \labfig{moire-real-life}
+\end{marginfigure}
+
+\section{\ac{SIM}}%
+\labsec{sim}
+
+The aliasing in harmonic \ac{SIM} is better presented in the Fourier domain.
+We will denote the Fourier images of functions by capital letters.
+That is, we denote the Fourier image of the source \(\source\) as \(\F*{\source} = \Fsource\), the illumination
+    \(\ip\) as \(\F*{\ip} = \Fip\) and so on.
+This notation is also used in the experiment part.
+
+The harmonic \ac{SIM} illumination pattern as already mentioned is the harmonic cosine function.
+In \(2\)D, this is
+% TODO: Add a figure of the illumination pattern here <08-01-24> 
+    \begin{equation*}
+        \labeq{ip-formula}
+        \ip_{(m,\vec{k}_\ip,\phi)}(\vec{r}) = 1 + \tfrac{m}{2} \cos\ab(2\pi \vec{k}_\ip \cdot \vec{r} + \phi),
+    \end{equation*}
+    where \(m\), \(\vec{k}_\ip\) and \(\phi\) are constant parameters \emph{modulation}, \emph{phase-shift} (or
+    \emph{orientation}) and \emph{phase-offset} of the illumination pattern respectively.
+The Fourier image of a \(2\)D harmonic function is
+    \newlength{\preeqlength}
+    \settowidth{\preeqlength}{\(\displaystyle\mathsurround=0pt\F{\cos(2\pi \vec{k}_\ip\cdot \vec{r})}\)}
+    \begin{equation*}
+        \begin{split}
+            \F{\cos(2\pi \vec{k}_\ip\cdot \vec{r})} &= \tfrac{1}{2}\F{\exp(2\pi \imag\vec{k}_\ip \cdot \vec{r}) + \exp(-2\pi
+            \imag\vec{k}_\ip \cdot \vec{r})} \\[\medskipamount]
+            &\begin{multlined}[t][\textwidth - \preeqlength]
+            = \tfrac{1}{2} \iint_{\R^2} \ab(\exp(2\pi \imag\vec{k}_\ip \cdot \vec{r}) + \exp(-2\pi \imag\vec{k}_\ip \cdot
+            \vec{r}))\\[-0.5em]
+            \cdot\exp(-2\pi \imag \vec{k}\cdot \vec{r}) \odif{\vec{r}}
+        \end{multlined}\\[\medskipamount]
+            &\begin{multlined}[t][\textwidth - \preeqlength]
+            =\tfrac{1}{2} \iint_{\R^2} \exp(2\pi \imag\vec{k}_\ip \cdot \vec{r}) \cdot \exp(-2\pi
+                \imag \vec{k}\cdot \vec{r}) \odif{\vec{r}} \\
+                + \tfrac{1}{2} \iint_{\R^2} \exp(-2\pi \imag\vec{k}_\ip \cdot \vec{r}) \cdot \exp(-2\pi \imag \vec{k}\cdot \vec{r}) \odif{\vec{r}}
+            \end{multlined} \\[\medskipamount]
+            &=\begin{multlined}[t][\textwidth - \preeqlength] 
+                \frac{\F{\exp(2\pi \imag\vec{k}_\ip \cdot \vec{r})} + \F{\exp(-2\pi \imag\vec{k}_\ip \cdot \vec{r})}}{2}        
+            \end{multlined} \\[\medskipamount]
+            &= \tfrac{1}{2}\dirac\ab(\vec{k} + \vec{k}_\ip) + \tfrac{1}{2}\dirac\ab(\vec{k} - \vec{k}_{\ip}),
+        \end{split}
+    \end{equation*}
+    which means that the Fourier image of the illumination pattern, due to linearity of \(\FourierSymbol\) is
+    \begin{equation*}
+      \F{\ip_{(m,\vec{k}_\ip,\phi)}(\vec{r})} = \Fip_{(m,\vec{k}_\ip,\phi)}(\vec{k}) = \frac{me^{-\imag \phi}}{4} \dirac_{-\vec{k}_\ip} + \dirac +
+                          \frac{me^{\imag \phi}}{4} \dirac_{+\vec{k}_\ip}.
+    \end{equation*}
+
+We assume that the relation between excitation illumination intensity \(\ip\) and the emission intensity of a single 
+    fluorophore is linear.
+The relation between the emission intensity \(\noisefree\) at a point and the source structure \(\source\) (i.e. the 
+    density of fluorescent particles) times the excitation intensity is also linear.
+In fact we assume that the multiplicative coefficient is \(1\) without loss in generality since we are not interested in
+    the actual number of photons produced, but instead the structure variations and so, in the spatial domain
+    \begin{equation*}
+      \noisefree(\vec{r}) = \source(\vec{r}) \cdot \ip(\vec{r}).
+    \end{equation*}
+
+We know that the in the Fourier domain, this translates to the convolution, i.e.
+    \begin{equation*}
+      \Fnoisefree(\vec{k}) = \Fsource(\vec{k}) * \Fip(\vec{k}).
+    \end{equation*}
+
+From this, it is clear that the structured illumination of the sample, induces spatial frequency aliasing of the sample
+    source \(\source\) in the \(\noisefree\) signal.
+This signal is then propagated through the optical system via the transfer function to produce the sensed signal
+    \(\sensed\).
+In the Fourier domain, this is expressed by
+    \begin{equation*}
+      \Fsensed(\vec{k}) = (\Fsource(\vec{k}) * \Fip(\vec{k})) \cdot \otf(\vec{k}).
+    \end{equation*}
+The reconstruction procedure then deals with antialiasing the frequencies of the sensed \(\Fsensed\) and placing them 
+    into their correct locations within the reconstructed \(\Freconstructed\).
+From \(\Freconstructed\), we can then obtain the reconstructed spatial source as 
+    \begin{equation*}
+        \Finverse*{\Freconstructed} = \reconstructed .
+    \end{equation*}
+This concept is further explained and performed in \refch{sim-reconstruction}. 
+
+\section{Discussion}
+\labsec{discussion}
+
+Due to the fact that the only difference between the \ac{SIM} based acquisition and a regular acquisition is the
+    non-uniform illumination, \ac{SIM} is composable with various setup modalities, available for regular view-field
+    microscopy.
+For example, it can be used in combination with \ac{TIRFM}, where noise can be reduced by reducing the illumination of
+    the sample to a narrow axial slice.
+The data that we are working with in the later chapters is acquired with this modality.
+
+We are also not limited to the case of harmonic illumination.
+There have been successful \ac{SIM} demonstrations with apriori unknown speckle patterns, with only the singular 
+    condition, of summing into a uniform intensity \sidecite{yeh2017, mudry2012}.
+
+It is also not limited to lateral resolution enhancement.
+The harmonic patterns that we are using can also be expressed for axial slices that are not in one the focal plane and 
+    the \(3\)D \ac{OTF} can be used in the reconstruction to enhance the image resolution in both axial and lateral 
+    directions\sidecite{gustafsson2008}.
+This approach requires \(15\) acquisitions with different parameters to in the reconstruction compared with \(9\) frame
+    acquisitions of the standard Wiener filter based reconstruction for lateral resolution gain.
+
+We are also not limited to a mere resolution doubling, as can be observed from \reftab{sr-methods} 
+    \sidecite{gustafsson2005}.
+It is essential though to realize  that the harmonic illumination pattern is limited in the intensity variation 
+    frequency similarly by diffraction similarly to the wide way the optical system limits the resolution by
+    diffraction\sidenote{%
+        Thus \(\alpha \approx 1\) in \refsec{sim-principle} in not only the best option from the resolution gain 
+        standpoint, but also a forced necessity in the \ac{SIM} realization.%
+    }.
+This problem is overcome by utilization of the non-linearity of the relation between excitation and emission near the
+    saturation point of the fluorophores.
+A non-linearity in the generation of photons by the fluorophores can be modelled and is desirable in this case, because
+    it enables us to induce higher frequencies.
+Let \(I_{\text{em}} = I_{\text{em}}(I_{\text{ex}})\) be the known non-linear relationship, where \(I_{\text{em}}\) is 
+    the emission intensity and \(I_{\text{ex}}\) is the excitation intensity.
+If we have the modulation \(m\) of \(I_{\text{ex}}\), such that the peak intensities of \(I_{\text{ex}}\) are above the
+    saturation point of the fluorophores, we can express the relation \(I_{\text{em}}(I_{\text{ex}}(\vec{r}))\) by the
+    sum of its harmonic components at a Fourier series.
+The frequency components of the source \(\source\) corresponding to the Fourier series components of 
+    \(I_{\text{em}}(I_{\text{ex}}(\vec{r}))\), including the higher frequencies than the ones included in the regular \ac{SIM}, are 
+    aliased in the sensed image \(\Fsensed\). 
+By multiple acquisitions and by using the calculated Fourier series coefficients, a chosen number of components can be 
+    linearly separated similarly as in \refsec{sim-reconstruction}, and the reconstruction \(\Freconstructed\) can be
+    assembled from these components.
+If you think about the aforementioned procedure, the lateral resolution that can be achieved is theoretically unlimited.
+What is the problem\sidenote{%
+        There must be one, because the prospect of unlimited resolution is unthinkable.
+    }?
+If we were to expand the relation \(I_{\text{em}}(I_{\text{ex}}(\vec{r}))\) into its Fourier series, we would observe that the higher
+    of the harmonic component \(\zeta_k(\vec{r})\) the lower the corresponding coefficient \(\rho_k\) and at some point, the 
+    component would become undistinguishable from the photon noise.
+This approach has also been implemented in combination with the photo-switchable dyes from \acs{STORM}, which achieved
+    the lateral resolution of \(\qty{50}{\nano\meter}\) \sidecite{rego2012}.
+
+% TODO: prakash2021 is good for an overview and the discussion of ways forward <07-01-24> 
