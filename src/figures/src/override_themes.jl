@@ -55,10 +55,10 @@ const ROTATE_LABELS = Theme(
 
 const NO_TICKS = Theme(
     Axis=(
-        xticksize=0,
-        yticksize=0,
-        xtickwidth=0,
-        ytickwidth=0,
+        # xticksize=0,
+        # yticksize=0,
+        # xtickwidth=0,
+        # ytickwidth=0,
         xticksvisible=false,
         yticksvisible=false,
     )
@@ -70,6 +70,8 @@ const NO_TICKLABELS = Theme(
     Axis=(
         xticklabelsvisible=false,
         yticklabelsvisible=false,
+        xticksvisible=false,
+        yticksvisible=false,
     )
 )
 
@@ -83,3 +85,9 @@ const FIGURE_PAD = Theme(
     figure_padding=6
 )
 const MARGIN_PX_TICKS = merge(TINY_TICKLABELS, NO_TICKS)
+
+const ORANGE_TITLE = Theme(
+    Axis=(
+        titlecolor=:orange,
+    )
+)

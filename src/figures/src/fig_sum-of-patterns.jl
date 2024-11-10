@@ -20,7 +20,7 @@ function fig_sum_of_patterns()
     fig = Makie.Figure()
     # TODO: Make some convention to determine pixels typographically ... (siunitx?) <20-11-23> 
     # ga = fig[1:2, 1] = GridLayout()
-    ax = Makie.Axis(fig[2, 1])
+    ax = Makie.Axis(fig[2:7, 1])
     # colgap!(ga, 2) # TODO: Set in theme <20-11-23> 
 
     for (i, h) in zip(map(orientation_mark, 1:3), harmonics)

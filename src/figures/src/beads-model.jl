@@ -20,6 +20,7 @@ Generate a model of a bead
 - `α::PerLength`: evanescent wave attenuation constant
 - `pixel_grid_length::Int = 100`: length of each pixel in the grid
 - `peak_intensity = 1.0`: peak intensity value
+- `subpixel_shift = (0, 0)`: subpixel shift
 
 """
 function bead(T::Type{<:Real}, d::Length, α::PerLength, Δxy::NTuple{2,Length}; pixel_grid_length=100, peak_intensity=one(T), subpixel_shift=(0, 0))::OffsetMatrix{T}

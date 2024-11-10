@@ -33,6 +33,7 @@ function fig_ambient_light()
     im = image!(ax, bg_mean_img)
     cb = Colorbar(fig[1, 2], im)
     cb.leftspinevisible = cb.rightspinevisible = false
+    cb.tellheight = false
     colgap!(fig.layout, Relative(0.04))
     fig
 end

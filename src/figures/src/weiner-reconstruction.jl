@@ -47,5 +47,3 @@ function weiner_reconstruction(imgs, shifts, phase_offsets, modulations, transfe
 
     return spatial_out, fourier_out
 end
-
-

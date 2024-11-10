@@ -5,7 +5,7 @@ const FIG_NAME = getbase(@__FILE__)
 
 
 function fig_selected_beads_patch(patch="CC")
-    _, selection_point2f = get_selected_beads("CC")
+    _, selection_point2f = get_selected_beads(patch)
     inds = patch_inds(patch; imsize=size(LR_beads_sum))
     fig = Makie.Figure()
 

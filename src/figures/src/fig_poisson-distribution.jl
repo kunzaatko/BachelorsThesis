@@ -6,7 +6,7 @@ const FIG_NAME = getbase(@__FILE__)
 
 function fig_poisson_noise_dist()
     fig = Figure()
-    ax = Makie.Axis(fig[2, 1])
+    ax = Makie.Axis(fig[2:7, 1])
     lines!(ax, 0 .. 10.5, x -> smooth_poiss.(x; λ=4), label=L"\tilde{\mathcal{P}}_{\lambda}(x)", color=COLORS[2])
     scatter!(ax, 0:10, smooth_poiss.(0:10; λ=4); label=L"\mathcal{P}_{\lambda}[N = k]")
     Legend(fig[1, 1], ax)
