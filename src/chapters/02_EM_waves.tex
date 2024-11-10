@@ -176,7 +176,7 @@ There is a problem with the spherical wave solution that will be demonstrated, h
 \labsubsec{spherical-wave}
 
 Let us consider a solution \(\wavescal\) to the \(3\)-dimensional wave equation (\refeqraw{wave-equation}) that is dependent
-    only on the radial distance from the origin \({r = \sqrt{x^2 + y^2 + z^2}}\) and time~\(t\).
+    only on the radial distance from the \linebreak origin \({r = \sqrt{x^2 + y^2 + z^2}}\) and time~\(t\).
 The Laplace operator \(\nabla^2\) of \(\wavescal\) gives us
     \begin{align*}
         \nabla^2\wavescal &= \sum_{i = 1}^{3} \pdv[order={2}]{\wavescal(r)}{x_i}  = \sum_{i = 1}^{3}
@@ -405,4 +405,44 @@ We use this solution as an approximation, and a good one undeniably, which uphol
     distance relative to the distance of the source\sidenote{%
     This makes it the relevant solution, when it comes to astronomy, where the light comes from far distances and the 
         relative size of the telescope is miniscule compared to them.}.
+
+\subsection{Harmonic Waves}
+\labsubsec{harmonic-waves}
+
+Harmonic waves play a special role in the theory of \ac{EM} field.
+This is due to the fact that Maxwell's equations are linear and therefore, any function \(F\) from subsections
+    \refsubsecraw{spherical-wave} and \refsubsecraw{planar-wave} that can be expressed in the form of harmonics can be 
+    expressed in the form of spherical and planar harmonic waves respectively.
+
+A harmonic plane wave has the form
+    \begin{equation}
+        \begin{gathered}
+            \E(\vec{r},t)=\vec{\Escal}_{0}\,e^{-\imag(\omega t-\vec{k}\cdot\vec{r})},\\
+            \B(\vec{r},t)=\vec{\Bscal}_{0}\,e^{-\imag(\omega t-\vec{k}\cdot\vec{r})},
+        \end{gathered}
+    \end{equation}
+    where the vectors \(\vec{\Escal}_0\),\(\vec{\Bscal}_0\) and \(\vec{k}\) form an orthogonal bases.
+
+
+% \subsection{Huygens-Fresnel Principle}
+% \labsubsec{huygens-fresnel}
+
+% \subsection{Paraxial Approximation}
+% \labsubsec{paraxial-approximation}
+
+
+% \section[Reflection and Refraction]{Reflection and Refraction}
+% \labsec{refraction-and-reflection}
+%
+% \subsection{Boundary Conditions}
+% \labsubsec{boundary-conditions}
+%
+% \subsection{Total Internal Reflection}
+% \labsubsec{tir}
+% TODO: Subsection TIR <05-01-24> 
+
+% \section{Scalar Diffraction}
+% \labsec{scalar-diffraction}
+% TODO: Section From vector to scalar theory <05-01-24> 
+
 % TODO: Note about the paraxial approximation <07-11-23> 
