@@ -1,45 +1,106 @@
-\setchapterpreamble[u]{\margintoc}
-\chapter{Introduction}
+\pagelayout{wide}
+% \setchapterpreamble[u]{\margintoc}
+\chapter*{Introduction\,\,}
 \labch{intro}
+\addcontentsline{toc}{chapter}{Introduction}
 
-% TODO: Subsection label <05-05-23, kunzaatko> 
+% % TODO: Subsection label <05-05-23, kunzaatko> 
 Advancements in precise and accurate observation techniques have always been at the forefront of scientific endeavours.
-Their charm rises from the possibility of viewing the known with a greater closeness and opening the prospect of
-    discovering what was impossible with previous methods, enabling the recognition of new phenomena in the field.
+Novel approaches often lead to chains of revolutionary new discoveries in the fields that utilize these methods.
 
-% \section{Motivation}
-\section[Need for Precision]{The Need for Precision}
-\labsec{need-for-precision}
-% TODO: Example with Tycho Brahe - need for greater precision <05-05-23, kunzaatko> 
+In microscopy, a physical limit that for a long time seemed unbreakable was \nameemph{Abbe's} resolution limit, due to
+    diffraction induced by the light transfer through the microscope.
+This bound, restricting both the lateral (\(\approx \qty{180}{\nano\meter}\)) and the axial 
+    (\(\approx \qty{450}{\nano\meter}\)) axes of resolution, remained a constraint for the precision of observation in 
+    microscopy for more than a century from its derivation, stifling progress in biology and countless other fields 
+    which depend on measurement and observation through microscopy imaging.
 
-We can effortlessly follow the complementary relationship between significant discoveries and the conceptions of novel
-    observation approaches throughout the history of science.
-% TODO: margin note of the past most known discoveries after observational novelties <26-03-23> 
-The prominence and crucial position of the development of sensing methods, within the scientific disciplines, has not
-    diminished over time.
-% TODO: margin note on Nobel prizes in the past decade for sensing techniques <26-03-23, kunzaatko> 
-In fact the current direction of research towards being a combined effort of progressively greater groups with broader
-    specializations permits teams to appropriate greater means to fine-tuning the data acquisition procedures used. 
-% TODO: Add reference <29-03-23> 
+Hope for better resolving power was re-established by a breakthrough at the hands of the \nameemph{Cremer} brothers in
+    the mid 1970s by a revolutionary approach to microscopy observation (\acs{4PIM}) that lead to the possibility of 
+    about \(4\)-fold improvement in the axial resolution.
+This discovery incited a revolution, in which new methods where introduced at an unprecedented speed for this field.
+As a result of this rise of attention, not long after, methods for improving the more practicable lateral resolution 
+    where developed and implemented.
+These methods which outperform the physical limits of \nameemph{Abbe} in at least one of the axes of resolution became 
+    collectively known as \acf{SR} methods.
+Most of these methods, however, relied on long acquisition times stemming from the necessity of sensing a narrow volume
+    of the sample object field which deemed them unusable for applications with non-static specimen.
 
-% TODO: More fluent progression to next part <29-03-23> 
-Game changing breakthroughs in sensing, however appealing, are not a matter of daily occurrence in science and with
-    this in mind scientists are expending serious effort on the improvement of techniques that are the current state of
-    the art in the field.
+This pressing barrier for implementing \ac{SR} for use in \emph{in vivo} examination was overcome with a new technique 
+    in the mid 1990s which was based on significantly a different principles within the optical acquisition than the
+    previous methods.
+Improvements that built upon the presented aforementioned \ac{SIM} method were rapidly developed and its implementation
+    was widely adopted throughout the scientific community.
+Further methods that employed the principles of \ac{SIM} also found there grounds in application.
+These two waves of research have resulted in the creation of a plethora of approaches and implementations of \ac{SR} 
+    methods.
 
-% TODO: Figure with a timeline of significant technology of sensing discoveries. <26-03-23, kunzaatko> 
+The original \ac{SIM} technique is still very relevant in present-day and the reconstruction methods for it are
+    continually improving.
+An underlying concept behind \ac{SIM} is the transfer function, which is modulated by the \emph{structured illumination}
+    which the \ac{SIM} method prescribes.
+With respect to this, the knowledge of the correct transfer function is fundamental to reconstruction techniques of the
+    \ac{SIM} method.
 
-Although gradual development is not as electrifying and showcase-worthy as are leaps of novelty, we can trace a large
-    amount elevation in knowledge that capitalises on this slow pace of progress.
+A transfer function is a powerful concept, which is not limited to microscopy.
+It is fundamental due to the fact that it fully determines the mapping of a linear system, which it represents.
+The utility of the knowledge of transfer functions is undeniable since physical systems are often linear or can be
+    approximated by a linear system.
 
-% TODO: margin note about the advancement in sensing gravitational waves <26-03-23, kunzaatko> 
+In the context of \ac{SIM}, an incorrect transfer function, may lead to artefacts and undetermined fidelity of the 
+    reconstruction and so it is crucial to determine it correctly.
+With this in mind, there are two major approaches to deriving the transfer function of the optical system:
+    \begin{description}
+        \item[modeling] Considers the context of the optical setup and the nature of the propagating light to determine
+            an appropriate transfer function with the relevant aberrations of the lens system and aperture.
+        \item[estimation] Resorts to the sensed signal of an acquisition and through modeling the source signal which 
+            produced the result, infers an estimated transfer function.
+    \end{description}
 
-The minuteness of errors in our current observation has gotten to a scale that would be unimaginable for Kepler and
-    Brahe, but our desire for even greater precision prevails.
+I use the estimation approach to derive the applicable transfer function of our acquisition in approximation for the 
+    whole field and subsequently for the individual locations within the focal plane.
+I incorporate this estimate into the reconstruction procedure to achieve better results than were previously available 
+    for use in our analysis of endocytosis at the outer cell membrane.
 
-\sidecite{kepler1609}
-% TODO: Add labels <20-05-23> 
-
-\section[Optical Instrumentation History]{The History of Optical Instrumentation}%
-\labsec{optical_instrumentation}
-
+% Their charm rises from the possibility of viewing the known with a greater closeness and opening the prospect of
+%     discovering what was impossible with previous methods, enabling the recognition of new phenomena in the field.
+%
+% % \section{Motivation}
+% \section*{The Need for Precision}
+% \labsec{need-for-precision}
+% \addcontentsline{toc}{section}{Need for Precision}  
+% % TODO: Example with Tycho Brahe - need for greater precision <05-05-23, kunzaatko> 
+%
+% We can effortlessly follow the complementary relationship between significant discoveries and the conceptions of novel
+%     observation approaches throughout the history of science.
+% % TODO: margin note of the past most known discoveries after observational novelties <26-03-23> 
+% The prominence and crucial position of the development of sensing methods, within the scientific disciplines, has not
+%     diminished over time.
+% % TODO: margin note on Nobel prizes in the past decade for sensing techniques <26-03-23, kunzaatko> 
+% In fact the current direction of research towards being a combined effort of progressively greater groups with broader
+%     specializations permits teams to appropriate greater means to fine-tuning the data acquisition procedures used. 
+% % TODO: Add reference <29-03-23> 
+%
+% % TODO: More fluent progression to next part <29-03-23> 
+% Game changing breakthroughs in sensing, however appealing, are not a matter of daily occurrence in science and with
+%     this in mind scientists are expending serious effort on the improvement of techniques that are the current state of
+%     the art in the field.
+%
+% % TODO: Figure with a timeline of significant technology of sensing discoveries. <26-03-23, kunzaatko> 
+%
+% Although gradual development is not as electrifying and showcase-worthy as are leaps of novelty, we can trace a large
+%     amount elevation in knowledge that capitalises on this slow pace of progress.
+%
+% % TODO: margin note about the advancement in sensing gravitational waves <26-03-23, kunzaatko> 
+%
+% The minuteness of errors in our current observation has gotten to a scale that would be unimaginable for Kepler and
+%     Brahe, but our desire for even greater precision prevails.
+%
+% \sidecite{kepler1609}
+% % TODO: Add labels <20-05-23> 
+%
+% \section*{The History of Optical Instrumentation}%
+% \labsec{optical_instrumentation}
+% \addcontentsline{toc}{section}{Optical Instrumentation History}  
+%
+\pagelayout{margin}
