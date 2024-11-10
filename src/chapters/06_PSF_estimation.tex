@@ -605,6 +605,18 @@ The key is that the beads are sub-diffraction-resolution and as such, they shoul
 The sampling rate of our setup is \(\qty{61}{\nano\meter}\) so, since the beads have a diameter of
     \(\approx\qty{99}{\nano\meter}\), they should have a image plane diameter of about \(\qty{1.6}{\pixel\lowres}\).
 
+\pagebreak
+\begin{marginfigure}[*+15]
+    \marginpng{model-vs-avg-psf}
+    \caption{%
+        The \ac{PSF} estimate versus the model. 
+        The model is clearly wider, which implies that the diffraction-resolution was overestimated by the model which
+            is in line with the reconstruction flaws we discussed in \refsec{wiener-filter-reconstruction}.
+    }
+    \labfig{psf-avg-estimate-CC}
+\end{marginfigure}
+
+
 \begin{figure}[h]
     \png{model-vs-avg-psf-deconv-CC-vs-sensed}
     \caption{%
