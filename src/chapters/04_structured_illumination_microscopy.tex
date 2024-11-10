@@ -94,7 +94,7 @@ A non-exhaustive table of \ac{SR} methods is presented in \reftab{sr-methods}.
     \RawFloats
     \centering
     \small
-    \begin{tabularx}{\textwidth+\marginparsep+\marginparwidth}{l X c c c c}%{@{}l @{\extracolsep{\fill}} *{4}{l} @{}}
+    \begin{tabularx}{\textwidth+\marginparsep+\marginparwidth + 2em}{l X c c c c}%{@{}l @{\extracolsep{\fill}} *{4}{l} @{}}
         \toprule
         \multirow[b]{2}{*}{\thead{\ac{SR}\\ Method}} & \multirow[b]{2}{*}{\thead{Method \\ Summary}}
                                                      & \multicolumn{3}{c}{\thead[b]{Resolution}}
@@ -393,7 +393,7 @@ The frequency components of the source \(\source\) corresponding to the Fourier 
     \(I_{\text{em}}(I_{\text{ex}}(\vec{r}))\), including the higher frequencies than the ones included in the regular \ac{SIM}, are 
     aliased in the sensed image \(\Fsensed\). 
 By multiple acquisitions and by using the calculated Fourier series coefficients, a chosen number of components can be 
-    linearly separated similarly as in \refsec{sim-reconstruction}, and the reconstruction \(\Freconstructed\) can be
+    linearly separated similarly as in \refch{sim-reconstruction}, and the reconstruction \(\Freconstructed\) can be
     assembled from these components.
 If you think about the aforementioned procedure, the lateral resolution that can be achieved is theoretically unlimited.
 What is the problem\sidenote{%

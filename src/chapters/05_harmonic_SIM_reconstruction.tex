@@ -17,7 +17,7 @@ If everything is done correctly, it is possible to recover all the additional in
 There is a multitude of approaches for performing these tasks, each of which has its own benefits and drawbacks.
 It is possible to categorise them into three broad categories based on the underlining theory that is used, namely:
 \begin{enumerate}[label=(\alph*)]
-    \item deconvolution based,
+    \item Wiener filter based,
     \item inversion/optimization based and
     \item machine learning based.
 \end{enumerate}
@@ -41,8 +41,8 @@ There again are many possible estimation algorithms relying on various assumptio
 
 First, one such estimation sequence for determining the parameters, that has been tested to work well for the data we 
     are working with, will be described (\refsecshort{IP-parameter-estimation}).
-The following sections will demonstrate the deconvolution based approach 
-    (\refsecshort{deconvolution-reconstruction}) and then the inversion/optimization based approach 
+The following sections will demonstrate the Wiener filter based approach 
+    (\refsecshort{wiener-filter-reconstruction}) and then the inversion/optimization based approach 
     (\refsecshort{inversion-reconstruction}).
 Lastly, some of the limitations and benefits of all three approaches will be discussed.
 
@@ -84,10 +84,10 @@ The formula for the \ac{OTF} is
 \section{Parameter Estimation}
 \labsec{IP-parameter-estimation}
 The general form of the \ac{LR} image illumination patterns in one orientation, denoted \(\ip_{\phi_1}\), 
-    \(\ip_{\phi_2}\) and \(\ip_{\phi_3}\), that are at the input of the deconvolution reconstruction is
+    \(\ip_{\phi_2}\) and \(\ip_{\phi_3}\), that are at the input of the Wiener filter reconstruction is
     \begin{equation}
         \labeq{ip-formula}
-        \ip_{\phi}(\vec{r}) = 1 + \frac{m}{2} \cos\ab(2\pi \vec{k}_\ip \cdot \vec{r} + \phi),
+        \ip_{\phi}(\vec{r}) = 1 + \tfrac{m}{2} \cos\ab(2\pi \vec{k}_\ip \cdot \vec{r} + \phi),
     \end{equation}
     where the phases \(\phi_1 \neq \phi_2 \neq \phi_3\) and \(\vec{k}_\ip\) is the wave vector of the illumination pattern.
 An assumption that is made in the our acquisition is that the phases differ by \(2\pi/3\), that is 
@@ -337,10 +337,10 @@ The modulation factor and the phase-offset estimates are consequently
 % \labsubsec{alternative_phase-offset_estimate}
 % TODO: Add the other estimation algorithm. This is not the one used for the estimation of modulation and phase-offset <17-12-23> 
 
-\section{Deconvolution Reconstruction}
-\labsec{deconvolution-reconstruction}
+\section{Wiener filter Reconstruction}
+\labsec{wiener-filter-reconstruction}
 
-The deconvolution approach consists of:
+The Wiener filter approach consists of:
 \begin{enumerate}[label=\roman*.]
     \item \labitm{component-separation} separation of the aliased components  
         \begin{equation*}
@@ -371,7 +371,7 @@ The deconvolution approach consists of:
             \ab(\Fcomponent_{-\vec{k}^{n}_\ip}^{n'}, \Fcomponent_{\vec{0}}^{n'}, \Fcomponent_{+\vec{k}^{n}_\ip}^{n'})_{n \in \oneto{3}}
             \mapsto \ab(\otf^{n'}_{-\vec{k}^{n}_\ip}, \otf^{n'}_{\vec{0}}, \otf^{n'}_{+\vec{k}^{n}_\ip})_{n \in \oneto{3}}
         \end{equation*}
-    \item \labitm{deconvolution} deconvolution of the mapped components 
+    \item \labitm{wiener-filter} application of the Wiener filter to the mapped components 
         \begin{equation*}
             \ab(\Fcomponent_{-\vec{k}^{n}_\ip}^{n'}, \Fcomponent_{\vec{0}}^{n'}, \Fcomponent_{+\vec{k}^{n}_\ip}^{n'})_{n \in
            \oneto{3}},
@@ -384,11 +384,11 @@ The deconvolution approach consists of:
 \labsubsec{component-separation}
 
 The procedure for \refitm{component-separation} was already described in \refsubsec{shift-estimation}.
-\marginnote{The necessity of the separation of components is one of the major drawbacks for the deconvolution approach,
+\marginnote{The necessity of the separation of components is one of the major drawbacks for the Wiener filter approach,
     since it requires the acquisition of 9 \ac{LR} images. We used all of the 9 \ac{LR} images for the parameter
     estimation (\refsecshort{IP-parameter-estimation}), but if the parameters where known as a consequence to the method
     of acquisition, or they where estimated using a lower number of \ac{LR} images, it wouldn't be possible to perform
-the reconstruction using the deconvolution approach. It would however be possible to use the other two methods.}
+the reconstruction using the Wiener filter approach. It would however be possible to use the other two methods.}
 At this moment, however, we have the estimates of the phase-offsets \(\phi_{-}, \phi_{0}, \phi_{+}\) and the 
     modulations \(m\),  therefore, we use them to separate the weighted components \(\Fcomponent_{-\vec{k}_\ip}\), 
     \(\Fcomponent_{\vec{0}}\) and \(\Fcomponent_{\vec{k}_\ip}\).
@@ -472,7 +472,7 @@ Accordingly to \refeq{component-separation}, the frequencies of the component \(
     the Fourier transformed sensed signal \(\Fsensed\).
 That is, an estimate of the source signal from the information contained in the component \(\Fcomponent'_{\vec{p}}\) can
     be illustratively\sidenote{The estimate is not obtained in this way precisely as will be demonstrated in
-    \refsubsec{deconvolution}.} written as
+    \refsubsec{wiener-filter}.} written as
     \begin{equation}
         \labeq{component-with-OTF-mapping}
         \hat{\Fsource}_{\Fcomponent'_{\vec{p}}}(\vec{k}) \cdot \otf(\vec{k} - \vec{p})
@@ -500,8 +500,8 @@ As indicated in \refitm{otf-shift} an \ac{OTF} is assigned\sidenote{
   \labfig{shifted-otfs}
 \end{marginfigure}
 
-\subsection{Deconvolution (\refitmshort{deconvolution})}
-\labsubsec{deconvolution}
+\subsection{Wiener Filter (\refitmshort{wiener-filter})}
+\labsubsec{wiener-filter}
 
 The state of the reconstruction is that we have frequency components, positioned at locations within the Fourier space 
     that are in compliance with the physical structure that they represent in the source signal and have appropriate 
@@ -517,7 +517,7 @@ There are many approaches with various purposes that attempt to achieve deconvol
 
 One such approach, that is widely used is the \emph{Weiner} deconvolution (filter). 
 It is derived in as a least square error estimate of the original signal, given a noisy sensed signal and a known
-    transfer (degradation) function (\refch{deconvolution}).
+    transfer (degradation) function.% (\refch{wiener-filter}).
 A simplified version of the Weiner filter estimate \(\Freconstructed\) of a noisy signal \(\Fsensed\) and an \ac{OTF} 
     \(\otf\) is given by
     \begin{equation*}
@@ -624,13 +624,14 @@ The artefacts that are filtered from the original non-apodized image are shown i
 \section{Inversion Reconstruction}
 \labsec{inversion-reconstruction}
 
-The principle of the inversion reconstruction is in many ways easier compared to the deconvolution reconstruction
-    (\refsecshort{deconvolution-reconstruction}).
+The principle of the inversion reconstruction is in many ways easier compared to the Weiner filter reconstruction
+    (\refsecshort{wiener-filter-reconstruction}).
 It relies on formulating a forward model \(\fwd\) that, when applied to the true source signal \(\source\) yields the
     expectation of the sensed \ac{LR} images \(\hat{\sensed}\).
-Unlike the deconvolution optimization, we do not attempt to develop an estimate for \(\fwd^{-1}\), but instead, it is
-    sufficient to formulate the forward model and rely on mathematical optimization for estimating the correct desired
-    input \(\source\), minimizing some defined loss \(\loss\) between \(\fwd[\source]\) and the sensed \(\sensed\).
+Unlike in the Wiener filter reconstruction, we do not attempt to develop an estimate for \(\fwd^{-1}\), but instead, it 
+    is sufficient to formulate the forward model and rely on mathematical optimization for estimating the correct 
+    desired input \(\source\), minimizing some defined loss \(\loss\) between \(\fwd[\source]\) and the sensed 
+    \(\sensed\).
 A simplified outline of the solution that inversion reconstruction gives is
     \begin{equation*}
         \reconstructed = \argmin_{\source} \loss[\sensed,  \fwd[\source] ].
@@ -760,8 +761,9 @@ The final reconstruction optimization problem is posed as
     where \(\lambda\) is the regularization parameter, that is set empirically and the loss is the sum of Poisson
     losses \(\loss_{\distribution{P}}\).
 
-The numerical optimization itself is performed using gradient descent with the use of source-to-source backward 
-    propagated automatic differentiation for computing the gradient and hessian.
+The numerical optimization itself is performed using the \ac{LBFGS} algorithm\sidecite{kmogensen2018} similar to 
+    gradient descent with the use of source-to-source backward propagated automatic differentiation \sidecite{innes2018} 
+    for computing the gradient and Hessian.
 
 \floatsetup[figure]{ % Captions for figueres
     capbesideposition={top,outside},%
@@ -840,7 +842,7 @@ In general, there is a trend for new algorithms to consolidate all the steps int
 An aspect that must be considered when choosing a reconstruction method, if the object of the observation is not static 
     (e.g. \emph{in vivo} acquisitions), is the value of temporal resolution and the photon efficiency of the 
     observation.
-There is an intrinsic deficiency of the deconvolution reconstruction in the fact that it is necessary to sense the image
+There is an intrinsic deficiency of the Wiener filter reconstruction in the fact that it is necessary to sense the image
     \(3\) times in a single orientation to be able to linearly separate the components.
 Machine learning and optimization based reconstruction procedures do not posses this limitation, as long as we are able 
     to estimate the parameters of the illumination patterns.

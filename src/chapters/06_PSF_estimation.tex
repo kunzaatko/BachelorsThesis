@@ -803,8 +803,8 @@ The final filter (\reffigshort{wide-discarded}) of the candidate \acp{ROI} by th
 \end{marginfigure}
 
 The comparison with the narrow mean \(\reconstructed_{\text{n}}\) is performed in order to discard the false 
-    positive locations that are present because of the reconstruction artefacts that occur using the deconvolution 
-    reconstruction~(\refsecshort{deconvolution-reconstruction}) and to discard the pixels connecting \acp{ROI} of beads
+    positive locations that are present because of the reconstruction artefacts that occur using the Wiener filter
+    reconstruction~(\refsecshort{wiener-filter-reconstruction}) and to discard the pixels connecting \acp{ROI} of beads
     that are close together, which is necessary for the \refitm{final-location}. % TODO: Closer reference <04-01-24> 
 It is made by a windowed mean with the window size of \(15\times 15~\unit{\pixel\highres}\) and the empirical threshold 
     is determined to be \(\beta_\text{n} = 2.46\)
