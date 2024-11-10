@@ -2,6 +2,7 @@
 \newcommand{\distribution}[1]{\ensuremath{\mathcal{#1}}}
 \setlength{\fboxsep}{0pt}
 \setlength{\fboxrule}{.1pt}
+\renewcommand\theadfont{\bfseries\small}
 \newcommand{\continuous}{\ensuremath{C}}
 \newcommand{\dAlembert}{\ensuremath{\Box}}
 \newcommand{\unitvec}[1]{\hat{\symbf{#1}}}
@@ -22,7 +23,8 @@
 % \newcommand{\D}{\ensuremath{\mathbb{D}}}
 \DeclareMathOperator{\SNR}{SNR} % signal to noise ratio
 \DeclareMathOperator{\NA}{NA} % numerical-aperture
-\DeclareMathOperator{\fwd}{Fwd} % forward model
+% \DeclareMathOperator{\fwd}{Fwd} % forward model
+\newcommand{\fwd}{\ensuremath{\mathscr{D}}}
 \DeclareMathOperator{\LinearSystem}{\mathscr{H}}
 \DeclareMathOperator{\reg}{Reg} % regularizer
 \DeclareMathOperator*{\supp}{supp} % support
@@ -34,7 +36,8 @@
 \DeclarePairedDelimiter\bracksnospace{\lbrack}{\rbrack}
 \newcommand{\oneto}[1]{\ensuremath{[#1]}}
 
-\newcommand{\FourierSymbol}{\mathcal{F}}
+\newcommand{\FourierSymbol}{\mathscr{F}}
+\newcommand{\imag}{\ensuremath{j}}
 
 \makeatletter
     \newcommand{\F}{\@ifstar{\@Fstar}{\@F}}
@@ -44,7 +47,7 @@
     \newcommand{\@Fstar}[1]{
         \FourierSymbol{\bracksnospace{#1}}
     }
-    \newcommand{\Finverse}{\@ifstar{\@Finvevsestar}{\@Finverse}}
+    \newcommand{\Finverse}{\@ifstar{\@Finversestar}{\@Finverse}}
     \newcommand{\@Finverse}[2][\vec{r}]{
         \FourierSymbol^{-1}{\bracksnospace{#2}}{\parsnospace{#1}}
     }
@@ -63,9 +66,10 @@
 \newcommand{\dirac}{\ensuremath{\delta}}
 \newcommand{\R}{\ensuremath{\mathbb{R}}}
 
-% TODO: Consider using a calligraphic font <27-11-23> 
-\newcommand{\ball}{\ensuremath{B}}
-\newcommand{\closedball}{\ensuremath{\overbar{B}}}
+\newcommand{\ball}{\ensuremath{\mathscr{B}}}
+\newcommand{\closedball}{\ensuremath{\overbar{\mathscr{B}}}}
+% \newcommand{\ball}{\ensuremath{B}}
+% \newcommand{\closedball}{\ensuremath{\overbar{B}}
 
 \newcommand{\ip}{\ensuremath{i}}
 \newcommand{\Fip}{\ensuremath{I}}
