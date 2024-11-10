@@ -2,14 +2,19 @@
 \usephysicsmodule{ab,diagmat,xmat}
 \usepackage{mathrsfs}
 
-\usepackage{booktabs}  
 \usepackage{fixdif,derivative}
 \usepackage[separate-uncertainty=true, multi-part-units=single]{siunitx}  
 \DeclareSIUnit{\pixel}{px}
 \DeclareSIQualifier{\lowres}{\scalebox{0.5}{\acs{LR}}}
 \DeclareSIQualifier{\highres}{\scalebox{0.5}{\acs{HR}}}
-\usepackage{enumitem}
 \usepackage{microtype}
+\usepackage{tabularx, array}
+\usepackage{multirow,makecell} % for multirow in table
+% \usepackage{pdfpages}
+% \usepackage{mfirstuc} % provides capitalisewords
+% \usepackage{tensor}
+% \usepackage{bm} % using unicode-math packages and this is not necessary
+
 % FIX: These arrows are slightly bigger than the default. Parentheses should be bigger too. This can be done be \ab <06-01-24> 
 % https://tex.stackexchange.com/questions/185641/automatic-brace-sizes-with-braket-and-mathtools --- Can use physics for
 % the braces

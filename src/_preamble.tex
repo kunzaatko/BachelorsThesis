@@ -11,6 +11,20 @@
     fontmethod=modern,
 ]{kaobook}
 
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
+\newenvironment{lyxlist}[1]
+	{\begin{list}{}
+		{\settowidth{\labelwidth}{#1}
+		 \setlength{\leftmargin}{\labelwidth}
+		 \addtolength{\leftmargin}{\labelsep}
+		 \renewcommand{\makelabel}[1]{##1\hfil}}}
+	{\end{list}}
+\makeatother
+
+\usepackage{datetime}
+\newdate{date}{9}{1}{2024}
+\date{\displaydate{date}}
 % Choose the language
 \usepackage[english]{babel} % Load characters and hyphenation
 \usepackage[english=british]{csquotes}	% English quotes
@@ -33,10 +47,14 @@
 
 \graphicspath{{figures/}{./}} % Paths where images are looked for
 
-\makeindex[columns=3, title=Alphabetical Index, intoc] % Make LaTeX produce the files required to compile the index
+% \makeindex[columns=3, title=Alphabetical Index, intoc] % Make LaTeX produce the files required to compile the index
 
-\input{_acronyms.tex}
+\usepackage{enumitem}
 \input{_packages.tex}
+\input{_acronyms.tex}
+% FIX: Could not find the package that defines the command so there was a ploblem with slides not knowing it before
+% redefining <24-01-24> 
+\renewcommand{\na}{\(\text{N}/\text{A}\)} 
 \input{_commands.tex}
 
 
@@ -45,7 +63,18 @@
 % FIX: Reduce the vskip before section and subsection titles <26-12-23> 
 % FIX: Do not output chapter numbers in the sections title  <26-12-23> 
 % https://en.wikibooks.org/wiki/LaTeX/Counters
-\setcounter{chapter}{-1}
-\setcounter{secnumdepth}{2}
+% \setcounter{chapter}{-1}
+% \setcounter{secnumdepth}{2}
+
+% \includeonly{chapters/01_introduction.tex}
+% \includeonly{chapters/02_EM_waves.tex}
+% \includeonly{chapters/03_transfer_functions.tex}
+% \inlcudeonly{chapters/04_structured_illumination_microscopy.tex}
+% \includeonly{chapters/05_harmonic_SIM_reconstruction.tex}
+% \includeonly{chapters/06_PSF_estimation.tex}
+% \includeonly{chapters/07_conclusion.tex}
+
+
+\def\documentdate{\displaydate{date}}
 
 \begin{document}
