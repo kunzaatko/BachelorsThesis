@@ -1,0 +1,37 @@
+\pagelayout{wide}
+\chapter*{Summary and Conclusion\,\,}
+\labch{conclusion}
+\addcontentsline{toc}{chapter}{Conclusion}
+
+I have demonstrated various different methods of the \ac{SIM} reconstruction from images of an acquisition using
+    structured illumination.
+Two algorithms for reconstruction, the Wiener filter and the optimization reconstructions in several forms and
+    modifications were presented, implemented and their results where presented compared and a commentary was given as 
+    to their drawbacks and benefits.
+There were given options and prospects for improvement upon these algorithms that should lead to further enhancing the
+    results achieved.
+Also, a demonstration of the possibility of use of a reduced number of acquisitions was made, that was commented upon in
+    the literature, but the results were previously not presented.
+
+A faithful image formation model was developed in the context of the pursuit of estimating the transfer function of the 
+    optical system.
+The theoretical sources of noise were discussed, before a model of the noise was stated and its validity was indicated.
+Then a procedure for estimating the \ac{PSF} from a specific acquisition of micro-spheres (beads) was presented and
+    realized.
+Then a model of the source of the acquisition was developed via a custom algorithm inspired by other image processing
+    algorithms with a result that is well justified by the sensed image.
+Two other possible methods of estimating the transfer function were presented and implemented, one inspired by the 
+    optimization reconstruction algorithm, with the use of the source model developed and the other also via the source 
+    model, but by use of the \ac{LR} image sum.
+The averaging of beads estimation was realized on different patches of the image plane and comparison of the
+    reconstructions made using the estimates was demonstrated.
+Finally the validity and justification for use of these estimations was demonstrated by a reconstruction of the cell
+    using the estimate.
+A thorough discussion was given on the possible improvements upon the algorithms used.
+
+The final reconstruction of the cell using the estimate demonstrates a compelling result with a visible improvement in
+    the quality, artefacts partially eliminated and the structure of the \acp{CCP} on the cell membrane surface
+    visible in better contrast against the background noise.
+I have demonstrated the validity of the procedures developed and the achieved results improvement is unmistakable.
+Future possibilities for and paths towards improvement are clearly stated.
+\pagelayout{margin}
