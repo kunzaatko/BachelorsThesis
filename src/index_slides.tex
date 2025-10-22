@@ -1,0 +1,630 @@
+\frame{\titlepage}
+
+\section{Introduction}
+\subsection{Diffraction Limited Imaging}%
+\begin{frame}{Wide-field resolution}%
+    The \emph{Abbe diffraction limit} states that the best achievable resolution in a wide field optical microscope is
+    bounded by
+    \[
+        d \ge \frac{\alt<2->{\textcolor<2>{Orange}{\qty{488}{\nano\meter}}}{\lambda}}{2
+        \cdot\alt<2->{\textcolor<2>{Orange}{1.4}}{\NA}}\only<3->{\approx\textcolor<3>{Orange}{\qty{174}{\nano\meter}}}
+    \]
+\end{frame}
+
+\begin{frame}{\Acl{SR} Microscopy}
+    \only<1>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-motivation-diff-limited_full.pdf_tex}
+        \end{figure}
+    }
+    \only<2>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-motivation-diff-limited-cutout_full.pdf_tex}
+        \end{figure}
+    }
+    \only<3>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-motivation-deconv_full.pdf_tex}
+        \end{figure}
+    }
+    \only<4>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-motivation-deconv-comp_full.pdf_tex}
+        \end{figure}
+    }
+    \only<5>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-motivation-SIM_full.pdf_tex}
+        \end{figure}
+    }
+    \only<6>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-motivation-SIM-comp_full.pdf_tex}
+        \end{figure}
+    }
+\end{frame}
+
+% \begin{frame}{Super-resolution methods}
+%     \begin{itemize}
+%         \item \emph{optical microscopy} techniques
+%         \item achieve \emph{better resolution} than the Abbe limit in the lateral or axial direction or both
+%         \item often require a \emph{specific microscope setup}
+%     \end{itemize}
+% \end{frame}
+
+\subsection{\acf{SIM}}%
+
+% \begin{frame}{Why choose \acs{SIM}?}
+%     \begin{itemize}
+%         \pause \item achieves \emph{double the lateral resolution} than a wide-field image
+%         \pause \item the \emph{microscope setup} is not very limiting
+%         \begin{itemize}
+%             \pause \item[\(\mathbf{\implies}\)] it can be combined with additional imaging modalities \pause
+%             \textcolor{gray}{(\acs{TIR}, \(z\)-slicing, etc.)}
+%             \pause \item[\(\mathbf{\implies}\)] does not add requirements on the sample
+%         \end{itemize}
+%         \pause \item increased \emph{photon-efficiency} compared to the other \ac{SR} methods 
+%         \begin{itemize}
+%             \pause \item[\(\mathbf{\implies}\)] enables video acquisitions with \emph{high temporal resolution}
+%         \end{itemize}
+%     \end{itemize}
+% \end{frame}
+
+
+\begin{frame}{How does \acs{SIM} work?}
+    \begin{itemize}
+            \item \emph{harmonic} illumination intensity instead of uniform \pause
+            \[
+                \ip_{(m,\vec{k}_\ip,\phi)}(\vec{r}) = 1 + \tfrac{m}{2} \textcolor{Orange}{\cos}\ab(2\pi \vec{k}_\ip \cdot \vec{r} + \phi)
+            \]
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{A \(1\)-D demonstration}
+    \only<1,2,3>{
+     \begin{itemize}
+         \item \say{signal} \[
+            \source(x) = \cos(2\pi x)
+        \] \pause
+        \item \say{illumination}\[
+            \ip(x) = \cos(2.2 \pi x)
+        \] \pause
+        \item \say{sensed}\[
+            \source(x) \cdot \ip(x) = \cos(2\pi x) \cdot \cos(2.2 \pi x) = \frac{\cos\ab(4.2 \pi x) + \color<8>{Orange}{\cos\ab(0.2 \pi x)}}{2}
+        \]
+    \end{itemize}}
+    \only<4>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-principle-ip-source-cos_full.pdf_tex}
+        \end{figure}
+    }
+    \only<5>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-principle-beats-mult_full.pdf_tex}
+    \end{figure}}
+\end{frame}
+
+\begin{frame}{Moiré Fringes}
+    \only<1>{
+        \begin{figure}
+            \centering
+            \includegraphics[width=0.8\textwidth]{moire-screen}
+        \end{figure}
+    }
+    \only<2>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-moire-on-actin_full.pdf_tex}
+        \end{figure}
+    }
+    \only<3>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-moire-on-actin-cutout_full.pdf_tex}
+        \end{figure}
+    }
+\end{frame}
+
+\begin{frame}{How does \acs{SIM} work?}
+    \only<1,3,5,6,7,8,9,13>{
+        \begin{itemize}
+            \item \emph{harmonic} illumination intensity instead of uniform
+            \only<1-11>{\[
+                \ip_{(m,\vec{k}_\ip,\phi)}(\vec{r}) = 1 + \tfrac{m}{2} \cos\ab(2\pi \vec{k}_\ip \cdot \vec{r} + \phi)
+            \]}
+            \pause % 2->3
+            \only<1-11>{\[
+                \F{\ip_{(m,\vec{k}_\ip,\phi)}} =  \frac{me^{-\imag \phi}}{4}
+                    \textcolor{Orange}{\dirac_{-\vec{k}_\ip}(\vec{k})}
+                    + \textcolor{Orange}{\dirac(\vec{k})} + 
+                    \frac{me^{\imag \phi}}{4} \textcolor{Orange}{\dirac_{+\vec{k}_\ip}(\vec{k})}
+            \]}
+            \pause\pause\pause 
+            \only<1-11>{
+                \alt<7->{
+                    \[
+                        \textcolor{Orange}{\text{image formation}}\ldots\begin{cases}
+                    \sensed_\text{\acs{SIM}}(\vec{r}) = (\source(\vec{r}) \cdot \ip(\vec{r})) * \psf(\vec{r}) \\
+                    \Fsensed_{\text{\acs{SIM}}}(\vec{k}) = (\Fsource(\vec{k}) * \Fip(\vec{k})) \cdot \otf(\vec{k})
+                        \end{cases}
+                    \] 
+                }{
+                \[
+                    \sensed_\text{\acs{SIM}}(\vec{r}) = (\source(\vec{r}) \cdot \ip(\vec{r})) * \psf(\vec{r})
+                \] 
+                \pause
+                \[
+                    \Fsensed_{\text{\acs{SIM}}}(\vec{k}) = (\Fsource(\vec{k}) * \Fip(\vec{k})) \cdot \otf(\vec{k})
+                \] 
+            }
+            }
+            \pause\pause\pause
+            \[
+                \Fsensed_{\text{\acs{SIM}}}(\vec{k}) =  \bigg(\frac{me^{-i \phi}}{4}
+                \alt<9>{\underbrace{\Fsource(\vec{k} + \vec{k}_\ip)}_{\textcolor{red}{C_{- \vec{k}_\ip}(\vec{k})}}}{\textcolor{Orange}{\Fsource(\vec{k} + \vec{k}_\ip)}}
+                    + 
+                \alt<9>{\underbrace{\Fsource(\vec{k})}_{\textcolor{green}{C_{0}(\vec{k})}}}{\textcolor{Orange}{\Fsource(\vec{k})}}
+                + \frac{me^{i \phi}}{4} 
+                \alt<9>{\underbrace{\Fsource(\vec{k}-\vec{k}_\ip)}_{\textcolor{blue}{C_{+ \vec{k}_\ip}(\vec{k})}}}{\textcolor{Orange}{\Fsource(\vec{k}-\vec{k}_\ip)}}
+                \bigg)\cdot\otf(\vec{k})
+                \] 
+            \pause\pause\pause\pause
+        \item in the simplest form, \(3\) orientations and \(3\) phases are used for one \ac{HR} image \pause
+            \color{gray}{(9 \ac{LR} images produce \(1\) \ac{HR} image)}
+        \end{itemize}
+    }
+    \pause
+    % image pattern on sample
+    % fourier
+    % fourier sample
+    % fourier pattern 
+    % fourier one orientation
+    % fourier one orientation separated components
+    \only<2>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-2D-principle-pattern_full.pdf_tex}
+        \end{figure}
+    }
+    \only<4>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-2D-principle-pattern-fft_full.pdf_tex}
+        \end{figure}
+    }
+    \only<10>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-2D-principle-fft-componets-coloured_full.pdf_tex}
+        \end{figure}
+    }
+    \only<11>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-2D-principle-fft-componets-sep-coloured_full.pdf_tex}
+        \end{figure}
+    }
+    \only<12>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-2D-principle-fft-componets-shifted-coloured_full.pdf_tex}
+        \end{figure}
+    }
+    \only<14>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-2D-principle-fft-sim-vs-widefield_full.pdf_tex}
+        \end{figure}
+    }
+\end{frame}
+
+
+% \begin{frame}{Equations of \ac{SIM}}
+%     \begin{enumerate}
+%       \item the illumination pattern
+%     \end{enumerate}
+%         \[
+%         \only<1>{
+%             \ip_{(m,\vec{k}_\ip,\phi)}(\vec{r}) = 1 + \tfrac{m}{2} \cos\ab(2\pi \vec{k}_\ip \cdot \vec{r} + \phi)
+%         }
+%         \only<2->{
+%             \F*{\ip_{(m,\vec{k}_\ip,\phi)}} =  \frac{me^{-\imag \phi}}{4} \dirac_{-\vec{k}_\ip} + \dirac +
+%                 \frac{me^{\imag \phi}}{4} \dirac_{+\vec{k}_\ip}
+%         }
+%         \] 
+%     \pause\pause
+%     \begin{enumerate}
+%         \setcounter{enumi}{1}
+%       \item the image formation model
+%     \end{enumerate}
+%     \[
+%             \only<3>{\sensed = (\source \cdot \ip) * \psf}
+%             \only<4>{\Fsensed = (\Fsource * \Fip) \cdot \otf\pause}
+%             \only<5-6>{\Fsensed =  \ab(\frac{me^{-i \phi}}{4} \textcolor<6>{Orange}{\Fsource(\vec{k} + \vec{k}_\ip)} + \Fsource(\vec{k})
+%             + \frac{me^{i \phi}}{4} \textcolor<6>{Orange}{\Fsource(\vec{k}-\vec{k}_\ip)})\cdot\otf}
+%     \] 
+%     \pause\pause\pause
+% \end{frame}
+
+\section{Reconstruction}%
+\subsection{Visual Intuition}%
+
+\begin{frame}
+    \only<1>{
+    \vfill
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{graphic_SIM_components.pdf_tex}
+        \end{figure}
+    \vfill
+    }
+    \only<2>{
+    \vfill
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{graphic_SIM_components_shifts.pdf_tex}
+        \end{figure}
+    \vfill
+    }
+    \only<3>{
+    \vfill
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{graphic_SIM_components_aliased.pdf_tex}
+        \end{figure}
+    \vfill
+    }
+    \only<4>{
+    \vfill
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{graphic_SIM_components_shifts_back.pdf_tex}
+        \end{figure}
+    \vfill
+    }
+\end{frame}
+
+\begin{frame}
+    \begin{center}
+        \textcolor{Orange}{\huge{Experiments}}
+        \only<2>{
+            \begin{enumerate}
+            \centering
+                \item Wiener Filter Reconstruction
+                \item Optimization / Inversion Reconstruction
+                \item Estimation of the \ac{PSF} - Bead averaging
+                \item Location dependence of the transfer function
+            \end{enumerate}
+        }
+    \end{center}
+\end{frame}
+
+\subsection{Reconstruction Implementations}%
+
+% \begin{frame}{Wiener Filter Reconstruction}
+%     \begin{equation*}
+%         \Freconstructed = \frac{\otf^*\Fsensed}{\otf^*\otf + \omega^2},
+%     \end{equation*}
+% \end{frame}
+
+\begin{frame}{Experiment 1 - Wiener Filter Reconstruction}
+    \only<1>{
+        \[
+        \Freconstructed = \frac{\sum_{k} \otf_k^*C_k}{\sum_{k} \otf_{k}^*\otf_{k} + \omega^2}
+        \] 
+    }
+    \only<2>{
+    \begin{figure}
+        \centering
+        \def\svgwidth{\textwidth}
+        \import{figures}{slides-wiener-reconstruction_full.pdf_tex}
+    \end{figure}
+    }
+    \only<3>{
+    \begin{figure}
+        \centering
+        \def\svgwidth{\textwidth}
+        \import{figures}{slides-wiener-reconstruction-cutout_full.pdf_tex}
+    \end{figure}
+    }
+    \only<4>{
+    \begin{figure}
+        \centering
+        \def\svgwidth{\textwidth}
+        \import{figures}{slides-wiener-reconstruction-apo-cutout_full.pdf_tex}
+    \end{figure}
+    }
+    \only<5>{
+    \begin{figure}
+        \centering
+        \def\svgwidth{\textwidth}
+        \import{figures}{slides-wiener-reconstruction-apo-comp_full.pdf_tex}
+    \end{figure}
+    }
+    \only<6>{
+    \begin{figure}
+        \centering
+        \def\svgwidth{\textwidth}
+        \import{figures}{slides-wiener-reconstruction-apo-diff_full.pdf_tex}
+    \end{figure}
+    }
+\end{frame}
+
+
+\begin{frame}{Experiment 2 - Optimization Reconstruction}
+    \only<1,2>{
+    \begin{equation*}
+        \reconstructed =  \argmin_{\source} \ab(\textcolor<2>{Orange}{\loss}\ab[\sensed,\fwd[\source]]
+        + \lambda\textcolor<2>{Orange}{\reg}[\source]),
+    \end{equation*}
+    }
+    \only<3>{
+        \begin{figure}
+        \centering
+        \def\svgwidth{\textwidth}
+        \import{figures}{slides-optimization-reconstruction-gr_full.pdf_tex}
+        \end{figure}
+    }
+    \only<4>{
+        \begin{figure}
+        \centering
+        \def\svgwidth{\textwidth}
+        \import{figures}{slides-optimization-reconstruction-gr-cutout_full.pdf_tex}
+        \end{figure}
+    }
+    \only<5>{
+        \begin{figure}
+        \centering
+        \def\svgwidth{\textwidth}
+        \import{figures}{slides-optimization-reconstruction-gr-vs-tv_full.pdf_tex}
+        \end{figure}
+    }
+    \only<6>{
+        \begin{figure}
+        \centering
+        \def\svgwidth{\textwidth}
+        \import{figures}{slides-optimization-reconstruction-3LR-vs-9LR_full.pdf_tex}
+        \end{figure}
+    }
+\end{frame}
+
+\begin{frame}
+    \begin{figure}
+        \centering
+        \def\svgwidth{\textwidth}
+        \import{figures}{slides-comparison-with-widefield_full.pdf_tex}
+    \end{figure}
+\end{frame}
+
+\section{\acs{PSF} Estimation}%
+
+% \begin{frame}
+%     \begin{itemize}
+%         \item acquired sample is of microspheres with sub-resolution diameter \textcolor{gray}{(\qty{99}{\nano\meter})}
+%         \item wide-field image is imitated from the \ac{SIM} \ac{LR} images by summation
+%     \end{itemize}
+% \end{frame}
+
+\begin{frame}{Experiment 3 - Bead Averaging}
+    \only<1>{
+    \begin{figure}
+        \centering
+        \def\svgwidth{\textwidth}
+        \import{figures}{slides-psf-estimation-CC_full.pdf_tex}
+    \end{figure}
+    }
+    \only<2>{
+    \begin{figure}
+        \centering
+        \def\svgwidth{\textwidth}
+        \import{figures}{slides-psf-estimation-patches-CC_full.pdf_tex}
+    \end{figure}
+    }
+    \only<3>{
+    \begin{figure}
+        \centering
+        \def\svgwidth{\textwidth}
+        \import{figures}{slides-psf-estimation-CC-estimate_full.pdf_tex}
+    \end{figure}
+    }
+\end{frame}
+
+\begin{frame}{Reconstruction}
+    \only<1>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-psf-estimation-reconstruction-fourier_full.pdf_tex}
+        \end{figure}
+    }
+    \only<2>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-psf-estimation-reconstruction-spatial-cutout_full.pdf_tex}
+        \end{figure}
+    }
+\end{frame}
+
+\begin{frame}{Cell Reconstruction}
+    \only<1>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-psf-estimation-reconstruction-fourier-ccp_full.pdf_tex}
+        \end{figure}
+    }
+    \only<2>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-psf-estimation-reconstruction-spatial-ccp-cutout_full.pdf_tex}
+        \end{figure}
+    }
+  
+\end{frame}
+
+\begin{frame}{Experiment 4 - Location Dependence}
+    \only<1>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-location-dependency-all-beads_full.pdf_tex}
+        \end{figure}
+    }
+    \only<2>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-location-dependency-cc-vs-lb_full.pdf_tex}
+        \end{figure}
+    }
+    \only<3>{
+        \begin{figure}
+            \centering
+            \def\svgwidth{\textwidth}
+            \import{figures}{slides-location-dependency-reconsruction-spatial_full.pdf_tex}
+        \end{figure}
+    }
+\end{frame}
+
+\section{Conclusion}%
+
+% \begin{frame}
+%     \only<1>{
+%         \begin{figure}
+%             \centering
+%             \def\svgwidth{\textwidth}
+%             \import{figures}{avg-location-psf-reconstructions-f-comp-cc-ccp_full.pdf_tex}
+%         \end{figure}
+%     }
+%     \only<2>{
+%         \begin{figure}
+%             \centering
+%             \def\svgwidth{\textwidth}
+%             \import{figures}{avg-location-psf-reconstructions-s-comp-cc-ccp_full.pdf_tex}
+%         \end{figure}
+%     }
+%     \only<3>{
+%         \begin{figure}
+%             \centering
+%             \def\svgwidth{\textwidth}
+%             \import{figures}{avg-location-psf-reconstructions-b-comp-cc-ccp-donut_full.pdf_tex}
+%         \end{figure}
+%     }
+% \end{frame}
+
+\begin{frame}
+    \begin{description}
+        \pause \item[reconstruction]\leavevmode
+            \begin{itemize}
+                \item supplying a \emph{general transfer function}
+                \item general and \emph{pluggable loss} (\emph{Poisson}, \emph{Gaussian}, \emph{mixture}, etc.) and
+                    \emph{regularizer} in optimization
+                \item implemented using \emph{automatic differentiation}
+            \end{itemize}
+            \pause \item[transfer function]\leavevmode
+            \begin{itemize}
+                \item \emph{data based estimate} of the \acs{PSF}
+                \item testing the \emph{location} dependence
+                \item testing the \emph{effect on the reconstruction}
+            \end{itemize} 
+        \pause \item[general]\leavevmode
+            \begin{itemize}
+                \item implemented in the \emph{Julia programming language} 
+                \item package for \ac{SIM} parameter estimation and reconstruction \textcolor{gray}{(work in progress)}
+            \end{itemize}
+    \end{description}
+\end{frame}
+% \begin{frame}{Future Prospects}%
+%     \begin{itemize}
+%         \item \ac{OTF} estimate from the source model
+%         \item \ac{OTF} estimate from the posed inversion optimization problem
+%         \item tiled reconstruction
+%     \end{itemize}
+% \end{frame}
+
+\begin{frame}
+    \vfill
+    \begin{center}
+        \huge{\textcolor{Orange}{Thank You!}}
+    \end{center}
+    \vfill
+\end{frame}
+
+
+% \section{Questions}%
+\begin{frame}{Questions}
+    \begin{enumerate}
+        \item \say{Why is the image of Fourier spectrum in fig 4.20 different in shape to fig 4.19 - namely the position
+            of circles?}
+    \end{enumerate}
+    % \only<2>{
+    % \begin{figure}[h!]
+    %     \def\svgwidth{\textwidth}
+    %     \import{figures}{avg-location-psf-reconstructions-model-ccp-and-beads-spatial_full.pdf_tex}
+    % \end{figure}}
+    \only<2>{
+    \begin{figure}[h!]
+        \centering
+        \def\svgwidth{\textwidth}
+        \import{figures}{slides-questions-model-ccp-and-beads-fft_full.pdf_tex}
+    \end{figure}}
+\end{frame}
+
+\begin{frame}{Questions}
+    \begin{enumerate}
+        \setcounter{enumi}{1}
+        \item \say{What is the size of the dataset you experimented with?}
+    \end{enumerate}
+    \bigskip\pause
+    The location dependent \ac{PSF}s are averaged from 12 for beads in each patch. The total number of beads in the
+    acquisition is  \(\approx 1200\).
+
+    % \pause
+    % \alt<3>{
+    %     \begin{figure}
+    %         \includegraphics[width=\textwidth]{dataset_size}
+    %     \end{figure}
+    % }{
+    % \begin{itemize}
+    %     \item \(16\) sample cells in \(2\) sessions spanning \(2\) days each
+    %     \item \(2\) channels with emission wavelengths \qty{488}{\nano\meter} and \qty{560}{\nano\meter} 
+    %         captured in series
+    %     \item sampled for \qtyrange[range-phrase = --, range-units = single]{1}{2}{\minute} with
+    %     a \ac{SR} frame rate of about \qtyrange[range-phrase = --, range-units = single]{0.5}{1}{\per\second}
+    %     \item \(5\) single frame \(2\) channel calibration bead acquisitions
+    % \end{itemize}
+    % That is \(\approx 25\,000\) uncompressed \ac{LR} frames
+    % }
+\end{frame}
+
+% vim: set makeprg="tectonic -X build --keep-intermediates --target BT_MartinKunz_slides"

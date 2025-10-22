@@ -5,3 +5,13 @@ bundle = 'https://data1.fullyjustified.net/tlextras-2022.0r0.tar'
 [[output]]
 name = 'BT_MartinKunz'
 type = 'pdf'
+preamble = "_preamble.tex"
+index = "index.tex"
+postamble = "_postamble.tex"
+
+[[output]]
+name = 'BT_MartinKunz_slides'
+type = 'pdf'
+preamble = "_preamble_slides.tex"
+index = "index_slides.tex"
+postamble = "_postamble.tex"

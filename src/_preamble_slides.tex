@@ -1,0 +1,52 @@
+\documentclass[x11names]{beamer}
+\usepackage{amsmath, amssymb, amsthm, mathtools, unicode-math}
+
+\usepackage[english]{babel} % Load characters and hyphenation
+\usepackage[english=british]{csquotes}	% English quotes
+
+\usepackage{import}
+\usepackage{graphicx}
+\graphicspath{{figures/}{./}} % Paths where images are looked for
+
+\usepackage{hyperref,tikz}
+\usepackage{dirtytalk}
+
+
+\usepackage{xcolor-material}
+\definecolor{Orange}{cmyk}{0,0.5,1,0}
+
+\usefonttheme[onlymath]{serif}
+
+\title[Super-resolution imaging]{Reconstruction of Cell Images Acquired by Super-resolution Microscopy}
+\author[]{\emph{author:} Martin Kunz \\
+    (\emph{supervisor:} doc. Ing. Filip Šroubek, Ph.D. DSc.) \\
+    (\emph{reviewer:} Mgr. Jaroslav Knotek)
+}
+\institute[FNSPE, CTU]{Faculty of Nuclear Sciences and Physical Engineering, Czech Technical University in Prague}
+\date{\today}
+
+\usetheme{Berlin}
+\usecolortheme{beaver}
+\setbeamertemplate{navigation symbols}{}
+
+% \AtBeginSection[]{
+% \ifnumcomp{\value{section}}{=}{1}{}
+%     {
+%         \tableofcontents[sections=\value{section}]
+%         \pagebreak
+%     }
+% }
+
+\makeatletter
+\setbeamertemplate{footline} {}
+\makeatother
+
+\input{_packages.tex}
+\input{_acronyms.tex}
+\input{_commands.tex}
+
+
+\usepackage{datetime}
+\newdate{date}{1}{2}{2024}
+\date{\displaydate{date}}
+\begin{document}
