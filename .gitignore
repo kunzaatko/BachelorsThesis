@@ -325,3 +325,8 @@ src/figures/*.png
 src/figures/*.svg
 src/figures/*.pdf
 src/figures/*.pdf_tex
+assignment.pdf
+src/figures/src/test_figures/
+src/chapters/A_fourier_transform.tex
+src/chapters/03_transfer_functions.tex
+src/chapters/B_weiner_filtering.tex
