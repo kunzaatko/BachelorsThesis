@@ -7,6 +7,8 @@ The PDF can be found in [releases](https://github.com/kunzaatko/BachelorsThesis/
 This is the latest version of the [document](https://github.com/kunzaatko/BachelorsThesis/releases/latest/download/BT_MartinKunz.pdf) 
   and the [defence
   slides](https://github.com/kunzaatko/BachelorsThesis/releases/latest/download/BT_MartinKunz_slides.pdf).
+Here is the [supervisors opinion](./opinions/opinion-supervisor.pdf) and the [opponents
+opinion](./opinions/opinion-opponent.pdf).
 
 ## Outline
 
