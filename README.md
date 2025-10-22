@@ -1,9 +1,12 @@
 # Analysis of Cell Images Acquired by Super-resolution Microscopy
 
 This repository contains the LaTeX source code for my bachelors thesis on [structured illumination
-microscopy](https://en.wikipedia.org/wiki/Super-resolution_microscopy#Structured_illumination_microscopy_(SIM)). The PDF
-can be found in [releases](https://github.com/kunzaatko/BachelorsThesis/releases). This is the latest version of the
-[document](https://github.com/kunzaatko/BachelorsThesis/releases/latest/download/BT_MartinKunz.pdf).
+  microscopy](https://en.wikipedia.org/wiki/Super-resolution_microscopy#Structured_illumination_microscopy_(SIM)) and
+  the slides used for its defence.
+The PDF can be found in [releases](https://github.com/kunzaatko/BachelorsThesis/releases). 
+This is the latest version of the [document](https://github.com/kunzaatko/BachelorsThesis/releases/latest/download/BT_MartinKunz.pdf) 
+  and the [defence
+  slides](https://github.com/kunzaatko/BachelorsThesis/releases/latest/download/BT_MartinKunz_slides.pdf).
 
 ## Outline
 
