@@ -1,5 +1,6 @@
 include("init.jl")
 using TransferFunctions: Cosine, apodize
+using Interpolations
 
 const FIG_NAME = getbase(@__FILE__)
 
@@ -133,3 +134,38 @@ function fig_artifacts_apo_diff()
 end
 
 savefig(fig_artifacts_apo_diff, FIG_NAME * "-artifacts"; hwratio=2.7, skip=[:full, :vector], override_theme=merge(FORMAT_TICKS, MARGIN_PX_TICKS, NO_SPINE, DATA_ASPECT))
+
+function fig_weiner_vs_widefield()
+    fig = Figure()
+    s_hat_ax, s_ax = Makie.Axis(fig[1, 1]), Makie.Axis(fig[1, 2])
+    colgap!(fig.layout, Relative(0.07))
+
+    s_ax.xticksvisible = s_ax.yticksvisible = s_ax.yticklabelsvisible = s_ax.xticklabelsvisible = false
+    s_hat_ax.xticksvisible = s_hat_ax.yticksvisible = s_hat_ax.yticklabelsvisible = s_hat_ax.xticklabelsvisible = false
+
+    image!(s_ax, LR_beads_sum')
+    image!(s_hat_ax, match_hist(real(s_out_model)))
+
+    return fig
+end
+
+savefig(fig_weiner_vs_widefield, FIG_NAME * "-vs-widefield"; hwratio=4 / 7, skip=[:vector, :margin], override_theme=merge(NO_SPINE, DATA_ASPECT))
+
+function fig_weiner_vs_widefield_cutout()
+    fig = Figure()
+    s_hat_ax, s_ax = Makie.Axis(fig[1, 1]), Makie.Axis(fig[1, 2])
+    linkaxes!(s_ax, s_hat_ax)
+    colgap!(fig.layout, Relative(0.07))
+
+    image!(s_ax, imresize(LR_beads_sum, (1024, 1024), method=Constant())')
+    image!(s_hat_ax, match_hist(real(s_out_model)))
+
+    limits!(s_ax, (320, 430), (520, 630))
+
+    s_ax.xticks, s_ax.yticks = tick_locations(((320, 430), (520, 630)), 0.1)
+    s_hat_ax.xticks, s_hat_ax.yticks = tick_locations(((320, 430), (520, 630)), 0.1)
+
+    return fig
+end
+
+savefig(fig_weiner_vs_widefield_cutout, FIG_NAME * "-vs-widefield-cutout"; hwratio=4 / 7, skip=[:vector, :margin], override_theme=merge(NO_SPINE, DATA_ASPECT, MARGIN_PX_TICKS), update=true)

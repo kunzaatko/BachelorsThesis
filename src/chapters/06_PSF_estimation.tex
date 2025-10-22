@@ -4,7 +4,7 @@
 
 If we have an optical system and want to model the way light passes through that system, either in order to enhance our
     estimate of the structure (source) that causes the output signal or to establish characteristics of that system, we 
-    need to determine one of the transfer functions introduced in \refch{transfer-functions}. % TODO: reference <14-11-23> 
+    need to determine one of the transfer functions of the optical system. % introduced in \refch{transfer-functions}. % TODO: reference <14-11-23> 
 Of the transfer functions, it is most intuitive to directly measure the \ac{PSF} or more specifically the
     magnitude of the \ac{PSF}.
 We disregard the phase change that the optical system may introduce, because in most set-ups it is practically 
@@ -14,9 +14,9 @@ We disregard the phase change that the optical system may introduce, because in 
     This algorithmic restoration of the phase is called phase-retrieval. However, in order for the phase to be 
         unambiguous, thus for the phase-retrieval algorithm to be stable, it is necessary that the phase retrieved 
         function to be non-symmetric with respect to the origin, which is often the case for the \ac{PSF}
-        \sidecite[*+2]{goodman2005b}.
+        \sidecite[*+5]{goodman2005b}.
     There are other algorithms that for phase retrieval that leverage the fact that the prior knowledge of the \ac{PSF}
-    \sidecite[*+3]{hanser2003}.
+        \sidecite[*+5]{hanser2003}.
     } , since 
     the light sensors (In our case the \ac{CMOS}) only measure the energy that hits the sensor elements which is 
     equivalent for all possible phases of the \ac{EM} wave, since it only depends on the intensity of the \ac{EM} 
@@ -35,7 +35,7 @@ Afterwards, one more estimate of the \ac{PSF} that leverages the model and recog
 Finally, we will return to the topic from \refch{sim-reconstruction} and compare the reconstructions that use the 
     transfer function estimates from this chapter~(\refsecshort{revised-reconstruction}).
 
-\section{Image Formation Model}%
+\section[Image Formation]{Image Formation Model}%
 \labsec{image-formation-model}
 
 % TODO: First step, noise. Measure noise from the background of the beads image. <14-11-23> 
@@ -362,7 +362,7 @@ This is a reasonable proposition, owing to the fact, that most of the noise can 
 \labsubsec{the-transfer-function}
 
 Next step is to consider how the source signal \(\source(\vec{r})\) is affected by the pass through the optical system.
-This has been developed in~\refch{transfer-functions}.
+% This has been developed in~\refch{transfer-functions}.
 As a reminder, in general, for a linear system \(\LinearSystem\), the Fredholm equation of the first kind applies \(\forall \vec{r}
     \in \R^2\)
     \begin{multline} \labeq{non-aplanatic-psf-light-formation}
@@ -385,7 +385,7 @@ Estimating the \ac{PSF} \(h\) that is location dependent like in \refeq{non-apla
 One option to handle this, is to make the assumption that the system is aplanatic%
 \sidenote{%
     An optical system, or more specifically the lens configuration is aplanatic, if it is free of both spherical and 
-        coma aberrations~(\refchshort{transfer-functions}).
+        coma aberrations.%~(\refchshort{transfer-functions}).
     The aplanatic system assumption is not fully justified and there is a slight location dependence in practice.
     This issue can be addressed by estimating the \ac{PSF} on patches of the sensed image separately. 
     This will be done in later sections.
@@ -537,7 +537,7 @@ The steps of performing an estimate from multiple bead samples are:
         The intensity of the ambient light in the location of the bead is estimated by the \(0.15\) quantile of the 
             intensities of a larger patch around the bead sample.
     \item Finding the sub-pixel centres of the beads by \ac{LSE} fitting a Gaussian%
-        \sidenote[][*-5]{%
+        \sidenote[][*-2]{%
             Any other unimodal function, which has its mode at the origin would suffice.
             The Gaussian is strategic here, since the \ac{PSF} has close shape to the Gaussian.
             In fact, it is often modelled by a it.
@@ -559,38 +559,27 @@ The cut-outs along with the fitted centres of the bead samples are shown in~\ref
 The final \ac{PSF} estimate and its comparison with the model introduced in~\refch{sim-reconstruction} is visible 
     in~\reffig{psf-avg-estimate-CC}.
 
-\begin{marginfigure}[*-15]
+\begin{marginfigure}[*-12]
   \marginpng{selected-beads-CC}
   \caption{Bead samples selected from the center of the image. For better accuracy the locations were selected from the
   \ac{HR} reconstructed image.}
   \labfig{selected-beads-CC}
 \end{marginfigure}
 
-\floatsetup[figure]{ % Captions for figueres
-    capbesideposition={top,outside},%
-}%
+% \floatsetup[figure]{ % Captions for figueres
+%     capbesideposition={top,outside},%
+% }%
 \begin{figure}[h]
     % \png{selected-beads-patches-CC-noticks}
     \png{selected-beads-patches-CC}
     \caption{The bead samples cut-outs from the center of the image and their fitted centres.}
     \labfig{selected-beads-patches-CC}
 \end{figure}
-\floatsetup[figure]{ % Captions for figueres
-    capbesideposition={bottom,outside},%
-}%
+% \floatsetup[figure]{ % Captions for figueres
+%     capbesideposition={bottom,outside},%
+% }%
 
 % TODO: Here figure with one cutout before and after centering <30-12-23> 
-
-\begin{marginfigure}[*-7]
-    \marginpng{model-vs-avg-psf}
-    \caption{%
-        The \ac{PSF} estimate versus the model. 
-        The model is clearly wider, which implies that the diffraction-resolution was overestimated by the model which
-            is in line with the reconstruction flaws we discussed in \refsec{deconvolution-reconstruction}.
-    }
-    \labfig{psf-avg-estimate-CC}
-\end{marginfigure}
-
 A first test to see if the estimate is better than the proposed model is to compare the deconvolution of the \ac{LR}
     image with the proposed \ac{PSF}~(\reffigshort{model-vs-avg-deconv-CC}).
 The deconvolution in this case is performed by formulating an optimization problem very similar to the formulation of 
@@ -712,8 +701,8 @@ The sampling in done by integration of the point emission function \(\ip_{\text{
 \end{marginfigure}
     
 
-\section{Locating the Beads (\refitmshort{locations-of-beads})}%
-\labsec{locating-the-beads}
+\subsection{Locating the Beads (\refitmshort{locations-of-beads})}%
+\labsubsec{locating-the-beads}
 
 The locations of the beads are determined by an empirically constructed algorithm that is inspired by the general Hough
     transform and image feature location algorithms.
@@ -929,11 +918,162 @@ It is not necessary to perform regularization if instead of the \ac{OTF} \(\otf\
 
 % TODO: Here reconstruction through optimization of the global and for the individual parts <05-01-24> 
 
-\section{Revised Reconstruction}%
+\section[New Reconstruction]{Revised Reconstruction}%
 \labsec{revised-reconstruction}
+
+
+There is a possibility of enhancing the reconstruction at a give location by using the transfer function from that
+    location instead of a model estimate from the whole image plane.
+In this spirit the image was subdivided into patches of right-top, left-top, center-center, right-bottom and left-bottom
+    in the \(xy\)-plane.
+\(12\) beads were selected from each patch within the image.
+An averaging estimation of the \ac{PSF} was performed and the Wiener filter reconstruction of the full image plane was 
+    made using the localized \ac{PSF}.
+
+\begin{figure}
+    \pdftex{avg-location-psf-reconstructions-spatial-comp}
+    \caption{
+        The reconstructions of the image using the localized \ac{PSF} estimates.
+        Boxes indicate the patches, where the beads, were selected from for the \ac{PSF} estimate.
+    }
+    \labfig{avg-location-psf-reconstructions-spatial-comp}
+\end{figure}
+
+\begin{figure}
+    \pdftex{avg-location-psf-reconstructions-spatial-comp-rt}
+    \caption{
+        Comparison of the left-bottom patch using the reconstructions of the image using the localized \ac{PSF} 
+            estimates.
+        There is a slight visible difference near the edges of the beads.
+    }
+    \labfig{avg-location-psf-reconstructions-spatial-comp-rt}
+\end{figure}
+
+There are perceivable differences between the patch reconstructions 
+    (\reffigshort{avg-location-psf-reconstructions-spatial-comp}) using the \acp{PSF} estimates from the patches.
+In general, however, the reconstruction of the image with the patch estimate of the \ac{PSF} at the patch indices is
+    noticeably better than those with \ac{PSF} estimate other than that particular patch 
+    (\reffigshort{avg-location-psf-reconstructions-spatial-comp-rt}).
+It is logical and true that the center patch estimate of the \ac{PSF} produces reconstructions that are best in average
+    over the whole image plane, since the aberrations are closest to the off-center ones in average.
+
+The next step is to compare the reconstruction using the model and the estimate.
+This is done in \reffig{model-vs-cc-reconstruction}, where the reconstruction using the center-center patch \ac{PSF}
+    estimate is shown.
+A resolution and visual enhancement is undoubtedly achieved using this reconstruction.
+
+\begin{figure}
+    % \png{avg-location-psf-reconstructions-f-comp-cc}\\[\medskipamount]
+    % \png{avg-location-psf-reconstructions-s-comp-cc}
+    \pdftex{avg-location-psf-reconstructions-b-comp-cc}
+    \caption{Comparison of the reconstructions and their Fourier transforms made using the model \ac{OTF} and using the
+        center-center patch localized averaged\ac{PSF}.
+        There is a significant difference in the uniformity of the Fourier image.
+        Moreover, there are no visible peaks in the centres of the components.
+        This reduces the artefacts that are caused by the incorrect transfer function significantly.
+    }
+    \labfig{model-vs-cc-reconstruction}
+\end{figure}
+
+We also want to see, if the estimated transfer function is useful for the reconstruction of acquisition of the cell,
+    since this is the prime goal of making these estimates.
+To asses the quality of the reconstruction, we use the center-center patch \ac{PSF} and the model \ac{OTF} to 
+    reconstruct cell image \ac{SIM} acquisition using the same microscope (\reffigshort{comp-cell-cc-model}).
+
+\begin{figure}[h!]
+    \pdftex{avg-location-psf-reconstructions-b-comp-cc-ccp}
+    \caption{%
+        A comparison of the reconstruction of the cell acquisition made by the model and the center-center patch
+            estimate of the \ac{PSF}.
+        A visual quality enhancement is achieved, although based on the Fourier space results, an even better result 
+            might be possible by using apodization or limiting estimating the support of the \ac{OTF} produced by the 
+            \ac{PSF} and artificially reducing it to \(0\) out of the bound of the support.
+}
+    \labfig{comp-cell-cc-model}
+\end{figure}
+\vfill
+
+\pagebreak
+
+The quality improvement is also undeniable, so we may conclude, that the \ac{PSF} estimate is more adequate for the cell
+    images as well (which is logical).
+For better comparison of the artefact elimination, a closer view of the reconstruction is shown in 
+    \reffig{comp-cell-cc-model-donut}.
+
+\begin{figure}[h!]
+    \pdftex{avg-location-psf-reconstructions-b-comp-cc-ccp-donut}
+    \caption{%
+        A close up of the spatial result achieved using the model and the center-center \ac{PSF} estimate.
+        Although the artefacts are not fully eliminated a reduction is evident.
+    }
+    \labfig{comp-cell-cc-model-donut}
+\end{figure}
 
 \section{Discussion}%
 \labsec{discussion}
+
+Although significant improvement is achieved there is a vast opportunity for improvement.
+Some of the improvements may be made to the estimation of the \ac{PSF} itself, but there is also room for enhancing the
+    reconstruction algorithm (Wiener filter is used) to match the attributes of the \ac{PSF} estimate.
+
+First for the estimation of the \ac{PSF}.
+\begin{enumerate}
+   \item%
+       As has been indicated in \refsubsec{noise}, the model of the noise is truly the one and discussed in the subsection.
+        There are methods for fitting the model, one of which was cited and commented upon in the subsection.
+        If this fit was to be made, we could calculate the distribution of the estimate of the averaged bead.
+        This could give us the opportunity to optimize the transfer function further, based on the artefacts that are produced
+            by the reconstruction employing it by defining some loss related to the amount of artefacts produced.
+        This optimization could be made with the knowledge of how probable it is for the \ac{PSF} to truly be this optimized 
+            form in contrast to the base estimate.
+    \item%
+        The source model estimation, or more specifically the \refsubsec{locating-the-beads} lead to finding bead
+            locations that were merely artefacts. 
+        This could be eliminated by developing a locating algorithm on the \ac{LR} summed image, which does not include
+            artefacts and the resulting locations could be compared and further filtered to eliminate all the artefacts.
+        It, however, is not possible to distinguish some artefacts from true beads even by eye, so an ideal model is not
+            thinkable using this approach.
+    \item%
+        The \ac{PSF} metric of \ac{FWHM} has been found to be different for the center and edge estimated \acp{PSF}.
+        This is not a surprise, since we know that the edge locations are more affected by the aberrations.
+        However, it proposes a possibility of determining the aberrations through assessing the \ac{OTF} produced by the
+            measured \ac{PSF} through fitting of Zernicke polynomials \sidecite{siddik2023a} and through this, it may be 
+            possible to produce a model of the location variant aberrations strength.
+        This could be utilized to determine a location variant model of the transfer function and improve the model
+            reconstruction.
+\end{enumerate}
+
+More importantly, what is possible to improve in the reconstruction in order of assumed importance:
+\begin{enumerate}
+    \item%
+        Limiting the support of the \ac{OTF} that is produced by the \ac{PSF} which should further reduce the
+            artefacts.
+    \item%
+        Seeing from the Fourier space reconstructions, that the edges of the components are still have a visibly
+            higher intensity than the centres of the components, this could be alleviated by using apodization, which 
+            should further reduce the artefacts.
+    \item%
+        The \ac{FWHM} in \(x\) and \(y\) axes differed significantly in all the estimations except for the center-center 
+            patch estimate.
+        This means that the spherical and coma are present and that the aplanatic assumption is wrong by a greater
+            margin then is expected.
+        The size of the error of the aplanatic assumption is a clear indication, that tiled reconstruction could
+            markedly improve the reconstructions.
+        There is also the possibility of an even better approach than the tiles produced by the estimate from the
+            averaging of beads throughout some predefined patches of the image plane.
+        It is in the assessment and integration of the estimate from \refsec{estimating_the_psf_from_the_model}, which
+            could produce the estimate for any given sufficiently large window within the image.
+    \item%
+        It is visible that the center components are have a greater intensity than the edge components by
+        a significant amount which is not realistically the true ratio of intensities. 
+        This could be more closely analysed by the Fourier transform of the \ac{LR} image sum, as there is some overlap
+            between the components.
+        This indicates the wrong estimation of modulations of the illumination patterns.
+        Therefore the modulation estimate should be modified and the resulting reconstruction of those modification
+            should be monitored to asses its influence.
+        If we had a measure for the artefacts, it would even be possible to optimize modulations based on the 
+            reconstruction artefacts, it produces.
+\end{enumerate}
 
 % TODO: This section should probably be removed and the introduction should only state the possibility and cite Fourier
 % Optics instead of implementing this. <31-12-23> 

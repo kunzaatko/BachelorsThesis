@@ -1,5 +1,6 @@
 include("init.jl")
-using SIMIlluminationPatterns: IlluminatedImage, separate_components, ShiftedComponent, separation_matrix
+using SIMIlluminationPatterns: IlluminatedImage, ShiftedComponent, separation_matrix # separate_components
+using SIMParameterEstimation: separate_components
 using TransferFunctions: padtosize, shift, FourierShiftTheorem, ModelTransferFunction, TransferFunction
 using Tullio, IterTools, NPZ, FFTW
 using ImageFiltering: Fill

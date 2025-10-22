@@ -4,43 +4,256 @@
 % a used acronym <06-01-24> 
 % TODO: Make e.g. and i.e. as acronyms, this is shown in the acro package documentation <06-01-24> 
 % TODO: Remove the "(Visited on ...)" in references <07-01-24> 
+% TODO: Unite the plotting gaps <07-01-24> 
+% TODO: Check with writefull and grammarly <07-01-24> 
+% TODO: Reducing the possible skip between paragraphs and subtitles as a length in LaTeX? <07-01-24> 
 %----------------------------------------------------------------------------------------
 %	BOOK INFORMATION
 %----------------------------------------------------------------------------------------
 
-\title[Super-Resolution Imaging]{Analysis of Cell Images \\ Acquired by Super-Resolution
-Microscopy}
+% % Rekonstrukce snímků buněk pořízených pomocí mikroskopie se strukturovaným osvětlením
+% \title[Super-Resolution Imaging]{Analysis of Cell Images \\ Acquired by Super-Resolution
+% Microscopy}
+\title[Super-Resolution Imaging]{Reconstruction of Cell Images Acquired by Super-resolution Microscopy}
 \author[MK]{Martin Kunz}
-% \subtitle{Customise this page according to your needs} % TODO: Decide after the thesis is written <07-11-23> 
-\date{\today}
+% % \subtitle{Customise this page according to your needs} % TODO: Decide after the thesis is written <07-11-23> 
+% \date{\displaydate{date}}
+
+
+\pagelayout{wide} % No margins
+\pagestyle{empty}
+{\centering
+
+\noindent %
+\begin{minipage}[c]{3cm}%
+\noindent \begin{center}
+\includegraphics[width=3cm,height=3cm,keepaspectratio]{images/TITLE/cvut}
+\par\end{center}%
+\end{minipage}%
+\begin{minipage}[c]{0.6\linewidth}%
+\begin{center}
+\textsc{\large{}Czech Technical University in Prague}{\large{}}\\
+{\large{}Faculty of Nuclear Sciences and Physical Engineering}
+\par\end{center}%
+\end{minipage}%
+\begin{minipage}[c]{3cm}%
+\noindent \begin{center}
+\includegraphics[width=3cm,height=3cm,keepaspectratio]{images/TITLE/fjfi}
+\par\end{center}%
+\end{minipage}
+
+\vspace{3cm}
+
+\textbf{\huge{}Reconstruction of Cell Images Acquired by Super-resolution Microscopy
+}{\huge\par}
+
+\vspace{1cm}
+
+\selectlanguage{czech}%
+\textbf{\huge{}Rekonstrukce snímků buněk pořízených pomocí mikroskopie se strukturovaným osvětlením}{\huge\par}
+
+\selectlanguage{english}%
+\vspace{2cm}
+
+{\large{}Bachelor's Degree Project}{\large\par}
+
+}
+
+\vfill{}
+
+\begin{lyxlist}{MMMMMMMMM}
+\begin{singlespace}
+\item [{Author:}] \textbf{Martin Kunz}
+\item [{Supervisor:}] \textbf{doc. Ing. Filip Šroubek, Ph.D. DSc.}
+\item [{Consultant:}] \textbf{Dr. Zuzana Kadlecová}
+\end{singlespace}
+% \item [{Language~advisor:}] \textbf{Mgr. Jméno Učitelky Angličtiny}
+\begin{singlespace}
+\item [{Academic~year:}] 2023/2024
+\end{singlespace}
+\end{lyxlist}
+\newpage{}
+
+~
+
+\includepdf[pages=-]{BT_task.pdf} 
+
+\noindent \emph{\Large{}Acknowledgment:}{\Large\par}
+
+\noindent I would like to thank 
+doc. Ing. Filip Šroubek, Ph.D. DSc. 
+for his expert guidance and uninterrupted patience during the implementation of methods from image processing and
+writing of the thesis.
+It has been an honour to be able to discuss ideas and possibilities with him and I am very grateful for his advice and
+    direction throughout the duration of the whole project.
+I am aware that at some times it must have been very hard to supervise me and point me to the correct path, but with his
+    help and acquired wisdom, he has managed to make my time during the project a lot more manageable and enjoyable.
+
+I would also like to thank my supervisor, Dr. Zuzana Kadlecová, for her explanations of biological aspects of
+    endocytosis and her enthusiastic attitude, which on occasion prevented me from losing motivation.
+
+An appreciation is also appropriate for Mgr. Adam Harmanec who has been always there with offers of help and advice in
+    the implementation of the algorithms.
+The time spent by him whilst debugging and verification of results has been of immense value to me and I am very
+    grateful.
+
+My genuine "thank you" goes out to all three of you!
+I have learned a lot in this time and you all have contributed in this manner. 
+It has been a pleasure and an honour to work with you.
+
+\vfill
+
+\noindent \emph{\Large{}Author's declaration:}{\Large\par}
+
+\noindent I declare that this Bachelor's Degree Project is entirely
+my own work and I have listed all the used sources in the bibliography.
+
+\bigskip{}
+
+\noindent Prague, \documentdate\hfill{}Martin Kunz
+
+\vspace{2cm}
+
+\newpage{}
+
+% ~\newpage{}
+
+\selectlanguage{czech}%
+\begin{onehalfspace}
+\noindent \emph{Název práce:}
+
+\noindent \textbf{Rekonstrukce snímků buněk pořízených pomocí mikroskopie se strukturovaným osvětlením}
+\end{onehalfspace}
+
+\bigskip{}
+
+\noindent \emph{Autor:} Martin Kunz
+
+\bigskip{}
+
+\noindent \emph{Obor:} Matematické inženýrství\bigskip{}
+
+\noindent \emph{Zaměření:} Aplikované matematicko-stochastické metody
+
+\bigskip{}
+
+\noindent \emph{Druh práce:} Bakalářská práce
+
+\bigskip{}
+
+\noindent \emph{Vedoucí práce:} doc. Ing. Filip Šroubek, Ph.D. DSc.,
+Oddělení zpracování obrazu, Ústav teorie informace a automatizace AV ČR, Pod Vodárenskou věží 4, 182 08 Praha 8
+
+\bigskip{}
+
+\noindent \emph{Konzultant:} Dr. Zuzana Kadlecová,
+Cambridge Institute for Medical Research, University of Cambridge, United Kingdom, / Oddělení zpracování obrazu, Ústav 
+teorie informace a automatizace AV ČR, Pod Vodárenskou věží 4, 182 08 Praha 8
+
+\bigskip{}
+
+\noindent \emph{Abstrakt:} 
+Super-rozlišení (SR) je výkonná metoda pro pozorování, která nabízí významné zlepšení rozlišení jak v laterálním, tak 
+    axiálním směru dosahující daleko za difrakční limit standardního světelného mikroskopu.
+To vedlo k mnoha významným objevům v biologii během posledních 50-ti let od vzniku prvních metod SR.
+Mezi metody SR má mikroskopie se strukturovaným osvětlením (SIM) důležitou výhodu ve své flexibilitě implementace a 
+    fotonové efektivitě, díky které hraje vedoucí roli v akvizici živých buněk s vysokou frekvencí snímků.
+
+Nejprve jsou prezentovány základní fyzikální principy nutné pro určení přenosu světla optickým \linebreak mikroskopem, 
+    v podobě odvození vlnové rovnice pro elektro-magnetické (EM) pole spolu s jejími dvěma řešeními nejvýznamnějšími pro 
+    aplikaci v optice mikroskopu. 
+Dále je představen přehled dostupných metod SR se zaměřením na srovnání jejich užití v biologických pozorováních.
+Intuitivní pojetí fungování mikroskopie se strukturovaným osvětlením je ilustrováno a následně matematicky představena 
+    podstata při harmonickém osvětlení.
+Pomocí přehledu příkladů využití SIMu v kombinaci s dalšími modalitami mikroskopie a v různých implementacích 
+    demonstruji flexibilitu této metody SR.
+
+Poté je provedena analýza pozorování mikrokuliček z akvizice pomocí harmonického osvětlení s cílem vylepšit kvalitu 
+    rekonstrukce. 
+Jsou odvozeny, implementovány a demonstrovány dvě různé metody rekonstrukce v několika variantách. 
+Schopnost omezit počet akvizicí potřebných pro rekonstrukci je diskutována a ukázána spolu s komentářem k dalším 
+    aspektům, výhodám a nevýhodám rekonstrukčních technik, které byly i nebyly použity.
+
+Další zlepšení rekonstrukčních metod snižováním přítomnosti artefaktů a zlepšováním vizuální kvality a rozlišení je 
+    dosaženo rekonstrukcí s odhadovanou přenosovou funkcí optického systému.
+Odhad je proveden pomocí různých postupů využívajících model struktury vzorku, který určen vlastním novým algoritmem
+    inspirovaným zavedenými metodami digitálního zpracování obrazu.
+Zvýšená věrnost rekonstrukce akvizice nad aktuálně používanou metodou pro rekonstrukci endocytózy na povrchu buněčné 
+    membrány je dosažena odhadem přenosové funkce řízené přímo daty z akvizice samotné.
+
+\bigskip{}
+
+\noindent \emph{Klíčová slova:} mikroskopie se strukturovaným osvětlením, super-rozlišení, přenosová funkce 
+
+\selectlanguage{english}%
+\vfill{}
+~
+
+\pagebreak
+\begin{onehalfspace}
+\noindent \emph{Title:}
+
+\noindent \textbf{%
+Reconstruction of Cell Images Acquired by Super-resolution Microscopy
+}
+\end{onehalfspace}
+
+\bigskip{}
+
+\noindent \emph{Author:} Martin Kunz
+
+\bigskip{}
+
+\noindent \emph{Abstract:} 
+\Acf{SR} is a powerful imaging approach which offers significant gains in both lateral and axial
+    resolution far beyond the diffraction limit of standard wide-field microscopy.
+This has lead to numerous breakthroughs in biology during the past 50 years of its existence.
+Among \ac{SR} methods, \acf{SIM} has an major advantage with its flexibility of implementation and photon-efficiency due 
+    to which it plays a lead role in high-frequency \emph{in vivo} cell acquisitions.
+
+First the elementary physics necessary for determining the transfer of light through an microscope is given by the 
+    derivation of the \acf{EM} field wave equation along with two of its most significant solutions for the application 
+    of microscopy optics.
+Next an condensed but informative overview of available \ac{SR} methods is presented with the focus on comparing their
+    utility in biological sensing applications.
+Intuitive conception behind the functioning of \ac{SIM} is illustrated before the mathematical presentation of the 
+    fundamentals of harmonic \ac{SIM}.
+An enumeration of examples where \ac{SIM} is used in combination with other microscopy modalities and in various
+    implementations demonstrates the flexibility the technique.
+
+Then an analysis of micro-beads images from a harmonic \ac{SIM} acquisition is performed with the goal of enhancing the
+    reconstruction.
+Two different methods of reconstruction are derived, implemented and demonstrated in multiple variations.
+The ability of limiting the number of acquisitions necessary for the reconstruction is discussed and shown
+    alongside a commentary of further aspects, benefits and drawbacks of the reconstruction techniques.
+
+Further enhancements to the reconstruction techniques in the reduction of artefacts and improvement of visual quality
+    and resolution is achieved by performing them with an estimated transfer function of the optical system.
+The estimation is performed using various procedures utilizing the model of the source structure in the object space of
+    the determined by a custom novel algorithm inspired by multiple digital image processing algorithms.
+The fidelity over the \ac{SIM} imaging technique currently used for the reconstruction of endocytosis at the cell
+    membrane surface is attained by the data-driven transfer function estimate.
+
+\bigskip{}
+
+\noindent \emph{Key words:} structured illumination microscopy, super-resolution imaging, transfer function
+% \cleardoublepage
+
 
 %----------------------------------------------------------------------------------------
 
-\frontmatter % Denotes the start of the pre-document content, uses roman numerals
 
 %----------------------------------------------------------------------------------------
 %	DEDICATION
 %----------------------------------------------------------------------------------------
 
-% \dedication{
-% 	The harmony of the world is made manifest in Form and Number, and the heart and soul and all the poetry of Natural Philosophy are embodied in the concept of mathematical beauty.\\
-% 	\flushright -- D'Arcy Wentworth Thompson
-% } % TODO: ? <05-05-23> 
-
 %----------------------------------------------------------------------------------------
 %	OUTPUT TITLE PAGE AND PREVIOUS
 %----------------------------------------------------------------------------------------
 
-% Note that \maketitle outputs the pages before here
-\maketitle
-
 %----------------------------------------------------------------------------------------
 %	PREFACE
 %----------------------------------------------------------------------------------------
-
-% \chapter*{Preface} % TODO: Decide when the thesis is written <05-05-23> 
-
-% TODO: Make abstract after the thesis is written <05-05-23> 
 
 %----------------------------------------------------------------------------------------
 %	TABLE OF CONTENTS & LIST OF FIGURES/TABLES
@@ -48,24 +261,18 @@ Microscopy}
 
 \begingroup % Local scope for the following commands
 
+\frontmatter % Denotes the start of the pre-document content, uses roman numerals
+
 % Define the style for the TOC, LOF, and LOT
 %\setstretch{1} % Uncomment to modify line spacing in the ToC
-%\hypersetup{linkcolor=blue} % Uncomment to set the colour of links in the ToC
-\setlength{\textheight}{230\vscale} % Manually adjust the height of the ToC pages
+% \hypersetup{linkcolor=blue} % Uncomment to set the colour of links in the ToC
+% \setlength{\textheight}{230\vscale} % Manually adjust the height of the ToC pages
 
 % Turn on compatibility mode for the etoc package
-\etocstandarddisplaystyle % "toc display" as if etoc was not loaded
-\etocstandardlines % "toc lines as if etoc was not loaded
+% \etocstandarddisplaystyle % "toc display" as if etoc was not loaded
+% \etocstandardlines % "toc lines as if etoc was not loaded
+{\let\cleardoublepage\clearpage\tableofcontents} % Output the table of contents
 
-\tableofcontents % Output the table of contents
-
-% \listoffigures % Output the list of figures % TODO: Decide when the thesis is written <07-11-23> 
-
-% Comment both of the following lines to have the LOF and the LOT on different pages
-% \let\cleardoublepage\bigskip
-% \let\clearpage\bigskip
-
-% \listoftables % Output the list of tables % TODO: Decide when the thesis is written <07-11-23> 
 
 \endgroup
 
@@ -79,26 +286,34 @@ Microscopy}
 \include{chapters/01_introduction.tex}
 
 \pagelayout{wide} % No margins
+\cleardoublepage
 \addpart{Theory} % TODO: Decide if parts are applicable <07-11-23> 
 \pagelayout{margin} % Restore margins
 
 \include{chapters/02_EM_waves.tex}
+
+% \include{chapters/03_transfer_functions.tex}
+
 \include{chapters/04_structured_illumination_microscopy.tex}
 
 \pagelayout{wide} % No margins
 % FIX: Different name <20-05-23> 
+\cleardoublepage
 \addpart{Experiment}
 \pagelayout{margin} % Restore margins
 
 \include{chapters/05_harmonic_SIM_reconstruction.tex}
 \include{chapters/06_PSF_estimation.tex}
+\include{chapters/07_conclusion.tex}
 
-\appendix % From here onwards, chapters are numbered with letters, as is the appendix convention
-
-\pagelayout{wide} % No margins
-\addpart{Appendix}
-\pagelayout{margin} % Restore margins
-
+% \appendix % From here onwards, chapters are numbered with letters, as is the appendix convention
+%
+% \pagelayout{wide} % No margins
+% \addpart{Appendix}
+% \pagelayout{margin} % Restore margins
+%
+% \include{chapters/A_fourier_transform.tex}
+% \include{chapters/B_weiner_filtering.tex}
 
 %----------------------------------------------------------------------------------------
 
@@ -114,6 +329,7 @@ Microscopy}
 % TODO: Change how the Certificate of Analysis is displayed... (The URL is too long) <28-11-23> 
 % \defbibnote{bibnote}{Here are the references in citation order.\par\bigskip} % Prepend this text to the bibliography
 \printbibliography[heading=bibintoc, title=Bibliography] % Add the bibliography heading to the ToC, set the title of the bibliography and output the bibliography note
+{\let\clearpage\relax \bigskip \printacronyms[name = {List of Acronyms and Abbreviations}] } % 
 
 %----------------------------------------------------------------------------------------
 %	INDEX
@@ -121,4 +337,4 @@ Microscopy}
 
 % The index needs to be compiled on the command line with 'makeindex main' from the template directory
 
-\printindex % Output the index
+% \printindex % Output the index
