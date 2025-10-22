@@ -318,3 +318,10 @@ kaobook/
 /outline.norg
 /fixdif
 /packages
+src/figures/6YLQ.pdb
+src/figures/src/data/
+věci.zip
+src/figures/*.png
+src/figures/*.svg
+src/figures/*.pdf
+src/figures/*.pdf_tex
