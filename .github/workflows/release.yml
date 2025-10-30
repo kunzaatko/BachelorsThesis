@@ -31,3 +31,4 @@ jobs:
           prerelease: false
           files: |
             build/BT_MartinKunz/BT_MartinKunz.pdf
+            build/BT_MartinKunz_slides/BT_MartinKunz_slides.pdf
