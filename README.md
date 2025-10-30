@@ -10,8 +10,10 @@ This is the latest version of the [document](https://github.com/kunzaatko/Bachel
 Here is the [supervisors opinion](./opinions/opinion-supervisor.pdf) and the [opponents
 opinion](./opinions/opinion-opponent.pdf).
 
-## Outline
+## Thesis
 
+<details>
+<summary>Outline</summary>
 - Contents
 - Introduction
 - Theory
@@ -40,6 +42,14 @@ opinion](./opinions/opinion-opponent.pdf).
     - Discussion
 - Conclusion
 - Bibliography
+</details>
+
+<object data="https://github.com/kunzaatko/BachelorsThesis/releases/latest/download/BT_MartinKunz.pdf" type="application/pdf" width="700px" height="700px">
+    <embed src="https://github.com/kunzaatko/BachelorsThesis/releases/latest/download/BT_MartinKunz.pdf">
+        <p>This browser does not support PDFs. Please download the PDF to view it: <a href="https://github.com/kunzaatko/BachelorsThesis/releases/latest/download/BT_MartinKunz.pdf">Download PDF</a>.</p>
+    </embed>
+</object>
+
 
 ## Compilation Instructions
 The document can be compiled using [`tectonic`](https://github.com/tectonic-typesetting/tectonic).
