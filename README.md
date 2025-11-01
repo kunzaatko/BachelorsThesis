@@ -74,3 +74,17 @@ You can build the document with the figures available by running
 ```bash
 $ just build # or `tectonic -X build`
 ```
+
+## Some key figures
+- Comparison of SIM and deconvolved raw acquired images
+
+![Comparison of SIM and deconvolved raw acquired images](https://github.com/kunzaatko/BachelorsThesis/releases/latest/download/fig_slides-motivation-SIM-comp_full.png)
+
+- Comparison of SIM reconstruction from 3 low resolution images reconstruction and standard 9 images reconstruction
+
+![3 low resolution images reconstruction vs. 9 images reconstruction](https://github.com/kunzaatko/BachelorsThesis/releases/latest/download/fig_slides-optimization-reconstruction-3LR-vs-9LR_full.png)
+
+- Comparison of the estimated measured PSF and the model PSF
+
+![Model PSF vs. Measured PSF](https://github.com/kunzaatko/BachelorsThesis/releases/latest/download/fig_slides-psf-estimation-CC-estimate_full.png)
+
