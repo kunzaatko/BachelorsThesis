@@ -44,8 +44,8 @@ opinion](./opinions/opinion-opponent.pdf).
 ## Compilation Instructions
 The document can be compiled using [`tectonic`](https://github.com/tectonic-typesetting/tectonic).
 A [`just`](https://github.com/casey/just) build script is included in the repository that builds the figures and compiles the document in one command by
-```bash
-$ just build-all
+```sh
+just build-all
 ```
 
 ### Figures
@@ -56,23 +56,23 @@ The figures that are necessary are included in the repository built from the dat
 
 Figures are built using `Julia` (which must be installed and the figure project instantiated).
 This is automated with the build script written in `just` by running
-```bash
-$ just build-all-figs
+```sh
+just build-all-figs
 ```
 
 To build a concrete figure, you can run
-```bash
-$ just build-fig <name>
+```sh
+just build-fig <name>
 ```
 and to list the available figures run
-```bash
-$ just list-figs
+```sh
+just list-figs
 ```
 
 ### Document 
 You can build the document with the figures available by running
-```bash
-$ just build # or `tectonic -X build`
+```sh
+just build # or `tectonic -X build`
 ```
 
 ## Some key figures
