@@ -76,15 +76,18 @@ $ just build # or `tectonic -X build`
 ```
 
 ## Some key figures
-- Comparison of SIM and deconvolved raw acquired images
+<p align="center">
+Comparison of SIM and deconvolved raw acquired images<br>
+<img src="https://github.com/kunzaatko/BachelorsThesis/releases/latest/download/fig_slides-motivation-SIM-comp_full.png" alt="Comparison of SIM and deconvolved raw acquired images">
+</p>
 
-![Comparison of SIM and deconvolved raw acquired images](https://github.com/kunzaatko/BachelorsThesis/releases/latest/download/fig_slides-motivation-SIM-comp_full.png)
+<p align="center">
+Comparison of SIM reconstruction from 3 low resolution images reconstruction and standard 9 images reconstruction<br>
+<img src="https://github.com/kunzaatko/BachelorsThesis/releases/latest/download/fig_slides-optimization-reconstruction-3LR-vs-9LR_full.png" alt="3 low resolution images reconstruction vs. 9 images reconstruction">
+</p>
 
-- Comparison of SIM reconstruction from 3 low resolution images reconstruction and standard 9 images reconstruction
-
-![3 low resolution images reconstruction vs. 9 images reconstruction](https://github.com/kunzaatko/BachelorsThesis/releases/latest/download/fig_slides-optimization-reconstruction-3LR-vs-9LR_full.png)
-
-- Comparison of the estimated measured PSF and the model PSF
-
-![Model PSF vs. Measured PSF](https://github.com/kunzaatko/BachelorsThesis/releases/latest/download/fig_slides-psf-estimation-CC-estimate_full.png)
+<p align="center">
+Comparison of the estimated measured PSF and the model PSF<br>
+<img src="https://github.com/kunzaatko/BachelorsThesis/releases/latest/download/fig_slides-psf-estimation-CC-estimate_full.png" alt="Model PSF vs. Measured PSF">
+</p>
 
